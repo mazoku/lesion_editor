@@ -48,7 +48,12 @@ def load_data(slice_idx=-1):
     return data, o_data, mask
 
 
-def estimate_healthy_pdf(data, mask, tv_weight, perc, k_std_l, simple_estim=False, show_me=False):
+def estimate_healthy_pdf(data, mask, tparams):
+    perc = params['perc']
+    k_std_l = params['k_std_h']
+    simple_estim = params['healthy_simple_estim']
+    show_me = params['show_healthy_pdf_estim']
+
     # data = tools.smoothing_tv(data.astype(np.uint8), tv_weight)
     ints = data[np.nonzero(mask)]
     hist, bins = skiexp.histogram(ints, nbins=256)
@@ -101,7 +106,17 @@ def estimate_healthy_pdf(data, mask, tv_weight, perc, k_std_l, simple_estim=Fals
     return mu, sigma, rv
 
 
-def estimate_outlier_pdf(data, mask, rv_healthy, prob_w, outlier_type, hack_it, show_me=False):
+def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
+    prob_w = params['prob_w']
+    show_me = params['show_outlier_pdf_estim']
+
+    if outlier_type == 'hypo':
+        hack_mu = params['hack_hypo_mu']
+        hack_sigma = params['hack_hypo_sigma']
+    elif outlier_type == 'hyper':
+        hack_mu = params['hack_hyper_mu']
+        hack_sigma = params['hack_hyper_sigma']
+
     probs = rv_healthy.pdf(data) * mask
     max_prob = rv_healthy.pdf(rv_healthy.mean())
     # print 'max_prob = %.3f' % max_prob
@@ -123,13 +138,10 @@ def estimate_outlier_pdf(data, mask, rv_healthy, prob_w, outlier_type, hack_it, 
     mu, sigma = scista.norm.fit(ints)
 
     # hack for moving pdfs of hypo and especially of hyper furhter from the pdf of healthy parenchyma
-    if outlier_type == 'hyper':
-        mu += hack_it
-        sigma += hack_it
-    elif outlier_type == 'hyper':
-        mu -= hack_it
-        sigma -= hack_it
+    mu += hack_mu
+    sigma += hack_sigma
     #-----------
+
     rv = scista.norm(mu, sigma)
 
     if show_me:
@@ -154,10 +166,12 @@ def estimate_outlier_pdf(data, mask, rv_healthy, prob_w, outlier_type, hack_it, 
     return mu, sigma, rv
 
 
-def get_unaries(data, mask, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_simple_estim, hack_hypo, hack_hyper, show_me):
+def get_unaries(data, mask, params):
+    show_me = params['show_estimated_pdfs']
+
     # liver pdf ------------
     print 'estimating pdf of healthy parenchym...'
-    mu_h, sigma_h, rv_healthy = estimate_healthy_pdf(data, mask, tv_weight, perc, k_std_h, healthy_simple_estim, False)
+    mu_h, sigma_h, rv_healthy = estimate_healthy_pdf(data, mask, params)
     print 'liver pdf: mu = ', mu_h, ', sigma = ', sigma_h
 
     # mask_e = skimor.binary_erosion(mask, np.ones((5, 5)))
@@ -170,13 +184,13 @@ def get_unaries(data, mask, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_s
     # hypodense pdf ------------
     print 'estimating pdf of hypodense objects...'
     # mu_hypo, sigma_hypo, rv_hypo = estimate_hypo_pdf(data, mask, rv_healthy, show_me)
-    mu_hypo, sigma_hypo, rv_hypo = estimate_outlier_pdf(data, mask, rv_healthy, prob_w, 'hypo', hack_hypo, False)
+    mu_hypo, sigma_hypo, rv_hypo = estimate_outlier_pdf(data, mask, rv_healthy, 'hypo', params)
     print 'hypodense pdf: mu = ', mu_hypo, ', sigma= ', sigma_hypo
 
     # hyperdense pdf ------------
     print 'estimating pdf of hyperdense objects...'
     # mu_hyper, sigma_hyper, rv_hyper = estimate_hyper_pdf(data, mask, rv_healthy, show_me)
-    mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, prob_w, 'hyper', hack_hyper, False)
+    mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, 'hyper', params)
     print 'hyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
 
     if show_me:
@@ -198,7 +212,7 @@ def get_unaries(data, mask, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_s
         plt.axis([0, 256, ax[2], ax[3]])
         plt.title('histogram of input data')
         plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
-        plt.show()
+        # plt.show()
 
     # unaries_l = rv_l.pdf(data)
     # unaries_t = rv_t.pdf(data)
@@ -252,7 +266,11 @@ def get_unaries(data, mask, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_s
     return unaries
 
 
-def run(slice_idx, sigma, alpha, beta, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_simple_estim, hack_hypo, hack_hyper, show_me):
+def run(params, show_me,):
+    slice_idx = params['slice_idx']
+    alpha = params['alpha']
+    beta = params['beta']
+
     _, data_o, mask = load_data(slice_idx)
     # data_o = cv2.imread('/home/tomas/Dropbox/images/medicine/hypodense_bad2.png', 0).astype(np.float)
 
@@ -268,7 +286,7 @@ def run(slice_idx, sigma, alpha, beta, tv_weight, perc, prob_w, k_std_h, k_std_t
     # unaries = data_d
     # # as we convert to int, we need to multipy to get sensible values
     # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
-    unaries = beta * get_unaries(data_o, mask, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_simple_estim, hack_hypo, hack_hyper, show_me)
+    unaries = beta * get_unaries(data_o, mask, params)
     n_labels = unaries.shape[2]
 
     print 'calculating pairwise potentials...'
@@ -311,6 +329,7 @@ def run(slice_idx, sigma, alpha, beta, tv_weight, perc, prob_w, k_std_h, k_std_t
     # plt.subplot(133), plt.imshow(data_s, 'gray', vmin=0, vmax=255)
     # plt.show()
 
+    plt.figure()
     plt.subplot(2, n_labels, 1), plt.title('original')
     plt.imshow(data_o, 'gray', interpolation='nearest')
     plt.subplot(2, n_labels, 2), plt.title('graph cut')
@@ -335,19 +354,27 @@ if __name__ == '__main__':
     # 41 ... small tumor
     # 138 ... hyperdense
     # -1 ... all data
-    slice_idx = 33
-    sigma = 10  # sigma for gaussian blurr
-    alpha = 2  # weightening parameter for pairwise term
-    beta = 1  # weightening parameter for unary term
-    perc = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
-    k_std_h = 3  # weighting parameter for sigma of normal distribution of healthy parenchym
-    k_std_t = 3  # weighting parameter for sigma of normal distribution of tumor
-    tv_weight = 0.05  # weighting parameter for total variation filter
-    healthy_simple_estim = False  # simple healthy parenchym pdf estimation from all data
-    prob_w = 0.5  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
-    hack_hypo = 0  # hard move of mean and sigma of hypodense pdf (mean to the left)
-    hack_hyper = 5  # hard move of mean and sigma of hyperdense pdf (mean to the right)
+    params = dict()
+    params['slice_idx'] = 33
+    params['sigma'] = 10  # sigma for gaussian blurr
+    params['alpha'] = 2  # weightening parameter for pairwise term
+    params['beta'] = 1  # weightening parameter for unary term
+    params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
+    params['k_std_h'] = 3  # weighting parameter for sigma of normal distribution of healthy parenchym
+    params['k_std_t'] = 3  # weighting parameter for sigma of normal distribution of tumor
+    params['tv_weight'] = 0.05  # weighting parameter for total variation filter
+    params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
+    params['prob_w'] = 0.5  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+
+    params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
+    params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
+    params['hack_hyper_mu'] = 5  # hard move of mean of hyperdense pdf to the right
+    params['hack_hyper_sigma'] = 5  # hard widening of sigma of hyperdense  pdf
+
+    params['show_healthy_pdf_estim'] = False
+    params['show_estimated_pdfs'] = True
+    params['show_outlier_pdf_estim'] = False
 
     show_me = True  # debug visualization
 
-    run(slice_idx, sigma, alpha, beta, tv_weight, perc, prob_w, k_std_h, k_std_t, healthy_simple_estim, hack_hypo, hack_hyper, show_me)
+    run(params, show_me)

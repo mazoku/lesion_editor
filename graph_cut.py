@@ -13,11 +13,14 @@ import skimage.segmentation as skiseg
 import skimage.morphology as skimor
 import skimage.filter as skifil
 import skimage.exposure as skiexp
+import skimage.measure as skimea
 
 import cv2
 import pygco
 
 import tools
+import py3DSeedEditor
+from mayavi import mlab
 
 #-------------------------------------------------------------
 def load_data(slice_idx=-1):
@@ -222,7 +225,7 @@ def get_unaries(data, mask, params):
         mask_e = skimor.binary_erosion(mask, np.ones((5, 5)))
     # mask_e = mask
     # unaries_bcg = - (rv_healthy.logpdf(data) + rv_hyper.logpdf(data)) * mask_e
-    unaries_healthy = - rv_healthy.logpdf(data)  * mask_e
+    unaries_healthy = - rv_healthy.logpdf(data) * mask_e
     unaries_hyper = - rv_hyper.logpdf(data) * mask_e
     unaries_hypo = - rv_hypo.logpdf(data) * mask_e
 
@@ -262,8 +265,68 @@ def get_unaries(data, mask, params):
     # plt.show()
 
     # unaries = np.dstack((unaries_hyper, unaries_hypo)).astype(np.int32)
-    unaries = np.dstack((unaries_hypo, unaries_healthy, unaries_hyper)).astype(np.int32)
+    # np.dstack([tdata1.reshape(-1,1), tdata2.reshape(-1,1)]).copy("C")
+    unaries = np.dstack((unaries_hypo.reshape(-1,1), unaries_healthy.reshape(-1,1), unaries_hyper.reshape(-1,1)))
+    unaries = unaries.astype(np.int32)
     return unaries
+
+
+def mayavi_visualization(res):
+    ### Read the data in a numpy 3D array ##########################################
+    #parenchym = np.logical_or(liver, vessels)
+    parenchym = res > 0
+    hypodense = res == 0
+    hyperdense = res == 2
+    data = np.where(parenchym, 1, 0)
+    data = data.T
+
+    src = mlab.pipeline.scalar_field(data)
+    src.spacing = [1, 1, 1]
+
+    data2 = np.where(hypodense, 1, 0)
+    # data2 = hypodense
+    data2 = data2.T
+    src2 = mlab.pipeline.scalar_field(data2)
+    src2.spacing = [1, 1, 1]
+
+    data3 = np.where(hyperdense, 1, 0)
+    # data3 = hyperdense
+    data3 = data3.T
+    src3 = mlab.pipeline.scalar_field(data3)
+    src3.spacing = [1, 1, 1]
+
+    #contours 6 ... cevy
+    #contours 3 ... jatra
+    #contours 10 ... jatra a cevy
+    #mlab.pipeline.iso_surface(src, contours=3, opacity=0.1)
+    #mlab.pipeline.iso_surface(src, contours=2, opacity=0.2)
+    mlab.pipeline.iso_surface(src, contours=2, opacity=0.2, color=(0, 1, 0))
+    mlab.pipeline.iso_surface(src2, contours=2, opacity=0.2, color=(1, 0, 0))
+    mlab.pipeline.iso_surface(src3, contours=2, opacity=0.2, color=(0, 0, 1))
+
+    mlab.show()
+
+
+def get_compactness(labels):
+    nlabels = labels.max()
+    eccs = np.zeros(nlabels)
+
+    for lab in range(nlabels):
+        obj = labels == lab
+        # area = obj.sum()
+        if labels.ndim == 2:
+            strel = np.ones((3, 3), dtype=np.bool)
+            obj = skimor.binary_closing(obj, strel)
+        else:
+            strel = np.ones((3, 3, 3), dtype=np.bool)
+            obj = tools.closing3D(obj, strel)
+
+        if labels.ndim == 2:
+            ecc = skimea.regionprops(obj)[0]['eccentricity']
+        else:
+            ecc = tools.get_zunics_compatness(obj)
+            eccs[lab] = ecc
+    return eccs
 
 
 def run(params, show_me,):
@@ -313,6 +376,13 @@ def run(params, show_me,):
     rows_inds = np.in1d(edges, nodes_in).reshape(edges.shape).sum(axis=1) == 2
     edges = edges[rows_inds, :]
 
+    # plt.show()
+
+    # un = unaries[:, :, 0].reshape(data_o.shape)
+    # un = unaries[:, :, 1].reshape(data_o.shape)
+    # un = unaries[:, :, 2].reshape(data_o.shape)
+    # py3DSeedEditor.py3DSeedEditor(un).show()
+
     print 'calculating graph cut...'
     # we flatten the unaries
     # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
@@ -323,29 +393,37 @@ def run(params, show_me,):
     res = np.where(mask, res, -1)
     print '\t...done'
 
+    #TODO: relabel res and run get_compactness
+    
+    # np.save('res.npy', res)
+
     # plt.figure()
     # plt.subplot(131), plt.imshow(data_o, 'gray', vmin=0, vmax=255)
     # plt.subplot(132), plt.imshow(data_d, 'gray')
     # plt.subplot(133), plt.imshow(data_s, 'gray', vmin=0, vmax=255)
     # plt.show()
 
-    plt.figure()
-    plt.subplot(2, n_labels, 1), plt.title('original')
-    plt.imshow(data_o, 'gray', interpolation='nearest')
-    plt.subplot(2, n_labels, 2), plt.title('graph cut')
-    plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
-    if n_labels == 2:
-        k = 3
-    else:
-        k = 4
-    plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
-    plt.imshow(unaries[:, :, 0], 'gray', interpolation='nearest'), plt.colorbar()
-    plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
-    plt.imshow(unaries[:, :, 1], 'gray', interpolation='nearest'), plt.colorbar()
-    if n_labels == 3:
-        plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
-        plt.imshow(unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
-    plt.show()
+    if data_o.ndim == 2:
+        plt.figure()
+        plt.subplot(2, n_labels, 1), plt.title('original')
+        plt.imshow(data_o, 'gray', interpolation='nearest')
+        plt.subplot(2, n_labels, 2), plt.title('graph cut')
+        plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
+        if n_labels == 2:
+            k = 3
+        else:
+            k = 4
+        plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
+        plt.imshow(unaries[:, :, 0], 'gray', interpolation='nearest'), plt.colorbar()
+        plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
+        plt.imshow(unaries[:, :, 1], 'gray', interpolation='nearest'), plt.colorbar()
+        if n_labels == 3:
+            plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
+            plt.imshow(unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
+        plt.show()
+    elif data_o.ndim == 3:
+        py3DSeedEditor.py3DSeedEditor(res).show()
+    # mayavi_visualization(res)
 
 
 #-------------------------------------------------------------
@@ -355,9 +433,9 @@ if __name__ == '__main__':
     # 138 ... hyperdense
     # -1 ... all data
     params = dict()
-    params['slice_idx'] = 33
+    params['slice_idx'] = -1
     params['sigma'] = 10  # sigma for gaussian blurr
-    params['alpha'] = 2  # weightening parameter for pairwise term
+    params['alpha'] = 3  # weightening parameter for pairwise term
     params['beta'] = 1  # weightening parameter for unary term
     params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
     params['k_std_h'] = 3  # weighting parameter for sigma of normal distribution of healthy parenchym

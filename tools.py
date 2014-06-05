@@ -14,6 +14,7 @@ import skimage.filter as skifil
 import skimage.restoration as skires
 import skimage.segmentation as skiseg
 import scipy.stats as scista
+import scipy.ndimage.morphology as scindimor
 
 #----------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------
@@ -371,9 +372,12 @@ def opening3D(data, selem=skimor.disk(3)):
     return data
 
 
-def closing3D(data, selem=skimor.disk(3)):
-    for i in range(data.shape[0]):
-        data[i,:,:] = skimor.binary_closing(data[i,:,:], selem)
+def closing3D(data, selem=skimor.disk(3), slicewise=False):
+    if slicewise:
+        for i in range(data.shape[0]):
+            data[i, :, :] = skimor.binary_closing(data[i, :, :], selem)
+    else:
+        data = scindimor.binary_closing(data, selem)
     return data
 
 

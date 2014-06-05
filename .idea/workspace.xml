@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="48488e51-8ace-4261-88f7-e750ecda8e6f" name="Default" comment="Estimating pdfs - included hack to move hypo and especially hyper pdf furher from the mu_healthy.&#10; Able to do multilabel segmentation. Prepared to segment in 3D. &#10; TODO: put all parameters to ?one? dictionary.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tools.py" />
+    <list default="true" id="48488e51-8ace-4261-88f7-e750ecda8e6f" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph_cut.py" afterPath="$PROJECT_DIR$/graph_cut.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools.py" afterPath="$PROJECT_DIR$/tools.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/upo.py" afterPath="$PROJECT_DIR$/upo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -17,8 +18,9 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1401802463253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1401714930357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1401881667368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$test.coverage" NAME="test Coverage Results" MODIFIED="1401881661268" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1401956170075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -31,48 +33,26 @@
     <favorites_list name="mrf_segmentation" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.4823906">
       <split-first>
         <leaf>
-          <file leaf-file-name="graph_cut.py" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="graph_cut.py" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/graph_cut.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="336" column="21" selection-start="12576" selection-end="12576" vertical-scroll-proportion="0.99192244" vertical-offset="4231" max-vertical-offset="5175">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="upo.py" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/upo.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="70" column="10" selection-start="1373" selection-end="1829" vertical-scroll-proportion="0.0" vertical-offset="477" max-vertical-offset="1350">
+                <state line="396" column="4" selection-start="13622" selection-end="13622" vertical-scroll-proportion="0.69809324" vertical-offset="5281" max-vertical-offset="6945">
                   <folding>
-                    <element signature="e#22#50#0" expanded="true" />
+                    <element signature="e#104#122#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="graph_cut.py" pinned="false" current="true" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/graph_cut.py">
+          <file leaf-file-name="test.py" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="124" column="0" selection-start="3623" selection-end="3623" vertical-scroll-proportion="0.273021" vertical-offset="1496" max-vertical-offset="5175">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="upo.py" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/upo.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="53" column="0" selection-start="1360" selection-end="1360" vertical-scroll-proportion="0.0" vertical-offset="326" max-vertical-offset="1350">
+                <state line="7" column="28" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="195">
                   <folding>
-                    <element signature="e#22#50#0" expanded="true" />
+                    <element signature="e#22#40#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -81,7 +61,7 @@
           <file leaf-file-name="pycut.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/../lisa/extern/pyseg_base/src/pycut.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="386" column="73" selection-start="13000" selection-end="13054" vertical-scroll-proportion="0.0" vertical-offset="5344" max-vertical-offset="7425">
+                <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7455">
                   <folding />
                 </state>
               </provider>
@@ -90,16 +70,56 @@
           <file leaf-file-name="tools.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/tools.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="384" column="0" selection-start="13533" selection-end="13533" vertical-scroll-proportion="0.0" vertical-offset="5194" max-vertical-offset="8370">
+                <state line="377" column="61" selection-start="13437" selection-end="13437" vertical-scroll-proportion="0.0" vertical-offset="5281" max-vertical-offset="8430">
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="organ_segmentation_gui.py" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/../lisa/src/organ_segmentation_gui.py">
+          <file leaf-file-name="upo.py" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/upo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="13" column="21" selection-start="250" selection-end="250" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="17790">
+                <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="graph_cut.py" pinned="false" current="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/graph_cut.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="312" column="0" selection-start="10475" selection-end="10475" vertical-scroll-proportion="0.3260188" vertical-offset="4128" max-vertical-offset="6705">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="pycut.py" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/../lisa/extern/pyseg_base/src/pycut.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7455">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="upo.py" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/upo.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="tools.py" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/tools.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="16" column="44" selection-start="478" selection-end="478" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8430">
                   <folding />
                 </state>
               </provider>
@@ -120,16 +140,17 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/tools.py" />
         <option value="$PROJECT_DIR$/upo.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/tools.py" />
         <option value="$PROJECT_DIR$/graph_cut.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="1104" />
+    <option name="y" value="1076" />
     <option name="width" value="1920" />
-    <option name="height" value="1056" />
+    <option name="height" value="1084" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -145,7 +166,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -156,42 +177,24 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mrf_segmentation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mrf_segmentation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mrf_segmentation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="recentsLimit" value="5" />
     <property name="FullScreen" value="false" />
+    <property name="options.lastSelected" value="editor.preferences.appearance" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings />
     </option>
   </component>
-  <component name="RunManager" selected="Python.graph_cut">
+  <component name="RunManager" selected="Python.upo">
     <configuration default="false" name="graph_cut" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -231,6 +234,25 @@
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="mrf_segmentation" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
@@ -384,14 +406,16 @@
       <option name="USE_PATTERN" value="false" />
       <method />
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Python.graph_cut" />
       <item index="1" class="java.lang.String" itemvalue="Python.upo" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test" />
     </list>
     <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Python.graph_cut" />
-        <item index="1" class="java.lang.String" itemvalue="Python.upo" />
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="Python.upo" />
+        <item index="1" class="java.lang.String" itemvalue="Python.graph_cut" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test" />
       </list>
     </recent_temporary>
   </component>
@@ -427,7 +451,15 @@
       <created>1401711208260</created>
       <updated>1401711208260</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Estimating pdfs - included hack to move hypo and especially hyper pdf furher from the mu_healthy.&#10; Able to do multilabel segmentation. Prepared to segment in 3D. &#10; TODO: put all parameters to ?one? dictionary.">
+      <created>1401802778161</created>
+      <updated>1401802778161</updated>
+    </task>
+    <task id="LOCAL-00004" summary="All parameters are now in one dictionary.">
+      <created>1401803983465</created>
+      <updated>1401803983465</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -451,25 +483,25 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="1104" width="1920" height="1056" extended-state="6" />
+    <frame x="0" y="1076" width="1920" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32928064" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17982924" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17982924" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14354323" sideWeight="0.5007587" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14354323" sideWeight="0.49924126" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39918947" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33232015" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34257427" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -490,106 +522,177 @@
     <MESSAGE value="Initialization and first lines of code." />
     <MESSAGE value="Testing of data pdf estimation - different probability distribution was tested (lognorm, beta, gamma, ...)." />
     <MESSAGE value="Estimating pdfs - included hack to move hypo and especially hyper pdf furher from the mu_healthy.&#10; Able to do multilabel segmentation. Prepared to segment in 3D. &#10; TODO: put all parameters to ?one? dictionary." />
-    <option name="LAST_COMMIT_MESSAGE" value="Estimating pdfs - included hack to move hypo and especially hyper pdf furher from the mu_healthy.&#10; Able to do multilabel segmentation. Prepared to segment in 3D. &#10; TODO: put all parameters to ?one? dictionary." />
+    <MESSAGE value="All parameters are now in one dictionary." />
+    <option name="LAST_COMMIT_MESSAGE" value="All parameters are now in one dictionary." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/graph_cut.py</url>
-          <line>304</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="29" />
+      <option name="time" value="34" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/upo.py">
+    <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="19" selection-start="406" selection-end="406" vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="420">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="180">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <element signature="e#22#40#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ShoPaBas/shopabas_suppxls_siblings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="645" column="20" selection-start="23381" selection-end="23381" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11460">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="260" column="0" selection-start="9987" selection-end="9987" vertical-scroll-proportion="0.0" vertical-offset="3455" max-vertical-offset="8385">
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graph_cut.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="28" selection-start="2511" selection-end="2511" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3510">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ShoPaBas/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="246" column="4" selection-start="9061" selection-end="9061" vertical-scroll-proportion="0.0" vertical-offset="3387" max-vertical-offset="8550">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Dropbox/Work/Python/Seeding/genetic_algs_superpixels.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="406" column="54" selection-start="16357" selection-end="16389" vertical-scroll-proportion="0.2912458" vertical-offset="5677" max-vertical-offset="11040">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="384" column="0" selection-start="13533" selection-end="13533" vertical-scroll-proportion="0.0" vertical-offset="5194" max-vertical-offset="8370">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../ShoPaBas/shopabas_suppxls_siblings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="645" column="20" selection-start="23381" selection-end="23381" vertical-scroll-proportion="0.0" vertical-offset="9034" max-vertical-offset="11250">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../lisa/src/organ_segmentation_gui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="21" selection-start="250" selection-end="250" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="17790">
-          <folding />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6570">
+          <folding>
+            <element signature="e#104#122#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../lisa/extern/pyseg_base/src/pycut.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="386" column="73" selection-start="13000" selection-end="13054" vertical-scroll-proportion="0.0" vertical-offset="5344" max-vertical-offset="7425">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7455">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/upo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="0" selection-start="1360" selection-end="1360" vertical-scroll-proportion="0.0" vertical-offset="326" max-vertical-offset="1350">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8475">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <element signature="e#22#40#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graph_cut.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="124" column="0" selection-start="3623" selection-end="3623" vertical-scroll-proportion="0.273021" vertical-offset="1496" max-vertical-offset="5175">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding>
+            <element signature="e#104#122#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lisa/extern/pyseg_base/src/pycut.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/upo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/upo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ShoPaBas/shopabas_suppxls_siblings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_cut.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding>
+            <element signature="e#104#122#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ShoPaBas/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Dropbox/Work/Python/Seeding/genetic_algs_superpixels.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../ShoPaBas/shopabas_suppxls_siblings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lisa/src/organ_segmentation_gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../lisa/extern/pyseg_base/src/pycut.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/upo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="28" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="195">
+          <folding>
+            <element signature="e#22#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="377" column="61" selection-start="13437" selection-end="13437" vertical-scroll-proportion="0.0" vertical-offset="5281" max-vertical-offset="8430">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_cut.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="396" column="4" selection-start="13622" selection-end="13622" vertical-scroll-proportion="0.69809324" vertical-offset="5281" max-vertical-offset="6945">
+          <folding>
+            <element signature="e#104#122#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

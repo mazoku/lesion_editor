@@ -15,6 +15,9 @@ import skimage.restoration as skires
 import skimage.segmentation as skiseg
 import scipy.stats as scista
 import scipy.ndimage.morphology as scindimor
+import scipy.ndimage.measurements as scindimea
+
+import py3DSeedEditor
 
 #----------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------
@@ -562,3 +565,19 @@ def remove_empty_suppxls(suppxls):
             new_supps[np.nonzero(sup)] = idx
             idx += 1
     return new_supps
+
+
+def label_3D(data, class_labels, background=-1):
+    # class_labels = np.unique(data[data > background])
+    labels = - np.ones(data.shape, dtype=np.int)
+    curr_l = 0
+    for c in class_labels:
+        x = data == c
+        labs, n_labels = scindimea.label(x)
+        print 'labels: ', np.unique(labs)
+        # py3DSeedEditor.py3DSeedEditor(labs).show()
+        for l in range(n_labels + 1):
+            labels = np.where(labs == l, curr_l, labels)
+            curr_l += 1
+    print 'min = %i, max = %i' % (labels.min(), labels.max())
+    return labels

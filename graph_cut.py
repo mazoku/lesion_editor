@@ -7,6 +7,7 @@ __author__ = 'tomas'
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.ndimage.morphology as scindimor
+import scipy.ndimage.measurements as scindimea
 import scipy.stats as scista
 
 import skimage.segmentation as skiseg
@@ -312,27 +313,60 @@ def get_compactness(labels):
     eccs = np.zeros(nlabels)
 
     for lab in range(nlabels):
-        obj = labels == lab
-        # area = obj.sum()
+        obj = labels == (lab + 1)
         if labels.ndim == 2:
             strel = np.ones((3, 3), dtype=np.bool)
-            obj = skimor.binary_closing(obj, strel)
+            obj_c = skimor.binary_closing(obj, strel)
+            if obj_c.sum() >= obj.sum():
+                obj = obj_c
         else:
             strel = np.ones((3, 3, 3), dtype=np.bool)
-            obj = tools.closing3D(obj, strel)
+            obj_c = tools.closing3D(obj, strel)
+            if obj_c.sum() >= obj.sum():
+                obj = obj_c
 
         if labels.ndim == 2:
             ecc = skimea.regionprops(obj)[0]['eccentricity']
         else:
             ecc = tools.get_zunics_compatness(obj)
-            eccs[lab] = ecc
+            # if np.isnan(ecc):
+            #     ecc = 0
+        eccs[lab] = ecc
+
     return eccs
+
+
+def filter_objects(feature_v, features, params):
+    min_area = params['min_area']
+    min_comp = params['min_compactness']
+
+    obj_ok = np.zeros(feature_v.shape, dtype=np.bool)
+    area_idx = -1
+    comp_idx = -1
+    try:
+        area_idx = features.index('area')
+    except ValueError:
+        pass
+    try:
+        comp_idx = features.index('compactness')
+    except ValueError:
+        pass
+
+    if area_idx != -1:
+        obj_ok[:, area_idx] = feature_v[:, area_idx] > min_area
+
+    if comp_idx != -1:
+        obj_ok[:, comp_idx] = feature_v[:, comp_idx] > min_comp
+
+    return obj_ok
 
 
 def run(params, show_me,):
     slice_idx = params['slice_idx']
     alpha = params['alpha']
     beta = params['beta']
+    hypo_lab = params['hypo_label']
+    hyper_lab = params['hyper_label']
 
     _, data_o, mask = load_data(slice_idx)
     # data_o = cv2.imread('/home/tomas/Dropbox/images/medicine/hypodense_bad2.png', 0).astype(np.float)
@@ -393,8 +427,49 @@ def run(params, show_me,):
     res = np.where(mask, res, -1)
     print '\t...done'
 
-    #TODO: relabel res and run get_compactness
-    
+    print 'calculating features of hypodense tumors...'
+    labels_hypo, n_labels = scindimea.label(res == hypo_lab)
+    areas_hypo = np.zeros(n_labels)
+    comps_hypo = get_compactness(labels_hypo)
+    for i in range(n_labels):
+        lab = labels_hypo == (i + 1)
+        areas_hypo[i] = lab.sum()
+        print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
+        # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+    print '\t...done'
+
+    print 'calculating features of hyperdense tumors...'
+    labels_hyper, n_labels = scindimea.label(res == hyper_lab)
+    areas_hyper = np.zeros(n_labels)
+    comps_hyper = get_compactness(labels_hyper)
+    for i in range(n_labels):
+        lab = labels_hyper == (i + 1)
+        areas_hyper[i] = lab.sum()
+        print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
+        # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+    print '\t...done'
+
+    print 'filtering false objects...'
+    features = ('area', 'compactness')
+    features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
+    features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
+    hypo_ok = filter_objects(features_hypo_v, features, params).sum(axis=1) == len(features)
+    hyper_ok = filter_objects(features_hyper_v, features, params).sum(axis=1) == len(features)
+    print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
+    print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
+
+    # print 'calculating compactness...'
+    # # labels_uniq = np.unique(res[res > -1])
+    # # labels = skimor.label(res)
+    # labels = tools.label_3D(res, class_labels=(0, 2))
+    # py3DSeedEditor.py3DSeedEditor(labels).show()
+    # comps = get_compactness(labels)
+    # for i in range(labels.max() + 1):
+    #     lab = labels == i
+    #     print 'label = %i, comp = %.2f' % (i, comps[i])
+    #     py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+    # print '\t...done'
+
     # np.save('res.npy', res)
 
     # plt.figure()
@@ -422,8 +497,9 @@ def run(params, show_me,):
             plt.imshow(unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
         plt.show()
     elif data_o.ndim == 3:
-        py3DSeedEditor.py3DSeedEditor(res).show()
-    # mayavi_visualization(res)
+        # py3DSeedEditor.py3DSeedEditor(data_o).show()
+        # py3DSeedEditor.py3DSeedEditor(res).show()
+        mayavi_visualization(res)
 
 
 #-------------------------------------------------------------
@@ -452,6 +528,11 @@ if __name__ == '__main__':
     params['show_healthy_pdf_estim'] = False
     params['show_estimated_pdfs'] = True
     params['show_outlier_pdf_estim'] = False
+
+    params['hypo_label'] = 0  # label of hypodense objects
+    params['hyper_label'] = 2  # label of hyperdense objects
+    params['min_area'] = 20
+    params['min_compactness'] = 0.2
 
     show_me = True  # debug visualization
 

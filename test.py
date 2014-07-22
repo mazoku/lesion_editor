@@ -33,26 +33,47 @@ params['hyper_label'] = 2  # label of hyperdense objects
 params['min_area'] = 20
 params['min_compactness'] = 0.2
 
-
+data_o = np.load('input_orig_data.npy')
 res = np.load('res.npy')
 
 hypo_lab = params['hypo_label']
 hyper_lab = params['hyper_label']
 
-print 'calculating features of hypodense tumors...'
-labels_hypo, n_labels = scindimea.label(res == hypo_lab)
-areas_hypo = np.zeros(n_labels)
-comps_hypo = get_compactness(labels_hypo)
+# print 'calculating features of hypodense tumors...'
+# labels_hypo, n_labels = scindimea.label(res == hypo_lab)
+# labels_hypo -= 1
+# areas_hypo = np.zeros(n_labels)
+# comps_hypo = get_compactness(labels_hypo)
+# for i in range(n_labels):
+#     lab = labels_hypo == i
+#     areas_hypo[i] = lab.sum()
+#     print 'label = %i, area = %i, comp = %.3f' % (i, areas_hypo[i], comps_hypo[i])
+#     # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+# print '\t...done'
+
+print 'calculating features of hyperdense tumors...'
+labels_hyper, n_labels = scindimea.label(res == hyper_lab)
+labels_hyper -= 1
+areas_hyper = np.zeros(n_labels)
+comps_hyper = get_compactness(labels_hyper)
 for i in range(n_labels):
-    lab = labels_hypo == (i + 1)
-    areas_hypo[i] = lab.sum()
-    print 'label = %i, area = %i, comp = %.3f' % (i, areas_hypo[i], comps_hypo[i])
+    lab = labels_hyper == i
+    areas_hyper[i] = lab.sum()
+    print 'label = %i, area = %i, comp = %.3f' % (i, areas_hyper[i], comps_hyper[i])
     # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
 print '\t...done'
 
 print 'filtering false objects...'
 features = ('area', 'compactness')
-features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
-hypo_ok = filter_objects(features_hypo_v, features, params).sum(axis=1) == len(features)
+# features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
+features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
+# hypo_ok = filter_objects(features_hypo_v, features, params).sum(axis=1) == len(features)
+hyper_ok = filter_objects(features_hyper_v, features, params).sum(axis=1) == len(features)
 
-print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), len(hypo_ok))
+# print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), len(hypo_ok))
+print '\tfiltrated hyperdense: %i/%i survived' % (hyper_ok.sum(), len(hyper_ok))
+
+
+# hypo = np.in1d(labels_hypo, np.nonzero(hypo_ok)).reshape(labels_hypo.shape)
+hyper = np.in1d(labels_hyper, np.nonzero(hyper_ok)).reshape(labels_hyper.shape)
+py3DSeedEditor.py3DSeedEditor(data_o, contour=hyper).show()

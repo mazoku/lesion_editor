@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.ndimage.morphology as scindimor
 import scipy.ndimage.measurements as scindimea
+import scipy.ndimage.interpolation as scindiint
 import scipy.stats as scista
 
 import skimage.segmentation as skiseg
@@ -15,6 +16,7 @@ import skimage.morphology as skimor
 import skimage.filter as skifil
 import skimage.exposure as skiexp
 import skimage.measure as skimea
+import skimage.transform as skitra
 
 import cv2
 import pygco
@@ -22,6 +24,10 @@ import pygco
 import tools
 import py3DSeedEditor
 from mayavi import mlab
+
+
+from sklearn import metrics
+from sklearn.cluster import KMeans
 
 #-------------------------------------------------------------
 def load_data(slice_idx=-1):
@@ -52,7 +58,7 @@ def load_data(slice_idx=-1):
     return data, o_data, mask
 
 
-def estimate_healthy_pdf(data, mask, tparams):
+def estimate_healthy_pdf(data, mask, params):
     perc = params['perc']
     k_std_l = params['k_std_h']
     simple_estim = params['healthy_simple_estim']
@@ -218,56 +224,26 @@ def get_unaries(data, mask, params):
         plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
         # plt.show()
 
-    # unaries_l = rv_l.pdf(data)
-    # unaries_t = rv_t.pdf(data)
     if data.ndim == 3:
         mask_e = tools.eroding3D(mask, skimor.disk(5))
     else:
         mask_e = skimor.binary_erosion(mask, np.ones((5, 5)))
-    # mask_e = mask
-    # unaries_bcg = - (rv_healthy.logpdf(data) + rv_hyper.logpdf(data)) * mask_e
+
     unaries_healthy = - rv_healthy.logpdf(data) * mask_e
-    unaries_hyper = - rv_hyper.logpdf(data) * mask_e
-    unaries_hypo = - rv_hypo.logpdf(data) * mask_e
+    if params['unaries_as_cdf']:
+        unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_healthy.pdf(mu_h)) * mask_e
+        # removing zeros with second lowest value so the log(0) wouldn't throw a warning -
+        tmp = 1 - rv_hypo.cdf(data)
+        values = np.unique(tmp)
+        tmp = np.where(tmp == 0, values[1], tmp)
+        #-
+        unaries_hypo = - np.log(tmp * rv_healthy.pdf(mu_h)) * mask_e
+        unaries_hypo = np.where(np.isnan(unaries_hypo), 0, unaries_hypo)
+    else:
+        unaries_hyper = - rv_hyper.logpdf(data) * mask_e
+        unaries_hypo = - rv_hypo.logpdf(data) * mask_e
 
-    # # display unary potentials
-    # plt.figure()
-    # plt.subplot(221), plt.imshow(data, 'gray')
-    # plt.subplot(223), plt.imshow(unaries_l, 'gray'), plt.title('liver unaries'), plt.colorbar()
-    # plt.subplot(224), plt.imshow(unaries_t, 'gray'), plt.title('tumor unaries'), plt.colorbar()
-    # # plt.show()
-    #
-    # display estimated pdf of normal distribution
-    # ints = data[np.nonzero(mask)]
-    # hist, bins = skiexp.histogram(ints, nbins=256)
-    # plt.figure()
-    # plt.subplot(211)
-    # plt.plot(bins, hist)
-    # plt.hold(True)
-    # plt.plot([mu_h, mu_h], [0, hist.max()], 'g')
-    # plt.plot([mu_hypo, mu_hypo], [0, hist.max()], 'm')
-    # plt.subplot(212), plt.plot(bins, rv_healthy.pdf(bins), 'g')
-    # plt.subplot(212), plt.plot(bins, rv_hypo.pdf(bins), 'm')
-    # plt.hold(True)
-    # plt.plot(mu_h, rv_healthy.pdf(mu_h), 'go')
-    # plt.plot(mu_hypo, rv_hypo.pdf(mu_hypo), 'mo')
-    # plt.show()
-
-    # # display histogram with borders of points from which the norm pdf is estimated
-    # plt.figure()
-    # plt.subplot(211), plt.plot(bins, hist)
-    # plt.hold(True)
-    # plt.plot(bins[peak_idx], hist[peak_idx], 'ro')
-    # plt.plot([bins[peak_idx - win_width], bins[peak_idx - win_width]], [0, hist[peak_idx]], 'r')
-    # plt.plot([bins[peak_idx + win_width], bins[peak_idx + win_width]], [0, hist[peak_idx]], 'r')
-    # plt.subplot(212), plt.plot(bins, rv.pdf(bins))
-    # plt.hold(True)
-    # plt.plot(bins[peak_idx], rv.pdf(bins[peak_idx]), 'ro')
-    # plt.show()
-
-    # unaries = np.dstack((unaries_hyper, unaries_hypo)).astype(np.int32)
-    # np.dstack([tdata1.reshape(-1,1), tdata2.reshape(-1,1)]).copy("C")
-    unaries = np.dstack((unaries_hypo.reshape(-1,1), unaries_healthy.reshape(-1,1), unaries_hyper.reshape(-1,1)))
+    unaries = np.dstack((unaries_hypo.reshape(-1, 1), unaries_healthy.reshape(-1, 1), unaries_hyper.reshape(-1, 1)))
     unaries = unaries.astype(np.int32)
     return unaries
 
@@ -309,11 +285,11 @@ def mayavi_visualization(res):
 
 
 def get_compactness(labels):
-    nlabels = labels.max()
+    nlabels = labels.max() + 1
     eccs = np.zeros(nlabels)
 
     for lab in range(nlabels):
-        obj = labels == (lab + 1)
+        obj = labels == lab
         if labels.ndim == 2:
             strel = np.ones((3, 3), dtype=np.bool)
             obj_c = skimor.binary_closing(obj, strel)
@@ -369,6 +345,19 @@ def run(params, show_me,):
     hyper_lab = params['hyper_label']
 
     _, data_o, mask = load_data(slice_idx)
+    print 'estimating number of clusters...'
+    print '\tcurrently switched off'
+    # d = scindiint.zoom(data_o, 0.5)
+    # m = skitra.resize(mask, np.array(mask.shape) * 0.5).astype(np.bool)
+    # ints = d[np.nonzero(m)]
+    # ints = ints.reshape((ints.shape[0], 1))
+    # for i in range(2, 5):
+    #     kmeans_model = KMeans(n_clusters=i, n_init=1).fit(ints)
+    #     labels = kmeans_model.labels_
+    #
+    #     sc = metrics.silhouette_score(ints, labels, metric='euclidean')
+    #     print '\tn_clusters = %i, score = %1.3f (best score=1, worse score=-1)' % (i, sc)
+
     # data_o = cv2.imread('/home/tomas/Dropbox/images/medicine/hypodense_bad2.png', 0).astype(np.float)
 
     # data_s = skifil.gaussian_filter(data_o, sigma)
@@ -427,8 +416,27 @@ def run(params, show_me,):
     res = np.where(mask, res, -1)
     print '\t...done'
 
+    plt.figure()
+    plt.subplot(2, n_labels, 1), plt.title('original')
+    plt.imshow(data_o, 'gray', interpolation='nearest')
+    plt.subplot(2, n_labels, 2), plt.title('graph cut')
+    plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
+    if n_labels == 2:
+        k = 3
+    else:
+        k = 4
+    plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
+    plt.imshow(unaries[:, :, 0].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
+    plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
+    plt.imshow(unaries[:, :, 1].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
+    if n_labels == 3:
+        plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
+        plt.imshow(unaries[:, :, 2].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
+    plt.show()
+
     print 'calculating features of hypodense tumors...'
     labels_hypo, n_labels = scindimea.label(res == hypo_lab)
+    labels_hypo -= 1  # shifts background to -1
     areas_hypo = np.zeros(n_labels)
     comps_hypo = get_compactness(labels_hypo)
     for i in range(n_labels):
@@ -440,6 +448,7 @@ def run(params, show_me,):
 
     print 'calculating features of hyperdense tumors...'
     labels_hyper, n_labels = scindimea.label(res == hyper_lab)
+    labels_hyper -= 1  # shifts background to -1
     areas_hyper = np.zeros(n_labels)
     comps_hyper = get_compactness(labels_hyper)
     for i in range(n_labels):
@@ -509,7 +518,7 @@ if __name__ == '__main__':
     # 138 ... hyperdense
     # -1 ... all data
     params = dict()
-    params['slice_idx'] = -1
+    params['slice_idx'] = 33
     params['sigma'] = 10  # sigma for gaussian blurr
     params['alpha'] = 3  # weightening parameter for pairwise term
     params['beta'] = 1  # weightening parameter for unary term
@@ -519,6 +528,8 @@ if __name__ == '__main__':
     params['tv_weight'] = 0.05  # weighting parameter for total variation filter
     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
     params['prob_w'] = 0.5  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+
+    params['unaries_as_cdf'] = True  # if estimate the prob. model of outliers as cumulative density function
 
     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf

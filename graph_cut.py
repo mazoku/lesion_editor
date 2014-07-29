@@ -203,27 +203,6 @@ def get_unaries(data, mask, params):
     mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, 'hyper', params)
     print 'hyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
 
-    if show_me:
-        ints = data[np.nonzero(mask)]
-        hist, bins = skiexp.histogram(ints, nbins=256)
-        x = np.arange(0, 255, 0.01)
-        plt.figure()
-        plt.subplot(211)
-        plt.plot(bins, hist)
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('histogram of input data')
-        plt.subplot(212)
-        plt.plot(x, rv_hypo.pdf(x), 'm')
-        plt.hold(True)
-        plt.plot(x, rv_healthy.pdf(x), 'b')
-        plt.plot(x, rv_hyper.pdf(x), 'g')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('histogram of input data')
-        plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
-        # plt.show()
-
     if data.ndim == 3:
         mask_e = tools.eroding3D(mask, skimor.disk(5))
     else:
@@ -245,6 +224,35 @@ def get_unaries(data, mask, params):
 
     unaries = np.dstack((unaries_hypo.reshape(-1, 1), unaries_healthy.reshape(-1, 1), unaries_hyper.reshape(-1, 1)))
     unaries = unaries.astype(np.int32)
+
+    if show_me:
+        ints = data[np.nonzero(mask)]
+        hist, bins = skiexp.histogram(ints, nbins=256)
+        x = np.arange(0, 255, 0.01)
+        healthy = rv_healthy.pdf(x)
+        if params['unaries_as_cdf']:
+            hypo = (1 - rv_hypo.cdf(x)) * rv_healthy.pdf(mu_h)
+            hyper = rv_hyper.cdf(x) * rv_healthy.pdf(mu_h)
+        else:
+            hypo = rv_hypo.pdf(x)
+            hyper = rv_hyper.pdf(x)
+
+        plt.figure()
+        plt.subplot(211)
+        plt.plot(bins, hist)
+        ax = plt.axis()
+        plt.axis([0, 256, ax[2], ax[3]])
+        plt.title('histogram of input data')
+        plt.subplot(212)
+        plt.plot(x, hypo, 'm')
+        plt.plot(x, healthy, 'g')
+        plt.plot(x, hyper, 'r')
+        ax = plt.axis()
+        plt.axis([0, 256, ax[2], ax[3]])
+        plt.title('histogram of input data')
+        plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
+        # plt.show()
+
     return unaries
 
 
@@ -416,76 +424,57 @@ def run(params, show_me,):
     res = np.where(mask, res, -1)
     print '\t...done'
 
-    plt.figure()
-    plt.subplot(2, n_labels, 1), plt.title('original')
-    plt.imshow(data_o, 'gray', interpolation='nearest')
-    plt.subplot(2, n_labels, 2), plt.title('graph cut')
-    plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
-    if n_labels == 2:
-        k = 3
-    else:
-        k = 4
-    plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
-    plt.imshow(unaries[:, :, 0].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-    plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
-    plt.imshow(unaries[:, :, 1].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-    if n_labels == 3:
-        plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
-        plt.imshow(unaries[:, :, 2].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-    plt.show()
-
-    print 'calculating features of hypodense tumors...'
-    labels_hypo, n_labels = scindimea.label(res == hypo_lab)
-    labels_hypo -= 1  # shifts background to -1
-    areas_hypo = np.zeros(n_labels)
-    comps_hypo = get_compactness(labels_hypo)
-    for i in range(n_labels):
-        lab = labels_hypo == (i + 1)
-        areas_hypo[i] = lab.sum()
-        print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
-        # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-    print '\t...done'
-
-    print 'calculating features of hyperdense tumors...'
-    labels_hyper, n_labels = scindimea.label(res == hyper_lab)
-    labels_hyper -= 1  # shifts background to -1
-    areas_hyper = np.zeros(n_labels)
-    comps_hyper = get_compactness(labels_hyper)
-    for i in range(n_labels):
-        lab = labels_hyper == (i + 1)
-        areas_hyper[i] = lab.sum()
-        print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
-        # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-    print '\t...done'
-
-    print 'filtering false objects...'
-    features = ('area', 'compactness')
-    features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
-    features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
-    hypo_ok = filter_objects(features_hypo_v, features, params).sum(axis=1) == len(features)
-    hyper_ok = filter_objects(features_hyper_v, features, params).sum(axis=1) == len(features)
-    print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
-    print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
-
-    # print 'calculating compactness...'
-    # # labels_uniq = np.unique(res[res > -1])
-    # # labels = skimor.label(res)
-    # labels = tools.label_3D(res, class_labels=(0, 2))
-    # py3DSeedEditor.py3DSeedEditor(labels).show()
-    # comps = get_compactness(labels)
-    # for i in range(labels.max() + 1):
-    #     lab = labels == i
-    #     print 'label = %i, comp = %.2f' % (i, comps[i])
-    #     py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-    # print '\t...done'
-
-    # np.save('res.npy', res)
-
     # plt.figure()
-    # plt.subplot(131), plt.imshow(data_o, 'gray', vmin=0, vmax=255)
-    # plt.subplot(132), plt.imshow(data_d, 'gray')
-    # plt.subplot(133), plt.imshow(data_s, 'gray', vmin=0, vmax=255)
+    # plt.subplot(2, n_labels, 1), plt.title('original')
+    # plt.imshow(data_o, 'gray', interpolation='nearest')
+    # plt.subplot(2, n_labels, 2), plt.title('graph cut')
+    # plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
+    # if n_labels == 2:
+    #     k = 3
+    # else:
+    #     k = 4
+    # plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
+    # plt.imshow(unaries[:, :, 0].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
+    # plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
+    # plt.imshow(unaries[:, :, 1].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
+    # if n_labels == 3:
+    #     plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
+    #     plt.imshow(unaries[:, :, 2].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
     # plt.show()
+
+    if params['filtration']:
+        print 'calculating features of hypodense tumors...'
+        labels_hypo, n_labels = scindimea.label(res == hypo_lab)
+        labels_hypo -= 1  # shifts background to -1
+        areas_hypo = np.zeros(n_labels)
+        comps_hypo = get_compactness(labels_hypo)
+        for i in range(n_labels):
+            lab = labels_hypo == (i + 1)
+            areas_hypo[i] = lab.sum()
+            print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
+            # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+        print '\t...done'
+
+        print 'calculating features of hyperdense tumors...'
+        labels_hyper, n_labels = scindimea.label(res == hyper_lab)
+        labels_hyper -= 1  # shifts background to -1
+        areas_hyper = np.zeros(n_labels)
+        comps_hyper = get_compactness(labels_hyper)
+        for i in range(n_labels):
+            lab = labels_hyper == (i + 1)
+            areas_hyper[i] = lab.sum()
+            print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
+            # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+        print '\t...done'
+
+        print 'filtering false objects...'
+        features = ('area', 'compactness')
+        features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
+        features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
+        hypo_ok = filter_objects(features_hypo_v, features, params).sum(axis=1) == len(features)
+        hyper_ok = filter_objects(features_hyper_v, features, params).sum(axis=1) == len(features)
+        print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
+        print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
 
     if data_o.ndim == 2:
         plt.figure()
@@ -508,6 +497,7 @@ def run(params, show_me,):
     elif data_o.ndim == 3:
         # py3DSeedEditor.py3DSeedEditor(data_o).show()
         # py3DSeedEditor.py3DSeedEditor(res).show()
+        py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
         mayavi_visualization(res)
 
 
@@ -518,7 +508,7 @@ if __name__ == '__main__':
     # 138 ... hyperdense
     # -1 ... all data
     params = dict()
-    params['slice_idx'] = 33
+    params['slice_idx'] = -1
     params['sigma'] = 10  # sigma for gaussian blurr
     params['alpha'] = 3  # weightening parameter for pairwise term
     params['beta'] = 1  # weightening parameter for unary term
@@ -529,7 +519,7 @@ if __name__ == '__main__':
     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
     params['prob_w'] = 0.5  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
 
-    params['unaries_as_cdf'] = True  # if estimate the prob. model of outliers as cumulative density function
+    params['unaries_as_cdf'] = True  # whether estimate the prob. model of outliers as cumulative density function
 
     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
@@ -542,6 +532,8 @@ if __name__ == '__main__':
 
     params['hypo_label'] = 0  # label of hypodense objects
     params['hyper_label'] = 2  # label of hyperdense objects
+
+    params['filtration'] = False  # whether to filtrate or not
     params['min_area'] = 20
     params['min_compactness'] = 0.2
 

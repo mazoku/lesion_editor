@@ -107,7 +107,7 @@ prob_hypo_cdf = (1 - rv_hypo.cdf(data)) * rv_healthy.pdf(mu_h) * mask_e
 # plt.plot(x, hyper_cdf, 'r')
 # plt.show()
 
-# CDF ------------------------------------------------------------------------------------------
+# PDF versus CDF --------------------------------------------------------------------------------
 plt.figure()
 plt.subplot(321), plt.imshow(data, 'gray', interpolation='nearest'), plt.title('input')
 plt.subplot(322), plt.imshow(prob_healthy, 'gray', interpolation='nearest'), plt.title('healthy')
@@ -115,12 +115,47 @@ plt.subplot(322), plt.imshow(prob_healthy, 'gray', interpolation='nearest'), plt
 plt.subplot(323), plt.imshow(prob_hyper_pdf, 'gray', interpolation='nearest'), plt.title('hypodense - pdf')
 plt.subplot(324), plt.imshow(prob_hypo_pdf, 'gray', interpolation='nearest'), plt.title('hyperdense - pdf')
 
-# PDF ------------------------------------------------------------------------------------------
-# plt.figure()
-# plt.subplot(221), plt.imshow(data, 'gray', interpolation='nearest'), plt.title('input')
-# plt.subplot(222), plt.imshow(prob_healthy, 'gray', interpolation='nearest'), plt.title('healthy')
-
 plt.subplot(325), plt.imshow(prob_hypo_cdf, 'gray', interpolation='nearest'), plt.title('hypodense - cdf')
-plt.subplot(326), plt.imshow(prob_hyper_cdf, 'gray', interpolation='nearest'), plt.title('hyperdense - dcf')
+plt.subplot(326), plt.imshow(prob_hyper_cdf, 'gray', interpolation='nearest'), plt.title('hyperdense - cdf')
+
+
+# ploting GMM ------------------------------------
+ints = data[np.nonzero(mask)]
+hist, bins = skiexp.histogram(ints, nbins=256)
+plt.figure()
+plt.subplot(311)
+plt.title('histogram of input data')
+plt.plot(bins, hist)
+ax = plt.axis()
+plt.axis([0, 256, ax[2], ax[3]])
+
+plt.subplot(312)
+plt.title('GMM')
+plt.plot(x, rv_hypo.pdf(x), 'b')
+plt.plot(x, rv_healthy.pdf(x), 'g')
+plt.plot(x, rv_hyper.pdf(x), 'r')
+ax = plt.axis()
+plt.axis([0, 256, ax[2], ax[3]])
+
+x = np.arange(0, 255, 0.1)
+healthy = rv_healthy.pdf(x)
+hypo = (1 - rv_hypo.cdf(x)) * rv_healthy.pdf(mu_h)
+hyper = rv_hyper.cdf(x) * rv_healthy.pdf(mu_h)
+
+plt.subplot(313)
+plt.title('cdf')
+plt.plot(x, healthy, 'g')
+plt.plot(x, hypo, 'b')
+plt.plot(x, hyper, 'r')
+ax = plt.axis()
+plt.axis([0, 255, ax[2], ax[3]])
+
+
+# plt.figure()
+# plt.plot(x, healthy, 'g')
+# plt.plot(x, hypo, 'b')
+# plt.plot(x, hyper, 'r')
+# ax = plt.axis()
+# plt.axis([0, 255, ax[2], ax[3]])
 
 plt.show()

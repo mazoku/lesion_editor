@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="48488e51-8ace-4261-88f7-e750ecda8e6f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TumorVisualiser.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mrf_gmm_test.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TumorVisualiser.py" afterPath="$PROJECT_DIR$/TumorVisualiser.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph_cut.py" afterPath="$PROJECT_DIR$/graph_cut.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_deriving_data_model.py" afterPath="$PROJECT_DIR$/test_deriving_data_model.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/upo.py" afterPath="$PROJECT_DIR$/upo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mrf_segmentation.iws" />
@@ -18,14 +17,14 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/mrf_segmentation$tumor_visualiser.coverage" NAME="tumor_visualiser Coverage Results" MODIFIED="1406637262159" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$tumor_visualiser.coverage" NAME="tumor_visualiser Coverage Results" MODIFIED="1406808198202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$test_deriving_data_model.coverage" NAME="test_deriving_data_model Coverage Results" MODIFIED="1406118629904" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1406203838829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1406808574975" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$bootstrap.coverage" NAME="bootstrap Coverage Results" MODIFIED="1404132204647" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$test.coverage" NAME="test Coverage Results" MODIFIED="1405496455289" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$lisa.coverage" NAME="lisa Coverage Results" MODIFIED="1402554546756" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lisa" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1405492739683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$organ_segmentation_gui.coverage" NAME="organ_segmentation_gui Coverage Results" MODIFIED="1402485182702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lisa/src" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1406789915774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$mrf_gmm_test.coverage" NAME="mrf_gmm_test Coverage Results" MODIFIED="1406614263118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -45,7 +44,7 @@
           <file leaf-file-name="graph_cut.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/graph_cut.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="396" column="56" selection-start="12821" selection-end="12821" vertical-scroll-proportion="0.0" vertical-offset="5243" max-vertical-offset="7860">
+                <state line="387" column="0" selection-start="12361" selection-end="12361" vertical-scroll-proportion="0.0" vertical-offset="5406" max-vertical-offset="8310">
                   <folding />
                 </state>
               </provider>
@@ -63,9 +62,11 @@
           <file leaf-file-name="upo.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/upo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="2" column="0" selection-start="22" selection-end="22" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
+                <state line="44" column="39" selection-start="1213" selection-end="1213" vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="1020">
                   <folding>
-                    <element signature="e#22#50#0" expanded="true" />
+                    <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+                    <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+                    <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
                   </folding>
                 </state>
               </provider>
@@ -74,7 +75,7 @@
           <file leaf-file-name="TumorVisualiser.py" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/TumorVisualiser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="245" column="67" selection-start="9193" selection-end="9193" vertical-scroll-proportion="0.33333334" vertical-offset="3473" max-vertical-offset="4995">
+                <state line="27" column="31" selection-start="741" selection-end="741" vertical-scroll-proportion="0.28601694" vertical-offset="135" max-vertical-offset="5955">
                   <folding>
                     <element signature="e#23#33#0" expanded="true" />
                   </folding>
@@ -89,7 +90,7 @@
           <file leaf-file-name="graph_cut.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/graph_cut.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="408" column="0" selection-start="13482" selection-end="13482" vertical-scroll-proportion="0.0" vertical-offset="5918" max-vertical-offset="7860">
+                <state line="225" column="52" selection-start="7295" selection-end="7295" vertical-scroll-proportion="0.0" vertical-offset="3375" max-vertical-offset="8310">
                   <folding />
                 </state>
               </provider>
@@ -98,29 +99,26 @@
           <file leaf-file-name="test_deriving_data_model.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test_deriving_data_model.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="127" column="0" selection-start="5185" selection-end="5205" vertical-scroll-proportion="0.0" vertical-offset="1471" max-vertical-offset="2415">
+                <state line="127" column="0" selection-start="5185" selection-end="5205" vertical-scroll-proportion="0.0" vertical-offset="1905" max-vertical-offset="2490">
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="py3DSeedEditor.py" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="py3DSeedEditor.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/py3DSeedEditor.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="172" column="93" selection-start="5508" selection-end="5585" vertical-scroll-proportion="0.7788779" vertical-offset="2093" max-vertical-offset="5550">
+                <state line="127" column="8" selection-start="3914" selection-end="3914" vertical-scroll-proportion="0.0" vertical-offset="1440" max-vertical-offset="5565">
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="TumorVisualiser.py" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="TumorVisualiser.py" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/TumorVisualiser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="146" column="41" selection-start="5604" selection-end="5604" vertical-scroll-proportion="0.0" vertical-offset="1679" max-vertical-offset="4995">
-                  <folding>
-                    <element signature="e#23#33#0" expanded="true" />
-                    <marker date="1406639856455" expanded="true" signature="711:3587" placeholder="..." />
-                  </folding>
+                <state line="197" column="54" selection-start="7676" selection-end="7676" vertical-scroll-proportion="0.48622882" vertical-offset="2361" max-vertical-offset="5820">
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -140,17 +138,17 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/upo.py" />
         <option value="$PROJECT_DIR$/../lisa/extern/pyseg_base/src/dcmreaddata.py" />
         <option value="$PROJECT_DIR$/../lisa/src/lesions.py" />
         <option value="$PROJECT_DIR$/bootstrap.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/tools.py" />
-        <option value="$PROJECT_DIR$/py3DSeedEditor.py" />
-        <option value="$PROJECT_DIR$/graph_cut.py" />
         <option value="$PROJECT_DIR$/tumor_visualiser.py" />
         <option value="$PROJECT_DIR$/test_deriving_data_model.py" />
         <option value="$PROJECT_DIR$/mrf_gmm_test.py" />
+        <option value="$PROJECT_DIR$/py3DSeedEditor.py" />
+        <option value="$PROJECT_DIR$/graph_cut.py" />
+        <option value="$PROJECT_DIR$/upo.py" />
         <option value="$PROJECT_DIR$/TumorVisualiser.py" />
       </list>
     </option>
@@ -229,7 +227,7 @@
       <recent name="$USER_HOME$/Dropbox/Work/Dizertace/scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.tumor_visualiser">
+  <component name="RunManager" selected="Python.graph_cut">
     <configuration default="false" name="graph_cut" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -248,25 +246,6 @@
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PyDebugRunner" />
-      <ConfigurationWrapper RunnerId="PythonRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="mrf_segmentation" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="" />
-      <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
@@ -330,6 +309,25 @@
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="upo" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="mrf_segmentation" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/upo.py" />
+      <option name="PARAMETERS" value="" />
+      <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
@@ -417,6 +415,9 @@
       <option name="PARAMETERS" value="" />
       <method />
     </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
     <configuration default="true" type="tests" factoryName="Unittests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -438,9 +439,6 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
@@ -485,18 +483,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.graph_cut" />
-      <item index="1" class="java.lang.String" itemvalue="Python.test" />
-      <item index="2" class="java.lang.String" itemvalue="Python.test_deriving_data_model" />
-      <item index="3" class="java.lang.String" itemvalue="Python.tumor_visualiser" />
-      <item index="4" class="java.lang.String" itemvalue="Python.mrf_gmm_test" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test_deriving_data_model" />
+      <item index="2" class="java.lang.String" itemvalue="Python.tumor_visualiser" />
+      <item index="3" class="java.lang.String" itemvalue="Python.mrf_gmm_test" />
+      <item index="4" class="java.lang.String" itemvalue="Python.upo" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.tumor_visualiser" />
-        <item index="1" class="java.lang.String" itemvalue="Python.mrf_gmm_test" />
-        <item index="2" class="java.lang.String" itemvalue="Python.graph_cut" />
-        <item index="3" class="java.lang.String" itemvalue="Python.test_deriving_data_model" />
-        <item index="4" class="java.lang.String" itemvalue="Python.test" />
+        <item index="0" class="java.lang.String" itemvalue="Python.graph_cut" />
+        <item index="1" class="java.lang.String" itemvalue="Python.tumor_visualiser" />
+        <item index="2" class="java.lang.String" itemvalue="Python.upo" />
+        <item index="3" class="java.lang.String" itemvalue="Python.mrf_gmm_test" />
+        <item index="4" class="java.lang.String" itemvalue="Python.test_deriving_data_model" />
       </list>
     </recent_temporary>
   </component>
@@ -555,7 +553,11 @@
       <created>1406034583633</created>
       <updated>1406034583633</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Some minor changes in code. Creating a visualiser for proper displaying of results.&#10;TODO: Test the contour feature.">
+      <created>1406639936591</created>
+      <updated>1406639936591</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -586,21 +588,21 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15314835" sideWeight="0.4622496" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15314835" sideWeight="0.5362095" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1456777" sideWeight="0.46301925" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1456777" sideWeight="0.5359676" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2887538" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34245187" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33535966" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -622,24 +624,18 @@
     <MESSAGE value="Runs in 3D.&#10;TODO: relabel res and run get_compactness." />
     <MESSAGE value="Calculating features (area, compactness), classification based on minimal area and minimal compactness." />
     <MESSAGE value="Switching from GMM to one GM characterizing healthy parenchyma and two functions characterized by cumulative distribution functions of previous normal distribution.&#10;TODO: Replace cdfs with exponential functions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Switching from GMM to one GM characterizing healthy parenchyma and two functions characterized by cumulative distribution functions of previous normal distribution.&#10;TODO: Replace cdfs with exponential functions." />
+    <MESSAGE value="Some minor changes in code. Creating a visualiser for proper displaying of results.&#10;TODO: Test the contour feature." />
+    <option name="LAST_COMMIT_MESSAGE" value="Some minor changes in code. Creating a visualiser for proper displaying of results.&#10;TODO: Test the contour feature." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="77" />
+      <option name="time" value="79" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="357" column="0" selection-start="12897" selection-end="12897" vertical-scroll-proportion="0.0" vertical-offset="5355" max-vertical-offset="8820">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="59" column="26" selection-start="2398" selection-end="2398" vertical-scroll-proportion="0.0" vertical-offset="303" max-vertical-offset="1260">
@@ -663,16 +659,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="357" column="0" selection-start="12897" selection-end="12897" vertical-scroll-proportion="0.0" vertical-offset="5355" max-vertical-offset="8820">
-          <folding />
-        </state>
+        <state line="357" column="0" selection-start="12897" selection-end="12897" vertical-scroll-proportion="0.0" vertical-offset="5355" max-vertical-offset="8820" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
@@ -698,16 +694,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="377" column="61" selection-start="13437" selection-end="13437" vertical-scroll-proportion="0.0" vertical-offset="5655" max-vertical-offset="8535">
-          <folding />
-        </state>
+        <state line="377" column="61" selection-start="13437" selection-end="13437" vertical-scroll-proportion="0.0" vertical-offset="5655" max-vertical-offset="8535" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
@@ -733,16 +729,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8475">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8475" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
@@ -768,23 +764,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/upo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
           <folding>
-            <element signature="e#22#50#0" expanded="true" />
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -796,9 +794,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graph_cut.py">
@@ -873,13 +869,6 @@
         <state line="418" column="39" selection-start="13875" selection-end="13875" vertical-scroll-proportion="0.0" vertical-offset="5874" max-vertical-offset="15255" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="0" selection-start="2138" selection-end="2138" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1260">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../lisa/lisa.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="14" column="16" selection-start="332" selection-end="332" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315" />
@@ -887,23 +876,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="495" column="33" selection-start="17834" selection-end="17834" vertical-scroll-proportion="0.0" vertical-offset="7440" max-vertical-offset="8730">
-          <folding />
-        </state>
+        <state line="495" column="33" selection-start="17834" selection-end="17834" vertical-scroll-proportion="0.0" vertical-offset="7440" max-vertical-offset="8730" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/Dropbox/Work/Dizertace/scripts/mrf_unaries_gmm_versus_cdf.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2415" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/upo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="22" selection-end="22" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
-          <folding>
-            <element signature="e#22#50#0" expanded="true" />
-          </folding>
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test_deriving_data_model.py">
@@ -915,51 +893,64 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mrf_gmm_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="318" selection-end="318" vertical-scroll-proportion="0.3960396" vertical-offset="0" max-vertical-offset="1905">
-          <folding>
-            <element signature="e#22#40#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/graph_cut.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="396" column="56" selection-start="12821" selection-end="12821" vertical-scroll-proportion="0.0" vertical-offset="5243" max-vertical-offset="7860">
-          <folding />
-        </state>
+        <state line="16" column="0" selection-start="318" selection-end="318" vertical-scroll-proportion="0.3960396" vertical-offset="0" max-vertical-offset="1905" />
       </provider>
     </entry>
     <entry file="file:///usr/lib/pymodules/python2.7/matplotlib/pyplot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="396" column="0" selection-start="13254" selection-end="13254" vertical-scroll-proportion="0.33279485" vertical-offset="5314" max-vertical-offset="54765">
-          <folding />
-        </state>
+        <state line="396" column="0" selection-start="13254" selection-end="13254" vertical-scroll-proportion="0.33279485" vertical-offset="5314" max-vertical-offset="54765" />
       </provider>
     </entry>
     <entry file="file://$USER_HOME$/.PyCharm30/system/python_stubs/-1247972723/PyQt4/QtGui/QWidget.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1024" column="8" selection-start="37918" selection-end="37918" vertical-scroll-proportion="0.33333334" vertical-offset="15158" max-vertical-offset="16740">
-          <folding />
-        </state>
+        <state line="1024" column="8" selection-start="37918" selection-end="37918" vertical-scroll-proportion="0.33333334" vertical-offset="15158" max-vertical-offset="16740" />
       </provider>
     </entry>
     <entry file="file:///usr/lib/pymodules/python2.7/matplotlib/backends/backend_qt4agg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="145" column="8" selection-start="5070" selection-end="5070" vertical-scroll-proportion="0.33279485" vertical-offset="1804" max-vertical-offset="2445">
+        <state line="145" column="8" selection-start="5070" selection-end="5070" vertical-scroll-proportion="0.33279485" vertical-offset="1804" max-vertical-offset="2445" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="52" column="0" selection-start="2138" selection-end="2138" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1260">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/py3DSeedEditor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="172" column="93" selection-start="5508" selection-end="5585" vertical-scroll-proportion="0.7788779" vertical-offset="2093" max-vertical-offset="5550">
+        <state line="127" column="8" selection-start="3914" selection-end="3914" vertical-scroll-proportion="0.0" vertical-offset="1440" max-vertical-offset="5565">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/lib/python2.7/dist-packages/numpy/lib/twodim_base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="288" column="0" selection-start="6970" selection-end="6970" vertical-scroll-proportion="0.33226836" vertical-offset="4112" max-vertical-offset="14070" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/upo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="39" selection-start="1213" selection-end="1213" vertical-scroll-proportion="0.0" vertical-offset="274" max-vertical-offset="1020">
+          <folding>
+            <marker date="1406789915763" expanded="true" signature="312:534" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="568:1474" placeholder="..." />
+            <marker date="1406789915763" expanded="true" signature="756:1474" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_cut.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="387" column="0" selection-start="12361" selection-end="12361" vertical-scroll-proportion="0.0" vertical-offset="5406" max-vertical-offset="8310">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/TumorVisualiser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="245" column="67" selection-start="9193" selection-end="9193" vertical-scroll-proportion="0.33333334" vertical-offset="3473" max-vertical-offset="4995">
+        <state line="27" column="31" selection-start="741" selection-end="741" vertical-scroll-proportion="0.28601694" vertical-offset="135" max-vertical-offset="5955">
           <folding>
             <element signature="e#23#33#0" expanded="true" />
           </folding>

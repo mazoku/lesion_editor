@@ -15,14 +15,16 @@ import numpy as np
 
 class TumorVisualiser(QtGui.QMainWindow):
 
-    def __init__(self, im, labels, params):
+    def __init__(self, im, labels, healthy_label, hypo_label, hyper_label):
         super(TumorVisualiser, self).__init__()
 
         self.im = im
         self.labels = labels
         self.show_view_1 = True
         self.show_view_2 = True
-        self.params = params
+        self.healthy_label = healthy_label
+        self.hypo_label = hypo_label
+        self.hyper_label = hyper_label
         # self.data_1 = self.im
         # self.data_2 = self.labels
 
@@ -51,34 +53,34 @@ class TumorVisualiser(QtGui.QMainWindow):
         self.toolbar_view_2.addAction(view_2_action)
 
         # show input data on view 1
-        show_im_1_action = QtGui.QAction(QtGui.QIcon('icons/Stock graph.png'), 'im_1', self)
-        show_im_1_action.triggered.connect(self.show_im_1_callback)
-        self.toolbar_view_1.addAction(show_im_1_action)
+        self.show_im_1_action = QtGui.QAction(QtGui.QIcon('icons/Stock graph.png'), 'im_1', self)
+        self.show_im_1_action.triggered.connect(self.show_im_1_callback)
+        self.toolbar_view_1.addAction(self.show_im_1_action)
 
         # show input data on view 2
-        show_im_2_action = QtGui.QAction(QtGui.QIcon('icons/Stock graph.png'), 'im_2', self)
-        show_im_2_action.triggered.connect(self.show_im_2_callback)
-        self.toolbar_view_2.addAction(show_im_2_action)
+        self.show_im_2_action = QtGui.QAction(QtGui.QIcon('icons/Stock graph.png'), 'im_2', self)
+        self.show_im_2_action.triggered.connect(self.show_im_2_callback)
+        self.toolbar_view_2.addAction(self.show_im_2_action)
 
         # show label data on view 1
-        show_labels_1_action = QtGui.QAction(QtGui.QIcon('icons/Blue tag.png'), 'labels_1', self)
-        show_labels_1_action.triggered.connect(self.show_labels_1_callback)
-        self.toolbar_view_1.addAction(show_labels_1_action)
+        self.show_labels_1_action = QtGui.QAction(QtGui.QIcon('icons/Blue tag.png'), 'labels_1', self)
+        self.show_labels_1_action.triggered.connect(self.show_labels_1_callback)
+        self.toolbar_view_1.addAction(self.show_labels_1_action)
 
         # show label data on view 2
-        show_labels_2_action = QtGui.QAction(QtGui.QIcon('icons/Blue tag.png'), 'labels_2', self)
-        show_labels_2_action.triggered.connect(self.show_labels_2_callback)
-        self.toolbar_view_2.addAction(show_labels_2_action)
+        self.show_labels_2_action = QtGui.QAction(QtGui.QIcon('icons/Blue tag.png'), 'labels_2', self)
+        self.show_labels_2_action.triggered.connect(self.show_labels_2_callback)
+        self.toolbar_view_2.addAction(self.show_labels_2_action)
 
         # show label data on view 1
-        show_contours_1_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_1', self)
-        show_contours_1_action.triggered.connect(self.show_contours_1_callback)
-        self.toolbar_view_1.addAction(show_contours_1_action)
+        self.show_contours_1_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_1', self)
+        self.show_contours_1_action.triggered.connect(self.show_contours_1_callback)
+        self.toolbar_view_1.addAction(self.show_contours_1_action)
 
         # show label data on view 2
-        show_contours_2_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_2', self)
-        show_contours_2_action.triggered.connect(self.show_contours_2_callback)
-        self.toolbar_view_2.addAction(show_contours_2_action)
+        self.show_contours_2_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_2', self)
+        self.show_contours_2_action.triggered.connect(self.show_contours_2_callback)
+        self.toolbar_view_2.addAction(self.show_contours_2_action)
 
 
         # STATUS BAR -------------------
@@ -90,18 +92,30 @@ class TumorVisualiser(QtGui.QMainWindow):
         self.center()
         self.setWindowTitle('Tumor Visualiser')
 
-        self.form_widget = FormWidget(self, self.params)
+        self.form_widget = FormWidget(self)
 
         self.setCentralWidget(self.form_widget)
 
     def view_1_callback(self):
         self.show_view_1 = not self.show_view_1
+
+        # enabling and disabling other toolbar icons
+        self.show_im_1_action.setEnabled(not self.show_im_1_action.isEnabled())
+        self.show_labels_1_action.setEnabled(not self.show_labels_1_action.isEnabled())
+        self.show_contours_1_action.setEnabled(not self.show_contours_1_action.isEnabled())
+
         self.statusBar().showMessage('view_1 set to %s' % self.show_view_1)
         # print 'view_1 set to', self.show_view_1
         self.form_widget.update_figures()
 
     def view_2_callback(self):
         self.show_view_2 = not self.show_view_2
+
+        # enabling and disabling other toolbar icons
+        self.show_im_2_action.setEnabled(not self.show_im_2_action.isEnabled())
+        self.show_labels_2_action.setEnabled(not self.show_labels_2_action.isEnabled())
+        self.show_contours_2_action.setEnabled(not self.show_contours_2_action.isEnabled())
+
         self.statusBar().showMessage('view_2 set to %s' % self.show_view_2)
         # print 'view_2 set to', self.show_view_2
         self.form_widget.update_figures()
@@ -136,7 +150,7 @@ class TumorVisualiser(QtGui.QMainWindow):
 
     def show_contours_1_callback(self):
         # print 'data_2 set to contours'
-        self.statusBar().showMessage('data_2 set to contours')
+        self.statusBar().showMessage('data_1 set to contours')
         self.form_widget.data_1 = self.im
         self.form_widget.data_1_str = 'contours'
         self.form_widget.update_figures()
@@ -157,15 +171,16 @@ class TumorVisualiser(QtGui.QMainWindow):
 # Main widget containing figures etc
 class FormWidget(QtGui.QWidget):
 
-    def __init__(self, window, params):
+    def __init__(self, window):
 
         self.win = window  # link to the main window
         self.im = self.win.im  # input data
         self.labels = self.win.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
         self.n_slices = self.im.shape[2]  # numer of slices
-        self.hypo_label = params['hypo_label']
-        self.hyper_label = params['hyper_label']
+        self.healthy_label = self.win.healthy_label
+        self.hypo_label = self.win.hypo_label
+        self.hyper_label = self.win.hyper_label
 
         super(FormWidget, self).__init__()
         self.init_UI_form()
@@ -180,6 +195,7 @@ class FormWidget(QtGui.QWidget):
         self.data_2_str = 'labels'
 
         self.figure = plt.figure()
+        self.axes = self.figure.add_axes([0, 0, 1, 1])
 
         self.canvas = FigureCanvas(self.figure)
 
@@ -188,7 +204,8 @@ class FormWidget(QtGui.QWidget):
         # self.button.clicked.connect(self.plot)
 
         # slider
-        self.slider = QtGui.QSlider(QtCore.Qt.Vertical, self)
+        # self.slider = QtGui.QSlider(QtCore.Qt.Vertical, self)
+        self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
         self.slider.setMinimum(0)
         self.slider.setMaximum(self.n_slices - 1)
         # self.slider.setMaximum(10)
@@ -197,15 +214,18 @@ class FormWidget(QtGui.QWidget):
         self.slider.setPageStep(1)  # step for mouse wheel
 
         # set the layout
-        self.slice_label = QtGui.QLabel('slice #:\n%i/%i' % (self.actual_slice + 1, self.n_slices))
-        slider_layout = QtGui.QVBoxLayout()
-        slider_layout.addWidget(self.slider)
+        self.slice_label = QtGui.QLabel('slice #: %i/%i' % (self.actual_slice + 1, self.n_slices))
+        slider_layout = QtGui.QHBoxLayout()
+        # self.slice_label = QtGui.QLabel('slice #:\n%i/%i' % (self.actual_slice + 1, self.n_slices))
+        # slider_layout = QtGui.QVBoxLayout()
         slider_layout.addWidget(self.slice_label)
+        slider_layout.addWidget(self.slider)
         slider_frame = QtGui.QFrame()
         slider_frame.setLayout(slider_layout)
 
-        layout = QtGui.QHBoxLayout()
-        layout.addWidget(self.canvas)
+        # layout = QtGui.QHBoxLayout()
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.canvas, 1)
         layout.addWidget(slider_frame)
         # layout.addWidget(self.button)
         self.setLayout(layout)
@@ -233,39 +253,60 @@ class FormWidget(QtGui.QWidget):
 
     def slider_change(self, value):
         # self.win.status_bar.showMessage('slider changed to %i' % value)
-        self.win.statusBar().showMessage('actual slice changed to %i' % value)
+        # self.win.statusBar().showMessage('actual slice changed to %i' % value)
         self.actual_slice = value
         self.update_slice_label()
         self.update_figures()
 
     def update_figures(self):
+        # setting the minimal and maximal to scale luminance data
+        vmin = 0
+        if self.data_1_str is 'labels':
+            vmax1 = self.data_1.max()
+        else:
+            vmax1 = 255
+        if self.data_2_str is 'labels':
+            vmax2 = self.data_2.max()
+        else:
+            vmax2 = 255
+
+        # if both views are enabled
         if self.win.show_view_1 and self.win.show_view_2:
             plt.figure(self.figure.number)
             plt.subplot(121)
-            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest')
-            #TODO: otestovat contury, potreba upravit vstupni data labels
+            self.figure.gca().cla()  # clearing the contours, just to be sure
+            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax1)
+            # displaying contours if desirable
             if self.data_1_str is 'contours':
-                try:
-                    ctr = self.ax.contour(self.labels[:, :, self.actual_slice] == self.hypo_label, 1, colors='b', linewidths=2)
-                except:
-                    pass
-                try:
-                    ctr = self.ax.contour(self.labels[:, :, self.actual_slice] == self.hyper_label, 1, colors='r', linewidths=2)
-                except:
-                    pass
+                self.draw_contours()
             plt.title('view_1: %s' % self.data_1_str)
+
             plt.subplot(122)
-            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest')
+            self.figure.gca().cla()  # clearing the contours, just to be sure
+            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax2)
+            # displaying contours if desirable
+            if self.data_2_str is 'contours':
+                self.draw_contours()
             plt.title('view_2: %s' % self.data_2_str)
+
+        # if only the first view is enabled
         elif self.win.show_view_1:
             plt.figure(self.figure.number)
             plt.subplot(111)
-            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest')
+            self.figure.gca().cla()  # clearing the contours, just to be sure
+            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax1)
+            if self.data_1_str is 'contours':
+                self.draw_contours()
             plt.title('view_1: %s' % self.data_1_str)
+
+        # if only the second view is enabled
         elif self.win.show_view_2:
             plt.figure(self.figure.number)
             plt.subplot(111)
-            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest')
+            self.figure.gca().cla()  # clearing the contours, just to be sure
+            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax2)
+            if self.data_2_str is 'contours':
+                self.draw_contours()
             plt.title('view_2: %s' % self.data_2_str)
         else:
             plt.figure(self.figure.number)
@@ -273,14 +314,27 @@ class FormWidget(QtGui.QWidget):
 
         self.canvas.draw()
 
+    def draw_contours(self):
+        try:
+            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.healthy_label, [0.5], colors='g', linewidths=2)
+        except:
+            print 'contour fail: ', sys.exc_info()[0]
+        try:
+            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.hypo_label, [0.5], colors='b', linewidths=2)
+        except:
+            print 'contour fail: ', sys.exc_info()[0]
+        try:
+            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.hyper_label, [0.5], colors='r', linewidths=2)
+        except:
+            print 'contour fail: ', sys.exc_info()[0]
+
     def update_slice_label(self):
-        self.slice_label.setText('slice #:\n%i/%i' % (self.actual_slice + 1, self.n_slices))
+        self.slice_label.setText('slice #: %i/%i' % (self.actual_slice + 1, self.n_slices))
 
     def next_slice(self):
         self.actual_slice += 1
         if self.actual_slice >= self.n_slices:
             self.actual_slice = 0
-
 
     def prev_slice(self):
         self.actual_slice -= 1
@@ -288,7 +342,7 @@ class FormWidget(QtGui.QWidget):
             self.actual_slice = self.n_slices - 1
 
     def on_scroll(self, event):
-        ''' mouse wheel is used for setting slider value'''
+        '''mouse wheel is used for setting slider value'''
         if event.button == 'up':
             self.next_slice()
         if event.button == 'down':
@@ -297,11 +351,23 @@ class FormWidget(QtGui.QWidget):
         # self.slider_change(self.actual_slice)
 
 
+def run(im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2):
+    if slice_axis == 0:
+        im = np.transpose(im, (1, 2, 0))
+        labels = np.transpose(labels, (1, 2, 0))
+    app = QtGui.QApplication(sys.argv)
+    tv = TumorVisualiser(im, labels, healthy_label, hypo_label, hyper_label)
+    tv.show()
+    sys.exit(app.exec_())
+
 def main():
     # parameters
     params = dict()
-    params['hypo_label'] = 0
-    params['hyper_label'] = 2
+    # params['hypo_label'] = 1
+    # params['hyper_label'] = 2
+    healthy_label = 0
+    hypo_label = 1
+    hyper_label = 2
 
     # preparing data
     size = 100
@@ -309,20 +375,18 @@ def main():
     im = np.zeros((size, size, n_slices))
     step = size / n_slices
     for i in range(n_slices):
-        im[i * step:(i + 1) * step, :, i] = 1
+        im[i * step:(i + 1) * step, :, i] = 150
 
     labels = np.zeros((size, size, n_slices))
     for i in range(n_slices):
-        labels[:, i * step:(i + 1) * step, i] = 1
+        if np.mod(i, 2) == 0:
+            lab = 1
+        else:
+            lab = 2
+        labels[:, i * step:(i + 1) * step, i] = lab
 
     # runing application
-    app = QtGui.QApplication(sys.argv)
-    tv = TumorVisualiser(im, labels, params)
-    tv.show()
-    sys.exit(app.exec_())
-
-
-
+    run(im, labels, healthy_label, hypo_label, hyper_label)
 
 if __name__ == '__main__':
     main()

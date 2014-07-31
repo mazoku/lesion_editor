@@ -25,6 +25,8 @@ import tools
 import py3DSeedEditor
 from mayavi import mlab
 
+import TumorVisualiser
+
 
 from sklearn import metrics
 from sklearn.cluster import KMeans
@@ -203,24 +205,25 @@ def get_unaries(data, mask, params):
     mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, 'hyper', params)
     print 'hyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
 
-    if data.ndim == 3:
-        mask_e = tools.eroding3D(mask, skimor.disk(5))
-    else:
-        mask_e = skimor.binary_erosion(mask, np.ones((5, 5)))
+    if params['erode_mask']:
+        if data.ndim == 3:
+            mask = tools.eroding3D(mask, skimor.disk(5))
+        else:
+            mask = skimor.binary_erosion(mask, np.ones((5, 5)))
 
-    unaries_healthy = - rv_healthy.logpdf(data) * mask_e
+    unaries_healthy = - rv_healthy.logpdf(data) * mask
     if params['unaries_as_cdf']:
-        unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_healthy.pdf(mu_h)) * mask_e
+        unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_healthy.pdf(mu_h)) * mask
         # removing zeros with second lowest value so the log(0) wouldn't throw a warning -
         tmp = 1 - rv_hypo.cdf(data)
         values = np.unique(tmp)
         tmp = np.where(tmp == 0, values[1], tmp)
         #-
-        unaries_hypo = - np.log(tmp * rv_healthy.pdf(mu_h)) * mask_e
+        unaries_hypo = - np.log(tmp * rv_healthy.pdf(mu_h)) * mask
         unaries_hypo = np.where(np.isnan(unaries_hypo), 0, unaries_hypo)
     else:
-        unaries_hyper = - rv_hyper.logpdf(data) * mask_e
-        unaries_hypo = - rv_hypo.logpdf(data) * mask_e
+        unaries_hyper = - rv_hyper.logpdf(data) * mask
+        unaries_hypo = - rv_hypo.logpdf(data) * mask
 
     unaries = np.dstack((unaries_hypo.reshape(-1, 1), unaries_healthy.reshape(-1, 1), unaries_hyper.reshape(-1, 1)))
     unaries = unaries.astype(np.int32)
@@ -497,7 +500,8 @@ def run(params, show_me,):
     elif data_o.ndim == 3:
         # py3DSeedEditor.py3DSeedEditor(data_o).show()
         # py3DSeedEditor.py3DSeedEditor(res).show()
-        py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
+        TumorVisualiser.run(data_o, res, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0)
+        # py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
         mayavi_visualization(res)
 
 
@@ -531,11 +535,14 @@ if __name__ == '__main__':
     params['show_outlier_pdf_estim'] = False
 
     params['hypo_label'] = 0  # label of hypodense objects
+    params['healthy_label'] = 1
     params['hyper_label'] = 2  # label of hyperdense objects
 
     params['filtration'] = False  # whether to filtrate or not
     params['min_area'] = 20
     params['min_compactness'] = 0.2
+
+    params['erode_mask'] = True
 
     show_me = True  # debug visualization
 

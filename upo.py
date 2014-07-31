@@ -1,40 +1,62 @@
-__author__ = 'tomas'
+import sys
 
-import scipy.stats as scista
-import numpy as np
+from PyQt4 import QtGui, QtCore
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+
 import matplotlib.pyplot as plt
-import tools
-import skimage.exposure as skiexp
-import skimage.morphology as skimor
-from pygco import cut_simple, cut_from_graph
 
-x = np.zeros((10, 12, 3))
-x[:, :4, 0] = -1
-x[:, 4:8, 1] = -1
-x[:, 8:, 2] = -1
-unaries = x + 1. * np.random.normal(size=x.shape)
-x = np.argmin(x, axis=2)
-unaries = (unaries * 10).astype(np.int32)
-x_thresh = np.argmin(unaries, axis=2)
+import numpy as np
 
-# potts potential
-pairwise_potts = -2 * np.eye(3, dtype=np.int32)
-result = cut_simple(unaries, 10 * pairwise_potts)
+class TumorVisualiser(QtGui.QMainWindow):
 
-# potential that penalizes 0-1 and 1-2 less thann 0-2
-pairwise_1d = -15 * np.eye(3, dtype=np.int32) - 8
-pairwise_1d[-1, 0] = 0
-pairwise_1d[0, -1] = 0
-print(pairwise_1d)
-result_1d = cut_simple(unaries, pairwise_1d)
+    def __init__(self):
+        super(TumorVisualiser, self).__init__()
 
-plt.figure()
-plt.subplot(221, title="original")
-plt.imshow(x, interpolation="nearest")
-plt.subplot(222, title="thresholded unaries")
-plt.imshow(x_thresh, interpolation="nearest")
-plt.subplot(223, title="potts potentials")
-plt.imshow(result, interpolation="nearest")
-plt.subplot(224, title="1d topology potentials")
-plt.imshow(result_1d, interpolation="nearest")
-plt.show()
+        self.init_UI_win()
+
+    def init_UI_win(self):
+        self.form_widget = FormWidget(self)
+
+        self.setCentralWidget(self.form_widget)
+
+class FormWidget(QtGui.QWidget):
+
+    def __init__(self, window):
+
+        self.win = window  # link to the main window
+
+        super(FormWidget, self).__init__()
+        self.init_UI_form()
+
+    def init_UI_form(self):
+        self.figure = plt.figure()
+        # self.axes = self.figure.add_axes([0, 0, 1, 1])
+
+        self.canvas = FigureCanvas(self.figure)
+
+        self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        slider_layout = QtGui.QVBoxLayout()
+        slider_layout.addWidget(self.slider)
+        slider_frame = QtGui.QFrame()
+        slider_frame.setLayout(slider_layout)
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.canvas, 1)
+        # layout.addWidget(self.slider)
+        layout.addWidget(slider_frame)
+        self.setLayout(layout)
+
+        plt.subplot(121)
+        plt.imshow(np.eye(60))
+
+        plt.subplot(122)
+        plt.imshow(np.eye(60)[::-1,:])
+
+        self.canvas.draw()
+
+if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
+    tv = TumorVisualiser()
+    tv.show()
+    sys.exit(app.exec_())

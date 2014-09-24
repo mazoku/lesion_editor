@@ -15,7 +15,7 @@ import numpy as np
 
 class TumorVisualiser(QtGui.QMainWindow):
 
-    def __init__(self, im, labels, healthy_label, hypo_label, hyper_label):
+    def __init__(self, im, labels, healthy_label, hypo_label, hyper_label, disp_smoothed=False):
         super(TumorVisualiser, self).__init__()
 
         self.im = im
@@ -25,6 +25,7 @@ class TumorVisualiser(QtGui.QMainWindow):
         self.healthy_label = healthy_label
         self.hypo_label = hypo_label
         self.hyper_label = hyper_label
+        self.disp_smoothed = disp_smoothed
         # self.data_1 = self.im
         # self.data_2 = self.labels
 
@@ -130,7 +131,10 @@ class TumorVisualiser(QtGui.QMainWindow):
     def show_im_2_callback(self):
         # print 'data_2 set to im'
         self.statusBar().showMessage('data_2 set to im')
-        self.form_widget.data_2 = self.im
+        if self.disp_smoothed:
+            self.form_widget.data_2 = self.labels
+        else:
+            self.form_widget.data_2 = self.im
         self.form_widget.data_2_str = 'im'
         self.form_widget.update_figures()
 
@@ -258,24 +262,41 @@ class FormWidget(QtGui.QWidget):
         self.update_slice_label()
         self.update_figures()
 
+    def label2rgb(self, slice):
+        r = slice == self.hyper_label
+        g = slice == self.healthy_label
+        b = slice == self.hypo_label
+        slice_rgb = np.dstack((r, g, b))
+
+        return slice_rgb
+
     def update_figures(self):
         # setting the minimal and maximal to scale luminance data
-        vmin = 0
         if self.data_1_str is 'labels':
+            vmin1 = self.data_1.min()
             vmax1 = self.data_1.max()
+            slice_1 = self.label2rgb(self.data_1[:, :, self.actual_slice])
         else:
+            vmin1 = 0
             vmax1 = 255
+            slice_1 = self.data_1[:, :, self.actual_slice]
         if self.data_2_str is 'labels':
+            vmin2 = self.data_2.min()
             vmax2 = self.data_2.max()
+            slice_2 = self.label2rgb(self.data_2[:, :, self.actual_slice])
         else:
+            vmin2 = 0
             vmax2 = 255
+            if self.win.disp_smoothed:
+                vmax2 = self.labels.max()
+            slice_2 = self.data_2[:, :, self.actual_slice]
 
         # if both views are enabled
         if self.win.show_view_1 and self.win.show_view_2:
             plt.figure(self.figure.number)
             plt.subplot(121)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax1)
+            plt.imshow(slice_1, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
             # displaying contours if desirable
             if self.data_1_str is 'contours':
                 self.draw_contours()
@@ -283,7 +304,7 @@ class FormWidget(QtGui.QWidget):
 
             plt.subplot(122)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax2)
+            plt.imshow(slice_2, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
             # displaying contours if desirable
             if self.data_2_str is 'contours':
                 self.draw_contours()
@@ -294,7 +315,7 @@ class FormWidget(QtGui.QWidget):
             plt.figure(self.figure.number)
             plt.subplot(111)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(self.data_1[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax1)
+            plt.imshow(slice_1, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
             if self.data_1_str is 'contours':
                 self.draw_contours()
             plt.title('view_1: %s' % self.data_1_str)
@@ -304,7 +325,7 @@ class FormWidget(QtGui.QWidget):
             plt.figure(self.figure.number)
             plt.subplot(111)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(self.data_2[:, :, self.actual_slice], 'gray', interpolation='nearest', vmin=vmin, vmax=vmax2)
+            plt.imshow(slice_2, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
             if self.data_2_str is 'contours':
                 self.draw_contours()
             plt.title('view_2: %s' % self.data_2_str)
@@ -351,12 +372,12 @@ class FormWidget(QtGui.QWidget):
         # self.slider_change(self.actual_slice)
 
 
-def run(im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2):
+def run(im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):
     if slice_axis == 0:
         im = np.transpose(im, (1, 2, 0))
         labels = np.transpose(labels, (1, 2, 0))
     app = QtGui.QApplication(sys.argv)
-    tv = TumorVisualiser(im, labels, healthy_label, hypo_label, hyper_label)
+    tv = TumorVisualiser(im, labels, healthy_label, hypo_label, hyper_label, disp_smoothed)
     tv.show()
     sys.exit(app.exec_())
 

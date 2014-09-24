@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import scipy.ndimage.morphology as scindimor
 import scipy.ndimage.measurements as scindimea
 import scipy.ndimage.interpolation as scindiint
+import scipy.ndimage as scindi
 import scipy.stats as scista
 
 import skimage.segmentation as skiseg
@@ -27,9 +28,15 @@ from mayavi import mlab
 
 import TumorVisualiser
 
-
 from sklearn import metrics
 from sklearn.cluster import KMeans
+
+import pickle
+
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig()
+
 
 #-------------------------------------------------------------
 def load_data(slice_idx=-1):
@@ -41,6 +48,9 @@ def load_data(slice_idx=-1):
     data = np.load('input_data.npy')
     o_data = np.load('input_orig_data.npy')
     mask = np.load('mask.npy')
+
+    # to be sure that the mask is only binary
+    mask = np.where(mask > 0, 1, 0)
 
     if slice_idx != -1:
         data_s = data[slice_idx, :, :]
@@ -58,6 +68,49 @@ def load_data(slice_idx=-1):
     # plt.show()
 
     return data, o_data, mask
+
+def data_zoom(data, voxelsize_mm, working_voxelsize_mm):
+    zoom = voxelsize_mm / (1.0 * working_voxelsize_mm)
+    data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
+    return data_res
+
+
+def load_pickle_data(fname, params, slice_idx=-1):
+    fcontent = None
+    try:
+        import gzip
+        f = gzip.open(fname, 'rb')
+        fcontent = f.read()
+        f.close()
+    except Exception as e:
+        logger.warning("Input gzip exception: " + str(e))
+        f = open(fname, 'rb')
+        fcontent = f.read()
+        f.close()
+    data_dict = pickle.loads(fcontent)
+
+    data = tools.windowing(data_dict['data3d'], level=params['win_level'], width=params['win_width'])
+
+    mask = data_dict['segmentation']
+
+    voxel_size = data_dict['voxelsize_mm']
+    # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
+    # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
+
+
+    if slice_idx != -1:
+        data = data[slice_idx, :, :]
+        mask = mask[slice_idx, :, :]
+
+        # data, _ = tools.crop_to_bbox(data_s, mask_s)
+        # mask, _ = tools.crop_to_bbox(mask_s, mask_s)
+
+    # plt.figure()
+    # plt.subplot(121), plt.imshow(data_bbox, 'gray')
+    # plt.subplot(122), plt.imshow(mask_bbox, 'gray')
+    # plt.show()
+
+    return data, mask, voxel_size
 
 
 def estimate_healthy_pdf(data, mask, params):
@@ -91,8 +144,8 @@ def estimate_healthy_pdf(data, mask, params):
         inners = ints[np.nonzero(inners_m)]
 
         # liver pdf -------------
-        mu = bins[peak_idx]
-        sigma = k_std_l * np.std(inners)
+        mu = bins[peak_idx] + params['hack_healthy_mu']
+        sigma = k_std_l * np.std(inners) + params['hack_healthy_sigma']
 
     rv = scista.norm(mu, sigma)
 
@@ -130,19 +183,32 @@ def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
         hack_sigma = params['hack_hyper_sigma']
 
     probs = rv_healthy.pdf(data) * mask
+    # hist, bins = skiexp.histogram(probs, nbins=100)
+    # plt.figure()
+    # plt.plot(bins, hist)
+    # plt.show()
+
     max_prob = rv_healthy.pdf(rv_healthy.mean())
-    # print 'max_prob = %.3f' % max_prob
+    # mean_prob = np.mean(probs[np.nonzero(mask)])
+    print 'max_prob = %.3f' % max_prob
+    # print 'mean prob = %.3f' % mean_prob
     prob_t = prob_w * max_prob
 
     ints_out_m = probs < prob_t * mask
+
+    # TumorVisualiser.run(data, ints_out_m, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
 
     ints_out = data[np.nonzero(ints_out_m)]
     hist, bins = skiexp.histogram(ints_out, nbins=256)
 
     if outlier_type == 'hypo':
         ints = ints_out[np.nonzero(ints_out < rv_healthy.mean())]
+        # m = ints_out_m * (data < rv_healthy.mean())
+        # TumorVisualiser.run(data, m, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
     elif outlier_type == 'hyper':
         ints = ints_out[np.nonzero(ints_out > rv_healthy.mean())]
+        # m = ints_out_m * (data > rv_healthy.mean())
+        # TumorVisualiser.run(data, m, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
     else:
         print 'Wrong outlier specification.'
         return
@@ -173,37 +239,35 @@ def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
         ax = plt.axis()
         plt.axis([0, 256, ax[2], ax[3]])
         plt.title('estimated normal pdf of %sdense obejcts' % outlier_type)
-        # plt.show()
+        plt.show()
 
     return mu, sigma, rv
 
 
-def get_unaries(data, mask, params):
-    show_me = params['show_estimated_pdfs']
+def get_unaries(data, mask, models, params):
+    # show_me = params['show_estimated_pdfs']
 
-    # liver pdf ------------
-    print 'estimating pdf of healthy parenchym...'
-    mu_h, sigma_h, rv_healthy = estimate_healthy_pdf(data, mask, params)
-    print 'liver pdf: mu = ', mu_h, ', sigma = ', sigma_h
+    # # liver pdf ------------
+    # print 'estimating pdf of healthy parenchym...'
+    # mu_h, sigma_h, rv_healthy = estimate_healthy_pdf(data, mask, params)
+    # print 'liver pdf: mu = ', mu_h, ', sigma = ', sigma_h
+    #
+    # # hypodense pdf ------------
+    # print 'estimating pdf of hypodense objects...'
+    # # mu_hypo, sigma_hypo, rv_hypo = estimate_hypo_pdf(data, mask, rv_healthy, show_me)
+    # mu_hypo, sigma_hypo, rv_hypo = estimate_outlier_pdf(data, mask, rv_healthy, 'hypo', params)
+    # print 'hypodense pdf: mu = ', mu_hypo, ', sigma= ', sigma_hypo
+    #
+    # # hyperdense pdf ------------
+    # print 'estimating pdf of hyperdense objects...'
+    # # mu_hyper, sigma_hyper, rv_hyper = estimate_hyper_pdf(data, mask, rv_healthy, show_me)
+    # mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, 'hyper', params)
+    # print 'hyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
 
-    # mask_e = skimor.binary_erosion(mask, np.ones((5, 5)))
-    # liver_probs = rv_healthy.pdf(data) * mask_e
-    # plt.figure()
-    # plt.subplot(121), plt.imshow(liver_probs, 'gray'), plt.colorbar()
-    # plt.subplot(122), plt.imshow(liver_probs > 0.05, 'gray')
-    # plt.show()
-
-    # hypodense pdf ------------
-    print 'estimating pdf of hypodense objects...'
-    # mu_hypo, sigma_hypo, rv_hypo = estimate_hypo_pdf(data, mask, rv_healthy, show_me)
-    mu_hypo, sigma_hypo, rv_hypo = estimate_outlier_pdf(data, mask, rv_healthy, 'hypo', params)
-    print 'hypodense pdf: mu = ', mu_hypo, ', sigma= ', sigma_hypo
-
-    # hyperdense pdf ------------
-    print 'estimating pdf of hyperdense objects...'
-    # mu_hyper, sigma_hyper, rv_hyper = estimate_hyper_pdf(data, mask, rv_healthy, show_me)
-    mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_healthy, 'hyper', params)
-    print 'hyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
+    rv_heal = models['rv_heal']
+    rv_hyper = models['rv_hyper']
+    rv_hypo = models['rv_hypo']
+    mu_heal = models['mu_heal']
 
     if params['erode_mask']:
         if data.ndim == 3:
@@ -211,15 +275,15 @@ def get_unaries(data, mask, params):
         else:
             mask = skimor.binary_erosion(mask, np.ones((5, 5)))
 
-    unaries_healthy = - rv_healthy.logpdf(data) * mask
+    unaries_healthy = - rv_heal.logpdf(data) * mask
     if params['unaries_as_cdf']:
-        unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_healthy.pdf(mu_h)) * mask
+        unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_heal.pdf(mu_heal)) * mask
         # removing zeros with second lowest value so the log(0) wouldn't throw a warning -
         tmp = 1 - rv_hypo.cdf(data)
         values = np.unique(tmp)
         tmp = np.where(tmp == 0, values[1], tmp)
         #-
-        unaries_hypo = - np.log(tmp * rv_healthy.pdf(mu_h)) * mask
+        unaries_hypo = - np.log(tmp * rv_heal.pdf(mu_heal)) * mask
         unaries_hypo = np.where(np.isnan(unaries_hypo), 0, unaries_hypo)
     else:
         unaries_hyper = - rv_hyper.logpdf(data) * mask
@@ -232,10 +296,10 @@ def get_unaries(data, mask, params):
         ints = data[np.nonzero(mask)]
         hist, bins = skiexp.histogram(ints, nbins=256)
         x = np.arange(0, 255, 0.01)
-        healthy = rv_healthy.pdf(x)
+        healthy = rv_heal.pdf(x)
         if params['unaries_as_cdf']:
-            hypo = (1 - rv_hypo.cdf(x)) * rv_healthy.pdf(mu_h)
-            hyper = rv_hyper.cdf(x) * rv_healthy.pdf(mu_h)
+            hypo = (1 - rv_hypo.cdf(x)) * rv_heal.pdf(mu_heal)
+            hyper = rv_hyper.cdf(x) * rv_heal.pdf(mu_heal)
         else:
             hypo = rv_hypo.pdf(x)
             hyper = rv_hyper.pdf(x)
@@ -348,14 +412,21 @@ def filter_objects(feature_v, features, params):
     return obj_ok
 
 
-def run(params, show_me,):
+def run(params, show_me, fname=''):
     slice_idx = params['slice_idx']
     alpha = params['alpha']
     beta = params['beta']
     hypo_lab = params['hypo_label']
     hyper_lab = params['hyper_label']
 
-    _, data_o, mask = load_data(slice_idx)
+    if not fname:
+        _, data, mask = load_data(slice_idx)
+    else:
+        data, mask, voxel_size = load_pickle_data(fname, params, slice_idx)
+    data = data.astype(np.uint8)
+
+    # TumorVisualiser.run(data, mask, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
+
     print 'estimating number of clusters...'
     print '\tcurrently switched off'
     # d = scindiint.zoom(data_o, 0.5)
@@ -378,12 +449,57 @@ def run(params, show_me,):
     #
     # data_d = np.where(data_d < 0, 0, data_d)
 
+    # zooming the data
+    # print 'zooming data...'
+    # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
+    # mask = data_zoom(mask, voxel_size, params['working_voxelsize_mm'])
+    # data = data.astype(np.uint8)
+
+    # smoothing data
+    print 'smoothing data...'
+    if params['smoothing'] == 1:
+        data = skifil.gaussian_filter(data, )
+    elif params['smoothing'] == 2:
+        data = tools.smoothing_bilateral(data, sigma_space=params['sigma_spatial'], sigma_color=params['sigma_range'], sliceId=0)
+    elif params['smoothing'] == 3:
+        data = tools.smoothing_tv(data, weight=params['weight'], sliceId=0)
+    else:
+        print '\tcurrently switched off'
+
+    print 'estimating intensity models...'
+    # liver pdf ------------
+    mu_heal, sigma_heal, rv_heal = estimate_healthy_pdf(data, mask, params)
+    print '\tliver pdf: mu = ', mu_heal, ', sigma = ', sigma_heal
+    # hypodense pdf ------------
+    mu_hypo, sigma_hypo, rv_hypo = estimate_outlier_pdf(data, mask, rv_heal, 'hypo', params)
+    print '\thypodense pdf: mu = ', mu_hypo, ', sigma= ', sigma_hypo
+    # hyperdense pdf ------------
+    mu_hyper, sigma_hyper, rv_hyper = estimate_outlier_pdf(data, mask, rv_heal, 'hyper', params)
+    print '\thyperdense pdf: mu = ', mu_hyper, ', sigma= ', sigma_hyper
+
+    models = dict()
+    models['mu_heal'] = mu_heal
+    models['sigma_heal'] = sigma_heal
+    models['mu_hypo'] = mu_hypo
+    models['sigma_hypo'] = sigma_hypo
+    models['mu_hyper'] = mu_hyper
+    models['sigma_hyper'] = sigma_hyper
+    models['rv_heal'] = rv_heal
+    models['rv_hypo'] = rv_hypo
+    models['rv_hyper'] = rv_hyper
+
+    # zooming the data
+    print 'zooming data...'
+    data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
+    mask = data_zoom(mask, voxel_size, params['working_voxelsize_mm'])
+    # data = data.astype(np.uint8)
+
     print 'calculating unary potentials...'
     # create unaries
     # unaries = data_d
     # # as we convert to int, we need to multipy to get sensible values
     # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
-    unaries = beta * get_unaries(data_o, mask, params)
+    unaries = beta * get_unaries(data, mask, models, params)
     n_labels = unaries.shape[2]
 
     print 'calculating pairwise potentials...'
@@ -393,12 +509,12 @@ def run(params, show_me,):
     print 'deriving graph edges...'
     # use the gerneral graph algorithm
     # first, we construct the grid graph
-    inds = np.arange(data_o.size).reshape(data_o.shape)
-    if data_o.ndim == 2:
+    inds = np.arange(data.size).reshape(data.shape)
+    if data.ndim == 2:
         horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
         vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
         edges = np.vstack([horz, vert]).astype(np.int32)
-    elif data_o.ndim == 3:
+    elif data.ndim == 3:
         # horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
         # vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
         horz = np.c_[inds[:, :, :-1].ravel(), inds[:, :, 1:].ravel()]
@@ -406,7 +522,7 @@ def run(params, show_me,):
         dept = np.c_[inds[:-1, :, :].ravel(), inds[1:, :, :].ravel()]
         edges = np.vstack([horz, vert, dept]).astype(np.int32)
     # deleting edges with nodes outside the mask
-    nodes_in = np.ravel_multi_index(np.nonzero(mask), data_o.shape)
+    nodes_in = np.ravel_multi_index(np.nonzero(mask), data.shape)
     rows_inds = np.in1d(edges, nodes_in).reshape(edges.shape).sum(axis=1) == 2
     edges = edges[rows_inds, :]
 
@@ -422,7 +538,7 @@ def run(params, show_me,):
     # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
     # print 'tu: ', unaries.reshape(-1, n_labels).shape
     result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, n_labels), pairwise)
-    res = result_graph.reshape(data_o.shape)
+    res = result_graph.reshape(data.shape)
 
     res = np.where(mask, res, -1)
     print '\t...done'
@@ -479,10 +595,10 @@ def run(params, show_me,):
         print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
         print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
 
-    if data_o.ndim == 2:
+    if data.ndim == 2:
         plt.figure()
         plt.subplot(2, n_labels, 1), plt.title('original')
-        plt.imshow(data_o, 'gray', interpolation='nearest')
+        plt.imshow(data, 'gray', interpolation='nearest')
         plt.subplot(2, n_labels, 2), plt.title('graph cut')
         plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
         if n_labels == 2:
@@ -497,12 +613,15 @@ def run(params, show_me,):
             plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
             plt.imshow(unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
         plt.show()
-    elif data_o.ndim == 3:
+    elif data.ndim == 3:
         # py3DSeedEditor.py3DSeedEditor(data_o).show()
         # py3DSeedEditor.py3DSeedEditor(res).show()
-        TumorVisualiser.run(data_o, res, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0)
         # py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
-        mayavi_visualization(res)
+
+        plt.show()
+        TumorVisualiser.run(data, res, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0)
+
+        # mayavi_visualization(res)
 
 
 #-------------------------------------------------------------
@@ -521,18 +640,36 @@ if __name__ == '__main__':
     params['k_std_t'] = 3  # weighting parameter for sigma of normal distribution of tumor
     params['tv_weight'] = 0.05  # weighting parameter for total variation filter
     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
-    params['prob_w'] = 0.5  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+    params['prob_w'] = 0.0001  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+
+    params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
+
+    # data smoothing
+    # 0 ... no smoothing
+    # 1 ... gaussian blurr, param = sigma
+    # 2 ... bilateral filter, param = sigma_range (0.05)
+    # 3 ... total variation filter, param = weight (0.1)
+    params['smoothing'] = -1
+    params['sigma'] = 1
+    params['sigma_range'] = 0.05
+    params['sigma_spatial'] = 15
+    params['weight'] = 0.05
+
+    params['win_width'] = 350  # width of window for visualising abdomen
+    params['win_level'] = 50  # level of window for visualising abdomen
 
     params['unaries_as_cdf'] = True  # whether estimate the prob. model of outliers as cumulative density function
 
     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
-    params['hack_hyper_mu'] = 5  # hard move of mean of hyperdense pdf to the right
-    params['hack_hyper_sigma'] = 5  # hard widening of sigma of hyperdense  pdf
+    params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right
+    params['hack_hyper_sigma'] = 0 #5  # hard widening of sigma of hyperdense pdf
+    params['hack_healthy_mu'] = -0 #5  # hard move of mean of healthy pdf to the right
+    params['hack_healthy_sigma'] = 0 #5  # hard widening of sigma of healthy pdf
 
     params['show_healthy_pdf_estim'] = False
-    params['show_estimated_pdfs'] = True
     params['show_outlier_pdf_estim'] = False
+    params['show_estimated_pdfs'] = False
 
     params['hypo_label'] = 0  # label of hypodense objects
     params['healthy_label'] = 1
@@ -546,4 +683,38 @@ if __name__ == '__main__':
 
     show_me = True  # debug visualization
 
-    run(params, show_me)
+    fname = ''
+
+    # 2 hypo, 1 on the border --------------------
+    # arterial 0.6mm - bad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_arterial_0.6_B30f-.pklz'
+    # venous 0.6mm - good
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
+    # venous 5mm - ok, but wrong approach
+    # fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
+
+    # hypo in venous -----------------------
+    # arterial - bad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz'
+    # venous - good
+    fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz'
+
+    # hyper, 1 on the border -------------------
+    # arterial 0.6mm - not that bad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Art_Abd_0.75_I26f_M_0.5-.pklz'
+    # venous 5mm - bad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Ven_Abd_0.75_I26f_M_0.5-.pklz'
+
+    # shluk -----------------
+    # arterial 5mm
+    # fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_arterial_5.0_B30f-.pklz'
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_180_49509315_arterial_0.6_B20f-.pklz'
+
+    # targeted
+    # arterial 0.6mm - bad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Arterial_0.75_I26f_3-.pklz'
+    # venous 0.6mm - b  ad
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Venous_0.75_I26f_3-.pklz'
+
+
+    run(params, show_me, fname=fname)

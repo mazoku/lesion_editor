@@ -38,6 +38,7 @@ logging.basicConfig()
 
 
 from lession_editor_GUI import Ui_MainWindow
+import Form_widget
 
 class Lession_editor(QtGui.QMainWindow):
     """Main class of the programm."""
@@ -58,6 +59,119 @@ class Lession_editor(QtGui.QMainWindow):
         self.hypo_label = hypo_label
         self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
+        self.n_slices = im.shape[2]
+
+        # nastaveni rozsahu scrollBaru podle poctu rezu
+        self.ui.slice_scrollB.setMaximum(self.n_slices - 1)
+
+        self.form_widget = Form_widget.Form_widget(self)
+        data_viewer_layout = QtGui.QHBoxLayout()
+        data_viewer_layout.addWidget(self.form_widget)
+        self.ui.viewer_F.setLayout(data_viewer_layout)
+
+        # connecting callbacks ----------------------------------
+        self.ui.view_1_BTN.clicked.connect(self.view_1_callback)
+        self.ui.view_2_BTN.clicked.connect(self.view_2_callback)
+
+        # show image data
+        self.ui.show_im_1_BTN.clicked.connect(self.show_im_1_callback)
+        self.ui.show_im_2_BTN.clicked.connect(self.show_im_2_callback)
+
+        # show label data
+        self.ui.show_labels_1_BTN.clicked.connect(self.show_labels_1_callback)
+        self.ui.show_labels_2_BTN.clicked.connect(self.show_labels_2_callback)
+
+        # show contours data
+        self.ui.show_contours_1_BTN.clicked.connect(self.show_contours_1_callback)
+        self.ui.show_contours_2_BTN.clicked.connect(self.show_contours_2_callback)
+
+        # connecting slider
+        self.ui.slice_scrollB.valueChanged.connect(self.slider_changed)
+
+    def wheelEvent(self, event):
+        print event.delta() / 120
+
+    def slider_changed(self, val):
+        self.slice_change(val)
+        self.form_widget.actual_slice = val
+        self.form_widget.update_figures()
+
+    def slice_change(self, val):
+        self.ui.slice_scrollB.setValue(val)
+        self.ui.slice_number_LBL.setText('slice # = %i' % (val + 1))
+
+    def view_1_callback(self):
+        self.show_view_1 = not self.show_view_1
+
+        # enabling and disabling other toolbar icons
+        self.ui.show_im_1_BTN.setEnabled(not self.ui.show_im_1_BTN.isEnabled())
+        self.ui.show_labels_1_BTN.setEnabled(not self.ui.show_labels_1_BTN.isEnabled())
+        self.ui.show_contours_1_BTN.setEnabled(not self.ui.show_contours_1_BTN.isEnabled())
+
+        self.statusBar().showMessage('view_1 set to %s' % self.show_view_1)
+        # print 'view_1 set to', self.show_view_1
+
+        print 'upravit update figur'
+        self.form_widget.update_figures()
+
+    def view_2_callback(self):
+        self.show_view_2 = not self.show_view_2
+
+        # enabling and disabling other toolbar icons
+        self.ui.show_im_2_BTN.setEnabled(not self.ui.show_im_2_BTN.isEnabled())
+        self.ui.show_labels_2_BTN.setEnabled(not self.ui.show_labels_2_BTN.isEnabled())
+        self.ui.show_contours_2_BTN.setEnabled(not self.ui.show_contours_2_BTN.isEnabled())
+
+        self.statusBar().showMessage('view_2 set to %s' % self.show_view_2)
+        # print 'view_2 set to', self.show_view_2
+
+        print 'upravit update figur'
+        self.form_widget.update_figures()
+
+    def show_im_1_callback(self):
+        # print 'data_1 set to im'
+        self.statusBar().showMessage('data_1 set to im')
+        self.form_widget.data_1 = self.im
+        self.form_widget.data_1_str = 'im'
+        self.form_widget.update_figures()
+
+    def show_im_2_callback(self):
+        # print 'data_2 set to im'
+        self.statusBar().showMessage('data_2 set to im')
+        if self.disp_smoothed:
+            self.form_widget.data_2 = self.labels
+        else:
+            self.form_widget.data_2 = self.im
+        self.form_widget.data_2_str = 'im'
+        self.form_widget.update_figures()
+
+    def show_labels_1_callback(self):
+        # print 'data_1 set to labels'
+        self.statusBar().showMessage('data_1 set to labels')
+        self.form_widget.data_1 = self.labels
+        self.form_widget.data_1_str = 'labels'
+        self.form_widget.update_figures()
+
+    def show_labels_2_callback(self):
+        # print 'data_2 set to labels'
+        self.statusBar().showMessage('data_2 set to labels')
+        self.form_widget.data_2 = self.labels
+        self.form_widget.data_2_str = 'labels'
+        self.form_widget.update_figures()
+
+    def show_contours_1_callback(self):
+        # print 'data_2 set to contours'
+        self.statusBar().showMessage('data_1 set to contours')
+        self.form_widget.data_1 = self.im
+        self.form_widget.data_1_str = 'contours'
+        self.form_widget.update_figures()
+
+    def show_contours_2_callback(self):
+        # print 'data_2 set to contours'
+        self.statusBar().showMessage('data_2 set to contours')
+        self.form_widget.data_2 = self.im
+        self.form_widget.data_2_str = 'contours'
+        self.form_widget.update_figures()
 
 
 def run(im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):

@@ -129,7 +129,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QWidget" name="histogram_WDT" native="true">
+         <widget class="QFrame" name="histogram_F">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -817,7 +817,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QWidget" name="viewer_WDT" native="true">
+         <widget class="QFrame" name="viewer_F">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -854,7 +854,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QScrollBar" name="horizontalScrollBar">
+           <widget class="QScrollBar" name="slice_scrollB">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>

@@ -73,12 +73,12 @@ class TumorVisualiser(QtGui.QMainWindow):
         self.show_labels_2_action.triggered.connect(self.show_labels_2_callback)
         self.toolbar_view_2.addAction(self.show_labels_2_action)
 
-        # show label data on view 1
+        # show contours data on view 1
         self.show_contours_1_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_1', self)
         self.show_contours_1_action.triggered.connect(self.show_contours_1_callback)
         self.toolbar_view_1.addAction(self.show_contours_1_action)
 
-        # show label data on view 2
+        # show contours data on view 2
         self.show_contours_2_action = QtGui.QAction(QtGui.QIcon('icons/Brush.png'), 'contours_2', self)
         self.show_contours_2_action.triggered.connect(self.show_contours_2_callback)
         self.toolbar_view_2.addAction(self.show_contours_2_action)

@@ -1,0 +1,3 @@
+FILE FOR NOTES AND TODOS
+
+* udelat callbacky na spinboxy u modelu

@@ -1,11 +1,11 @@
 __author__ = 'tomas'
 
 import numpy as np
-import graph_cut as gc
+import Computational_core as gc
 
 import scipy.ndimage.measurements as scindimea
 import skimage.transform as skitra
-from graph_cut import *
+from Computational_core import *
 
 
 params = dict()

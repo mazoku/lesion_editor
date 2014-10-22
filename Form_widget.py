@@ -12,7 +12,7 @@ class Form_widget(QtGui.QWidget):
     def __init__(self, window):
 
         self.win = window  # link to the main window
-        self.im = self.win.im  # input data
+        self.im = self.win.data  # input data
         self.labels = self.win.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
         self.n_slices = self.im.shape[2]  # numer of slices

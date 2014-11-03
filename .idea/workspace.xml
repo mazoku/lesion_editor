@@ -2,16 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="48488e51-8ace-4261-88f7-e750ecda8e6f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Computational_core.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TODO.txt" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/graph_cut.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lession_editor_GUI.ui" afterPath="$PROJECT_DIR$/lession_editor_GUI.ui" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Form_widget.py" afterPath="$PROJECT_DIR$/Form_widget.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Hist_widget.py" afterPath="$PROJECT_DIR$/Hist_widget.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Lession_editor.py" afterPath="$PROJECT_DIR$/Lession_editor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lession_editor_GUI.py" afterPath="$PROJECT_DIR$/lession_editor_GUI.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_deriving_data_model.py" afterPath="$PROJECT_DIR$/test_deriving_data_model.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TODO.txt" afterPath="$PROJECT_DIR$/TODO.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="mrf_segmentation.iws" />
@@ -25,16 +18,16 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/mrf_segmentation$tumor_visualiser.coverage" NAME="tumor_visualiser Coverage Results" MODIFIED="1406808198202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$lession_editor.coverage" NAME="lession_editor Coverage Results" MODIFIED="1411546345906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Dropbox/Work/Python/PyQt" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$lession_editor_example.coverage" NAME="lession_editor_example Coverage Results" MODIFIED="1411462025221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Dropbox/Work/Python/PyQt" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1413636027198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$lession_editor.coverage" NAME="lession_editor Coverage Results" MODIFIED="1411546345906" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Dropbox/Work/Python/PyQt" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$test_deriving_data_model.coverage" NAME="test_deriving_data_model Coverage Results" MODIFIED="1406118629904" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$graph_cut.coverage" NAME="graph_cut Coverage Results" MODIFIED="1413636027198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$bootstrap.coverage" NAME="bootstrap Coverage Results" MODIFIED="1404132204647" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$Lession_editor.coverage" NAME="Lession_editor Coverage Results" MODIFIED="1413814435739" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$Lession_editor.coverage" NAME="Lession_editor Coverage Results" MODIFIED="1415016292749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$test.coverage" NAME="test Coverage Results" MODIFIED="1405496455289" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$lisa.coverage" NAME="lisa Coverage Results" MODIFIED="1407825651581" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lisa" />
-    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1406789915774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$organ_segmentation_gui.coverage" NAME="organ_segmentation_gui Coverage Results" MODIFIED="1402485182702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lisa/src" />
+    <SUITE FILE_PATH="coverage/mrf_segmentation$upo.coverage" NAME="upo Coverage Results" MODIFIED="1406789915774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/mrf_segmentation$mrf_gmm_test.coverage" NAME="mrf_gmm_test Coverage Results" MODIFIED="1406614263118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
@@ -51,10 +44,19 @@
     <splitter split-orientation="horizontal" split-proportion="0.49153647">
       <split-first>
         <leaf>
-          <file leaf-file-name="Lession_editor.py" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="Lession_editor.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Lession_editor.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="94" column="63" selection-start="2892" selection-end="2892" vertical-scroll-proportion="0.26656848" vertical-offset="749" max-vertical-offset="5130">
+                <state line="75" column="0" selection-start="1940" selection-end="1940" vertical-scroll-proportion="0.0" vertical-offset="434" max-vertical-offset="5145">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="Form_widget.py" pinned="false" current="true" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/Form_widget.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="149" column="13" selection-start="5864" selection-end="5864" vertical-scroll-proportion="0.235474" vertical-offset="2021" max-vertical-offset="2940">
                   <folding />
                 </state>
               </provider>
@@ -63,7 +65,7 @@
           <file leaf-file-name="TumorVisualiser.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/TumorVisualiser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="381" column="25" selection-start="14893" selection-end="14928" vertical-scroll-proportion="0.0" vertical-offset="5391" max-vertical-offset="6135">
+                <state line="381" column="25" selection-start="14893" selection-end="14928" vertical-scroll-proportion="0.0" vertical-offset="5715" max-vertical-offset="6270">
                   <folding />
                 </state>
               </provider>
@@ -74,8 +76,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state line="16" column="33" selection-start="452" selection-end="452" vertical-scroll-proportion="0.0" vertical-offset="325" max-vertical-offset="2010">
                   <folding>
-                    <element signature="e#22#32#0" expanded="true" />
-                    <marker date="1413814218660" expanded="true" signature="331:4048" placeholder="..." />
                     <marker date="1413814218660" expanded="true" signature="1592:1625" placeholder="..." />
                     <marker date="1413814218660" expanded="true" signature="1736:1767" placeholder="..." />
                   </folding>
@@ -87,9 +87,7 @@
             <entry file="file://$PROJECT_DIR$/Computational_core.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state line="40" column="13" selection-start="861" selection-end="861" vertical-scroll-proportion="0.0" vertical-offset="869" max-vertical-offset="10845">
-                  <folding>
-                    <element signature="e#23#41#0" expanded="true" />
-                  </folding>
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -98,10 +96,10 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="Lession_editor.py" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="Lession_editor.py" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Lession_editor.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="194" column="20" selection-start="6785" selection-end="6785" vertical-scroll-proportion="-2.066274" vertical-offset="3833" max-vertical-offset="5130">
+                <state line="195" column="20" selection-start="6793" selection-end="6793" vertical-scroll-proportion="0.0" vertical-offset="2925" max-vertical-offset="5145">
                   <folding />
                 </state>
               </provider>
@@ -111,9 +109,7 @@
             <entry file="file://$PROJECT_DIR$/Hist_widget.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state line="52" column="19" selection-start="1574" selection-end="1574" vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="2010">
-                  <folding>
-                    <element signature="e#22#32#0" expanded="true" />
-                  </folding>
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -122,17 +118,15 @@
             <entry file="file://$PROJECT_DIR$/Computational_core.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state line="197" column="13" selection-start="7285" selection-end="7285" vertical-scroll-proportion="0.0" vertical-offset="2340" max-vertical-offset="10845">
-                  <folding>
-                    <element signature="e#23#41#0" expanded="true" />
-                  </folding>
+                  <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="TODO.txt" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="TODO.txt" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/TODO.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="2" column="24" selection-start="50" selection-end="50" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="120">
+                <state line="2" column="51" selection-start="77" selection-end="77" vertical-scroll-proportion="0.0433526" vertical-offset="0" max-vertical-offset="692">
                   <folding />
                 </state>
               </provider>
@@ -170,18 +164,18 @@
         <option value="$PROJECT_DIR$/TumorVisualiser.py" />
         <option value="$PROJECT_DIR$/lession_editor_GUI.py" />
         <option value="$PROJECT_DIR$/graph_cut.py" />
-        <option value="$PROJECT_DIR$/Form_widget.py" />
         <option value="$PROJECT_DIR$/Computational_core.py" />
-        <option value="$PROJECT_DIR$/TODO.txt" />
         <option value="$PROJECT_DIR$/Hist_widget.py" />
+        <option value="$PROJECT_DIR$/Form_widget.py" />
         <option value="$PROJECT_DIR$/Lession_editor.py" />
+        <option value="$PROJECT_DIR$/TODO.txt" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="-4" />
+    <option name="y" value="24" />
     <option name="width" value="1920" />
-    <option name="height" value="1084" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -209,7 +203,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -230,6 +223,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -439,6 +433,9 @@
       <option name="PARAMETERS" value="" />
       <method />
     </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
     <configuration default="true" type="tests" factoryName="Unittests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -460,9 +457,6 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
@@ -593,7 +587,11 @@
       <created>1413186889116</created>
       <updated>1413186889116</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Figure for histogram editing created.">
+      <created>1413985328268</created>
+      <updated>1413985328268</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -617,15 +615,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-4" width="1920" height="1084" extended-state="6" />
+    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16808964" sideWeight="0.466759" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16808964" sideWeight="0.53185594" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17289221" sideWeight="0.46814406" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17289221" sideWeight="0.53185594" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2887538" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26849037" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -633,12 +631,12 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32928064" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -664,7 +662,8 @@
     <MESSAGE value="Some minor changes in TumorVisualizer, layout redefinition etc." />
     <MESSAGE value="Starting creating more sophisticated editor, GUI created with QtDesigner." />
     <MESSAGE value="Created figure for displaying the image data. Now similar figure for showing histograms of individual objects needs to be created." />
-    <option name="LAST_COMMIT_MESSAGE" value="Created figure for displaying the image data. Now similar figure for showing histograms of individual objects needs to be created." />
+    <MESSAGE value="Figure for histogram editing created." />
+    <option name="LAST_COMMIT_MESSAGE" value="Figure for histogram editing created." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -674,30 +673,23 @@
           <line>499</line>
           <option name="timeStamp" value="88" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/Lession_editor.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="91" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="89" />
+      <option name="time" value="92" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8475" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Computational_core.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <folding>
-            <element signature="e#23#41#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -734,9 +726,7 @@
     <entry file="file://$PROJECT_DIR$/Computational_core.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <folding>
-            <element signature="e#23#41#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -912,13 +902,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7425" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Form_widget.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="115" column="77" selection-start="4218" selection-end="4283" vertical-scroll-proportion="0.0" vertical-offset="1293" max-vertical-offset="2895">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/TumorVisualiser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="381" column="25" selection-start="14893" selection-end="14928" vertical-scroll-proportion="0.0" vertical-offset="5391" max-vertical-offset="6135">
@@ -926,19 +909,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/TODO.txt">
+    <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="24" selection-start="50" selection-end="50" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="120">
-          <folding />
-        </state>
+        <state line="51" column="19" selection-start="2155" selection-end="2155" vertical-scroll-proportion="0.24311927" vertical-offset="546" max-vertical-offset="1200" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Hist_widget.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="16" column="33" selection-start="452" selection-end="452" vertical-scroll-proportion="0.0" vertical-offset="325" max-vertical-offset="2010">
           <folding>
-            <element signature="e#22#32#0" expanded="true" />
-            <marker date="1413814218660" expanded="true" signature="331:4048" placeholder="..." />
             <marker date="1413814218660" expanded="true" signature="1592:1625" placeholder="..." />
             <marker date="1413814218660" expanded="true" signature="1736:1767" placeholder="..." />
           </folding>
@@ -948,22 +927,41 @@
     <entry file="file://$PROJECT_DIR$/Computational_core.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="40" column="13" selection-start="861" selection-end="861" vertical-scroll-proportion="0.0" vertical-offset="869" max-vertical-offset="10845">
-          <folding>
-            <element signature="e#23#41#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
+    <entry file="file://$PROJECT_DIR$/../lisa/src/organ_segmentation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="19" selection-start="2155" selection-end="2155" vertical-scroll-proportion="0.24311927" vertical-offset="546" max-vertical-offset="1200">
+        <state line="22" column="18" selection-start="557" selection-end="557" vertical-scroll-proportion="-9.962519" vertical-offset="6975" max-vertical-offset="14610">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/share/pyshared/matplotlib/cbook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="526" column="0" selection-start="17158" selection-end="17158" vertical-scroll-proportion="0.0" vertical-offset="7379" max-vertical-offset="29565">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Lession_editor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="94" column="63" selection-start="2892" selection-end="2892" vertical-scroll-proportion="0.26656848" vertical-offset="749" max-vertical-offset="5130">
+        <state line="75" column="0" selection-start="1940" selection-end="1940" vertical-scroll-proportion="0.0" vertical-offset="434" max-vertical-offset="5145">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TODO.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="51" selection-start="77" selection-end="77" vertical-scroll-proportion="0.0433526" vertical-offset="0" max-vertical-offset="692">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Form_widget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="149" column="13" selection-start="5864" selection-end="5864" vertical-scroll-proportion="0.235474" vertical-offset="2021" max-vertical-offset="2940">
           <folding />
         </state>
       </provider>

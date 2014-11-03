@@ -15,7 +15,7 @@ class Form_widget(QtGui.QWidget):
         self.im = self.win.data  # input data
         self.labels = self.win.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
-        self.n_slices = self.im.shape[2]  # numer of slices
+        self.n_slices = self.im.shape[0]  # numer of slices
         self.healthy_label = self.win.healthy_label
         self.hypo_label = self.win.hypo_label
         self.hyper_label = self.win.hyper_label
@@ -93,21 +93,21 @@ class Form_widget(QtGui.QWidget):
         if self.data_1_str is 'labels':
             vmin1 = self.data_1.min()
             vmax1 = self.data_1.max()
-            slice_1 = self.label2rgb(self.data_1[:, :, self.actual_slice])
+            slice_1 = self.label2rgb(self.data_1[self.actual_slice, :, :])
         else:
             vmin1 = 0
             vmax1 = 255
-            slice_1 = self.data_1[:, :, self.actual_slice]
+            slice_1 = self.data_1[self.actual_slice, :, :]
         if self.data_2_str is 'labels':
             vmin2 = self.data_2.min()
             vmax2 = self.data_2.max()
-            slice_2 = self.label2rgb(self.data_2[:, :, self.actual_slice])
+            slice_2 = self.label2rgb(self.data_2[self.actual_slice, :, :])
         else:
             vmin2 = 0
             vmax2 = 255
             if self.win.disp_smoothed:
                 vmax2 = self.labels.max()
-            slice_2 = self.data_2[:, :, self.actual_slice]
+            slice_2 = self.data_2[self.actual_slice, :, :]
 
         # if both views are enabled
         if self.win.show_view_1 and self.win.show_view_2:
@@ -155,15 +155,15 @@ class Form_widget(QtGui.QWidget):
 
     def draw_contours(self):
         try:
-            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.healthy_label, [0.5], colors='g', linewidths=2)
+            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.healthy_label, [0.5], colors='g', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.hypo_label, [0.5], colors='b', linewidths=2)
+            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.5], colors='b', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[:, :, self.actual_slice] == self.hyper_label, [0.5], colors='r', linewidths=2)
+            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.5], colors='r', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
 
@@ -176,9 +176,12 @@ class Form_widget(QtGui.QWidget):
             self.actual_slice = 0
 
     def prev_slice(self):
+        print 'actual: ', self.actual_slice
         self.actual_slice -= 1
+        print 'new: ', self.actual_slice
         if self.actual_slice < 0:
             self.actual_slice = self.n_slices - 1
+            print 'remaped to: ', self.actual_slice
 
     def on_scroll(self, event):
         '''mouse wheel is used for setting slider value'''

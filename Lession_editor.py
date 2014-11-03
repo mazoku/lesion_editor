@@ -62,7 +62,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.hypo_label = hypo_label
         self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
-        self.n_slices = im.shape[2]
 
         # computational core
         self.cc = Computational_core.Computational_core(fname)
@@ -70,6 +69,8 @@ class Lession_editor(QtGui.QMainWindow):
         self.data = self.cc.data
         self.labels = np.zeros(self.data.shape, dtype=np.int)
         self.mask = self.cc.mask
+
+        self.n_slices = self.data.shape[0]
 
         # nastaveni rozsahu scrollBaru podle poctu rezu
         self.ui.slice_scrollB.setMaximum(self.n_slices - 1)

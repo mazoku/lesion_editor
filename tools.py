@@ -11,7 +11,8 @@ import cv2
 import skimage.measure as skimea
 import skimage.morphology as skimor
 import skimage.filter as skifil
-import skimage.restoration as skires
+# import skimage.restoration as skires
+import skimage.filter as skifil
 import skimage.segmentation as skiseg
 import scipy.stats as scista
 import scipy.ndimage.morphology as scindimor
@@ -236,17 +237,17 @@ def smoothing_bilateral(data, sigma_space=15, sigma_color=0.05, pseudo_3D='True'
     if data.ndim == 3 and pseudo_3D:
         if sliceId == 2:
             for idx in range(data.shape[2]):
-                # temp = skifil.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
-                temp = skires.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
+                temp = skifil.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
+                # temp = skires.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
                 data[idx, :, :] = (255 * temp).astype(np.uint8)
         elif sliceId == 0:
             for idx in range(data.shape[0]):
-                # temp = skifil.denoise_bilateral(data[idx, :, :], sigma_range=sigma_color, sigma_spatial=sigma_space)
-                temp = skires.denoise_bilateral(data[idx, :, :], sigma_range=sigma_color, sigma_spatial=sigma_space)
+                temp = skifil.denoise_bilateral(data[idx, :, :], sigma_range=sigma_color, sigma_spatial=sigma_space)
+                # temp = skires.denoise_bilateral(data[idx, :, :], sigma_range=sigma_color, sigma_spatial=sigma_space)
                 data[idx, :, :] = (255 * temp).astype(np.uint8)
     else:
-        # data = skifil.denoise_bilateral(data, sigma_range=sigma_color, sigma_spatial=sigma_space)
-        data = skires.denoise_bilateral(data, sigma_range=sigma_color, sigma_spatial=sigma_space)
+        data = skifil.denoise_bilateral(data, sigma_range=sigma_color, sigma_spatial=sigma_space)
+        # data = skires.denoise_bilateral(data, sigma_range=sigma_color, sigma_spatial=sigma_space)
         data = (255 * data).astype(np.uint8)
     return data
 
@@ -255,17 +256,17 @@ def smoothing_tv(data, weight=0.1, pseudo_3D=True, multichannel=False, sliceId=2
     if data.ndim == 3 and pseudo_3D:
         if sliceId == 2:
             for idx in range(data.shape[2]):
-                # temp = skifil.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
-                temp = skires.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
+                temp = skifil.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
+                # temp = skires.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
                 data[:, :, idx] = (255 * temp).astype(np.uint8)
         elif sliceId == 0:
             for idx in range(data.shape[0]):
-                # temp = skifil.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
-                temp = skires.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
+                temp = skifil.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
+                # temp = skires.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
                 data[idx, :, :] = (255 * temp).astype(np.uint8)
     else:
-        # data = skifil.denoise_tv_chambolle(data, weight=weight, multichannel=False)
-        data = skires.denoise_tv_chambolle(data, weight=weight, multichannel=False)
+        data = skifil.denoise_tv_chambolle(data, weight=weight, multichannel=False)
+        # data = skires.denoise_tv_chambolle(data, weight=weight, multichannel=False)
         data = (255 * data).astype(np.uint8)
     return data
 

@@ -21,7 +21,7 @@ import pygco
 
 import tools
 import py3DSeedEditor
-from mayavi import mlab
+# from mayavi import mlab
 
 import TumorVisualiser
 
@@ -375,40 +375,40 @@ class Computational_core():
         return unaries
 
 
-    def mayavi_visualization(self, res):
-        ### Read the data in a numpy 3D array ##########################################
-        #parenchym = np.logical_or(liver, vessels)
-        parenchym = res > 0
-        hypodense = res == 0
-        hyperdense = res == 2
-        data = np.where(parenchym, 1, 0)
-        data = data.T
-
-        src = mlab.pipeline.scalar_field(data)
-        src.spacing = [1, 1, 1]
-
-        data2 = np.where(hypodense, 1, 0)
-        # data2 = hypodense
-        data2 = data2.T
-        src2 = mlab.pipeline.scalar_field(data2)
-        src2.spacing = [1, 1, 1]
-
-        data3 = np.where(hyperdense, 1, 0)
-        # data3 = hyperdense
-        data3 = data3.T
-        src3 = mlab.pipeline.scalar_field(data3)
-        src3.spacing = [1, 1, 1]
-
-        #contours 6 ... cevy
-        #contours 3 ... jatra
-        #contours 10 ... jatra a cevy
-        #mlab.pipeline.iso_surface(src, contours=3, opacity=0.1)
-        #mlab.pipeline.iso_surface(src, contours=2, opacity=0.2)
-        mlab.pipeline.iso_surface(src, contours=2, opacity=0.2, color=(0, 1, 0))
-        mlab.pipeline.iso_surface(src2, contours=2, opacity=0.2, color=(1, 0, 0))
-        mlab.pipeline.iso_surface(src3, contours=2, opacity=0.2, color=(0, 0, 1))
-
-        mlab.show()
+    # def mayavi_visualization(self, res):
+    #     ### Read the data in a numpy 3D array ##########################################
+    #     #parenchym = np.logical_or(liver, vessels)
+    #     parenchym = res > 0
+    #     hypodense = res == 0
+    #     hyperdense = res == 2
+    #     data = np.where(parenchym, 1, 0)
+    #     data = data.T
+    #
+    #     src = mlab.pipeline.scalar_field(data)
+    #     src.spacing = [1, 1, 1]
+    #
+    #     data2 = np.where(hypodense, 1, 0)
+    #     # data2 = hypodense
+    #     data2 = data2.T
+    #     src2 = mlab.pipeline.scalar_field(data2)
+    #     src2.spacing = [1, 1, 1]
+    #
+    #     data3 = np.where(hyperdense, 1, 0)
+    #     # data3 = hyperdense
+    #     data3 = data3.T
+    #     src3 = mlab.pipeline.scalar_field(data3)
+    #     src3.spacing = [1, 1, 1]
+    #
+    #     #contours 6 ... cevy
+    #     #contours 3 ... jatra
+    #     #contours 10 ... jatra a cevy
+    #     #mlab.pipeline.iso_surface(src, contours=3, opacity=0.1)
+    #     #mlab.pipeline.iso_surface(src, contours=2, opacity=0.2)
+    #     mlab.pipeline.iso_surface(src, contours=2, opacity=0.2, color=(0, 1, 0))
+    #     mlab.pipeline.iso_surface(src2, contours=2, opacity=0.2, color=(1, 0, 0))
+    #     mlab.pipeline.iso_surface(src3, contours=2, opacity=0.2, color=(0, 0, 1))
+    #
+    #     mlab.show()
 
 
     def get_compactness(self, labels):

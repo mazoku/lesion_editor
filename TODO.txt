@@ -1,3 +1,4 @@
 FILE FOR NOTES AND TODOS
 
 * udelat callbacky na spinboxy u modelu - rozsah os
+* tools.py, radek 240 a dalsi - vyhlazuje data[:, :, idx], nemelo by byt data[idx, :, :]?

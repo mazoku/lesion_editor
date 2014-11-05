@@ -18,12 +18,12 @@ import skimage.exposure as skiexp
 import skimage.measure as skimea
 import skimage.transform as skitra
 
-import cv2
-import pygco
+# import cv2
+# import pygco
 
 import tools
 import py3DSeedEditor
-from mayavi import mlab
+# from mayavi import mlab
 
 import TumorVisualiser
 

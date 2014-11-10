@@ -64,7 +64,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.disp_smoothed = disp_smoothed
 
         # computational core
-        self.cc = Computational_core.Computational_core(fname)
+        self.cc = Computational_core.Computational_core(fname, self.statusBar())
 
         self.data = self.cc.data
         self.labels = np.zeros(self.data.shape, dtype=np.int)
@@ -105,6 +105,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         # main buttons
         self.ui.calculate_models_BTN.clicked.connect(self.calculate_models_callback)
+        self.ui.run_BTN.clicked.connect(self.run_callback)
 
         # connecting spin boxes
         self.ui.hypo_mean_SB.valueChanged.connect(self.hypo_mean_SB_callback)
@@ -202,6 +203,16 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.hyper_std_SB.setValue(self.cc.models['rv_hyper'].std())
 
         self.hist_widget.update_figures()
+
+
+    def run_callback(self):
+        # if no models are calculated so far, calculate them now
+        if not self.cc.models:
+            self.calculate_models_callback()
+
+        # run localization
+        self.statusBar().showMessage('Localization started...')
+        self.cc.run()
 
 
     def view_1_callback(self):

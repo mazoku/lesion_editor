@@ -153,10 +153,10 @@ def show_slice(data, segmentation=None, lesions=None, show='True'):
 
 
 def change_slice_index(data):
-    nSlices = data.shape[2]
-    data_reshaped = np.zeros(np.hstack((data.shape[2],data.shape[0],data.shape[1])))
-    for i in range(nSlices):
-        data_reshaped[i,:,:] = data[:,:,i]
+    n_slices = data.shape[2]
+    data_reshaped = np.zeros(np.hstack((data.shape[2], data.shape[0], data.shape[1])))
+    for i in range(n_slices):
+        data_reshaped[i, :, :] = data[:, :, i]
     return data_reshaped
 
 
@@ -209,11 +209,11 @@ def windowing(data, level=50, width=300, sub1024=False, sliceId=2):
         if sliceId == 2:
             for idx in range(data.shape[2]):
                 #rescalovani intenzity tak, aby skala <minHU, maxHU> odpovidala intervalu <0,255>
-                data[:,:,idx] = skexp.rescale_intensity(data[:,:,idx], in_range=(minHU, maxHU), out_range=(0, 255))
+                data[:, :, idx] = skexp.rescale_intensity(data[:, :, idx], in_range=(minHU, maxHU), out_range=(0, 255))
         elif sliceId == 0:
             for idx in range(data.shape[0]):
                 #rescalovani intenzity tak, aby skala <minHU, maxHU> odpovidala intervalu <0,255>
-                data[idx,:,:] = skexp.rescale_intensity(data[idx,:,:], in_range=(minHU, maxHU), out_range=(0, 255))
+                data[idx, :, :] = skexp.rescale_intensity(data[idx, :, :], in_range=(minHU, maxHU), out_range=(0, 255))
     else:
         data = skexp.rescale_intensity(data, in_range=(minHU, maxHU), out_range=(0, 255))
 
@@ -224,10 +224,10 @@ def smoothing(data, d=10, sigmaColor=10, sigmaSpace=10, sliceId=2):
     if data.ndim == 3:
         if sliceId == 2:
             for idx in range(data.shape[2]):
-                data[:,:,idx] = cv2.bilateralFilter( data[:,:,idx], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+                data[:, :, idx] = cv2.bilateralFilter( data[:, :, idx], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
         elif sliceId == 0:
             for idx in range(data.shape[0]):
-                data[idx,:,:] = cv2.bilateralFilter( data[idx,:,:], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+                data[idx, :, :] = cv2.bilateralFilter( data[idx, :, :], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
     else:
         data = cv2.bilateralFilter( data, d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
     return data
@@ -239,7 +239,7 @@ def smoothing_bilateral(data, sigma_space=15, sigma_color=0.05, pseudo_3D='True'
             for idx in range(data.shape[2]):
                 temp = skifil.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
                 # temp = skires.denoise_bilateral(data[:, :, idx], sigma_range=sigma_color, sigma_spatial=sigma_space)
-                data[idx, :, :] = (255 * temp).astype(np.uint8)
+                data[:, :, idx] = (255 * temp).astype(np.uint8)
         elif sliceId == 0:
             for idx in range(data.shape[0]):
                 temp = skifil.denoise_bilateral(data[idx, :, :], sigma_range=sigma_color, sigma_spatial=sigma_space)
@@ -276,7 +276,7 @@ def smoothing_gauss(data, sigma=1, pseudo_3D='True', sliceId=2):
         if sliceId == 2:
             for idx in range(data.shape[2]):
                 temp = skifil.gaussian_filter(data[:, :, idx], sigma=sigma)
-                data[idx, :, :] = (255 * temp).astype(np.uint8)
+                data[:, :, idx] = (255 * temp).astype(np.uint8)
         elif sliceId == 0:
             for idx in range(data.shape[0]):
                 temp = skifil.gaussian_filter(data[idx, :, :], sigma=sigma)
@@ -390,24 +390,39 @@ def get_central_moment(obj, p, q, r):
     return mom
 
 
-def opening3D(data, selem=skimor.disk(3)):
-    for i in range(data.shape[0]):
-        data[i,:,:] = skimor.binary_opening(data[i,:,:], selem)
+def opening3D(data, selem=skimor.disk(3), sliceId=0):
+    if sliceId == 0:
+        for i in range(data.shape[0]):
+            data[i,:,:] = skimor.binary_opening(data[i,:,:], selem)
+    elif sliceId == 2:
+        for i in range(data.shape[2]):
+            data[:,:,i] = skimor.binary_opening(data[:,:,i], selem)
     return data
 
 
-def closing3D(data, selem=skimor.disk(3), slicewise=False):
+def closing3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
     if slicewise:
-        for i in range(data.shape[0]):
-            data[i, :, :] = skimor.binary_closing(data[i, :, :], selem)
+        if sliceId == 0:
+            for i in range(data.shape[0]):
+                data[i, :, :] = skimor.binary_closing(data[i, :, :], selem)
+        elif sliceId == 2:
+            for i in range(data.shape[2]):
+                data[:, :, i] = skimor.binary_closing(data[:, :, i], selem)
     else:
         data = scindimor.binary_closing(data, selem)
     return data
 
 
-def eroding3D(data, selem=skimor.disk(3)):
-    for i in range(data.shape[0]):
-        data[i,:,:] = skimor.binary_erosion(data[i,:,:], selem)
+def eroding3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
+    if slicewise:
+        if sliceId == 0:
+            for i in range(data.shape[0]):
+                data[i, :, :] = skimor.binary_erosion(data[i, :, :], selem)
+        elif sliceId == 2:
+            for i in range(data.shape[2]):
+                data[:, :, i] = skimor.binary_erosion(data[:, :, i], selem)
+    else:
+        data = scindimor.binary_erosion(data, selem)
     return data
 
 

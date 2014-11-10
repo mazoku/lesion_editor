@@ -36,9 +36,10 @@ logging.basicConfig()
 
 class Computational_core():
 
-    def __init__(self, fname):
+    def __init__(self, fname, status_bar):
         self.params = self.init_params()
         self.models = None
+        self.status_bar = status_bar
 
         ext_list = ('pklz', 'pickle')
         self.fname = fname
@@ -319,11 +320,12 @@ class Computational_core():
         rv_heal = models['rv_heal']
         rv_hyper = models['rv_hyper']
         rv_hypo = models['rv_hypo']
-        mu_heal = models['mu_heal']
+        # mu_heal = models['mu_heal']
+        mu_heal = self.mu_heal
 
         if params['erode_mask']:
             if data.ndim == 3:
-                mask = tools.eroding3D(mask, skimor.disk(5))
+                mask = tools.eroding3D(mask, skimor.disk(5), slicewise=True)
             else:
                 mask = skimor.binary_erosion(mask, np.ones((5, 5)))
 
@@ -550,6 +552,7 @@ class Computational_core():
         # data = data.astype(np.uint8)
 
         print 'calculating unary potentials...'
+        self.status_bar.showMessage('Calculating unary potentials...')
         # create unaries
         # unaries = data_d
         # # as we convert to int, we need to multipy to get sensible values
@@ -558,10 +561,12 @@ class Computational_core():
         n_labels = self.unaries.shape[2]
 
         print 'calculating pairwise potentials...'
+        self.status_bar.showMessage('Calculating pairwise potentials...')
         # create potts pairwise
         self.pairwise = -alpha * np.eye(n_labels, dtype=np.int32)
 
         print 'deriving graph edges...'
+        self.status_bar.showMessage('Deriving graph edges...')
         # use the gerneral graph algorithm
         # first, we construct the grid graph
         inds = np.arange(self.data.size).reshape(self.data.shape)
@@ -589,6 +594,7 @@ class Computational_core():
         # py3DSeedEditor.py3DSeedEditor(un).show()
 
         print 'calculating graph cut...'
+        self.status_bar.showMessage('Calculating graph cut...')
         # we flatten the unaries
         # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
         # print 'tu: ', unaries.reshape(-1, n_labels).shape
@@ -597,6 +603,7 @@ class Computational_core():
 
         self.res = np.where(self.mask, self.res, -1)
         print '\t...done'
+        self.status_bar.showMessage('Done')
 
         # plt.figure()
         # plt.subplot(2, n_labels, 1), plt.title('original')
@@ -650,31 +657,31 @@ class Computational_core():
             print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
             print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
 
-        if self.data.ndim == 2:
-            plt.figure()
-            plt.subplot(2, n_labels, 1), plt.title('original')
-            plt.imshow(self.data, 'gray', interpolation='nearest')
-            plt.subplot(2, n_labels, 2), plt.title('graph cut')
-            plt.imshow(self.res, 'jet', interpolation='nearest', vmin=self.res.min(), vmax=self.res.max()), plt.colorbar(ticks=np.unique(self.res))
-            if n_labels == 2:
-                k = 3
-            else:
-                k = 4
-            plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
-            plt.imshow(self.unaries[:, :, 0], 'gray', interpolation='nearest'), plt.colorbar()
-            plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
-            plt.imshow(self.unaries[:, :, 1], 'gray', interpolation='nearest'), plt.colorbar()
-            if n_labels == 3:
-                plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
-                plt.imshow(self.unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
-            plt.show()
-        elif self.data.ndim == 3:
-            # py3DSeedEditor.py3DSeedEditor(data_o).show()
-            # py3DSeedEditor.py3DSeedEditor(res).show()
-            # py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
-
-            plt.show()
-            TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
+        # if self.data.ndim == 2:
+        #     plt.figure()
+        #     plt.subplot(2, n_labels, 1), plt.title('original')
+        #     plt.imshow(self.data, 'gray', interpolation='nearest')
+        #     plt.subplot(2, n_labels, 2), plt.title('graph cut')
+        #     plt.imshow(self.res, 'jet', interpolation='nearest', vmin=self.res.min(), vmax=self.res.max()), plt.colorbar(ticks=np.unique(self.res))
+        #     if n_labels == 2:
+        #         k = 3
+        #     else:
+        #         k = 4
+        #     plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
+        #     plt.imshow(self.unaries[:, :, 0], 'gray', interpolation='nearest'), plt.colorbar()
+        #     plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
+        #     plt.imshow(self.unaries[:, :, 1], 'gray', interpolation='nearest'), plt.colorbar()
+        #     if n_labels == 3:
+        #         plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
+        #         plt.imshow(self.unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
+        #     plt.show()
+        # elif self.data.ndim == 3:
+        #     # py3DSeedEditor.py3DSeedEditor(data_o).show()
+        #     # py3DSeedEditor.py3DSeedEditor(res).show()
+        #     # py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
+        #
+        #     plt.show()
+        #     TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 
             # mayavi_visualization(res)
 

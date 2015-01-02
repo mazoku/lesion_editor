@@ -18,6 +18,8 @@ import scipy.stats as scista
 import scipy.ndimage.morphology as scindimor
 import scipy.ndimage.measurements as scindimea
 
+import pickle
+
 import py3DSeedEditor
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -618,3 +620,30 @@ def label_3D(data, class_labels, background=-1):
             curr_l += 1
     print 'min = %i, max = %i' % (labels.min(), labels.max())
     return labels
+
+
+def load_pickle_data(fname, win_level=50, win_width=350, slice_idx=-1):
+    fcontent = None
+    try:
+        import gzip
+        f = gzip.open(fname, 'rb')
+        fcontent = f.read()
+        f.close()
+    except Exception as e:
+        f = open(fname, 'rb')
+        fcontent = f.read()
+        f.close()
+    data_dict = pickle.loads(fcontent)
+
+    data = windowing(data_dict['data3d'], level=win_level, width=win_width)
+
+    mask = data_dict['segmentation']
+
+    voxel_size = data_dict['voxelsize_mm']
+
+
+    if slice_idx != -1:
+        data = data[slice_idx, :, :]
+        mask = mask[slice_idx, :, :]
+
+    return data, mask, voxel_size

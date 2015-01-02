@@ -67,7 +67,7 @@ class Hist_widget(QtGui.QWidget):
         x = np.arange(0, 256, 0.1)  # artificial x-axis
         # self.figure.gca().cla()  # clearing the figure, just to be sure
 
-        plt.subplot(411)
+        # plt.subplot(411)
         plt.plot(self.bins, self.hist, 'k')
         plt.hold(True)
         if self.rv_healthy and self.rv_hypo and self.rv_hyper:
@@ -85,35 +85,35 @@ class Hist_widget(QtGui.QWidget):
         plt.axis([0, 256, ax[2], ax[3]])
         plt.hold(False)
 
-        plt.subplot(412)
-        plt.plot(self.bins, self.hist, 'k')
-        plt.hold(True)
-        if self.rv_healthy:
-            plt.plot(x, fac * self.rv_healthy.pdf(x), 'g', linewidth=2)
-        plt.title('healthy PDF')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.hold(False)
-
-        plt.subplot(413)
-        plt.plot(self.bins, self.hist, 'k')
-        plt.hold(True)
-        if self.rv_hypo:
-            plt.plot(x, fac * self.rv_hypo.pdf(x), 'b', linewidth=2)
-        plt.title('hypodense PDF')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.hold(False)
-
-        plt.subplot(414)
-        plt.plot(self.bins, self.hist, 'k')
-        plt.hold(True)
-        if self.rv_hyper:
-            plt.plot(x, fac * self.rv_hyper.pdf(x), 'r', linewidth=2)
-        plt.title('hyperdense PDF')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.hold(False)
+        # plt.subplot(412)
+        # plt.plot(self.bins, self.hist, 'k')
+        # plt.hold(True)
+        # if self.rv_healthy:
+        #     plt.plot(x, fac * self.rv_healthy.pdf(x), 'g', linewidth=2)
+        # plt.title('healthy PDF')
+        # ax = plt.axis()
+        # plt.axis([0, 256, ax[2], ax[3]])
+        # plt.hold(False)
+        #
+        # plt.subplot(413)
+        # plt.plot(self.bins, self.hist, 'k')
+        # plt.hold(True)
+        # if self.rv_hypo:
+        #     plt.plot(x, fac * self.rv_hypo.pdf(x), 'b', linewidth=2)
+        # plt.title('hypodense PDF')
+        # ax = plt.axis()
+        # plt.axis([0, 256, ax[2], ax[3]])
+        # plt.hold(False)
+        #
+        # plt.subplot(414)
+        # plt.plot(self.bins, self.hist, 'k')
+        # plt.hold(True)
+        # if self.rv_hyper:
+        #     plt.plot(x, fac * self.rv_hyper.pdf(x), 'r', linewidth=2)
+        # plt.title('hyperdense PDF')
+        # ax = plt.axis()
+        # plt.axis([0, 256, ax[2], ax[3]])
+        # plt.hold(False)
 
         self.canvas.draw()
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_pdf_view.ui'
 #
-# Created: Tue Dec 16 10:24:33 2014
+# Created: Fri Jan  2 09:26:05 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -452,6 +452,7 @@ class Ui_MainWindow(object):
         self.view_2_BTN.setObjectName(_fromUtf8("view_2_BTN"))
         self.horizontalLayout_13.addWidget(self.view_2_BTN)
         self.show_im_2_BTN = QtGui.QPushButton(self.right_view_btns_F)
+        self.show_im_2_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -464,6 +465,7 @@ class Ui_MainWindow(object):
         self.show_im_2_BTN.setObjectName(_fromUtf8("show_im_2_BTN"))
         self.horizontalLayout_13.addWidget(self.show_im_2_BTN)
         self.show_labels_2_BTN = QtGui.QPushButton(self.right_view_btns_F)
+        self.show_labels_2_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -476,6 +478,7 @@ class Ui_MainWindow(object):
         self.show_labels_2_BTN.setObjectName(_fromUtf8("show_labels_2_BTN"))
         self.horizontalLayout_13.addWidget(self.show_labels_2_BTN)
         self.show_contours_2_BTN = QtGui.QPushButton(self.right_view_btns_F)
+        self.show_contours_2_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -560,9 +563,8 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Menu pro volbu parametru a dalsich veci k vypoctu,</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">vizualizaci apod.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ovladaci talcitka, aby byla na ocich.</p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Menu pro volbu parametru a dalsich veci k vypoctu, vizualizaci apod.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ovladaci tlacitka, aby byla na ocich.</p></body></html>", None))
         self.calculate_models_BTN.setText(_translate("MainWindow", "Calculate models", None))
         self.run_BTN.setText(_translate("MainWindow", "Run localization", None))
         self.label.setText(_translate("MainWindow", "COLOR MODEL", None))

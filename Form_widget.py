@@ -180,12 +180,12 @@ class Form_widget(QtGui.QWidget):
             self.actual_slice = 0
 
     def prev_slice(self):
-        print 'actual: ', self.actual_slice
+        # print 'actual: ', self.actual_slice
         self.actual_slice -= 1
-        print 'new: ', self.actual_slice
+        # print 'new: ', self.actual_slice
         if self.actual_slice < 0:
             self.actual_slice = self.n_slices - 1
-            print 'remaped to: ', self.actual_slice
+            # print 'remaped to: ', self.actual_slice
 
     def on_scroll(self, event):
         '''mouse wheel is used for setting slider value'''

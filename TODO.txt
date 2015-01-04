@@ -1,4 +1,7 @@
-FILE FOR NOTES AND TODOS
+------  FILE FOR NOTES AND TODOS  ------
+----------------------------------------
 
-* udelat callbacky na spinboxy u modelu - rozsah os
-* udelat update figure - Lession_editor, line 230, 245
+* zprovoznit segmentaci, resp. jeji vizualizaci
+* manualni vyber seedu
+* vylistovani vsech lozisek - napsani rozsahu rezu a velikost
+* moznost najeti na lozisko pri kliknuti do listu (viz predchozi krok)

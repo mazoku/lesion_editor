@@ -57,7 +57,7 @@ class Lession_editor(QtGui.QMainWindow):
         # self.im = im
         # self.labels = labels
         self.show_view_1 = True
-        self.show_view_2 = True
+        self.show_view_2 = False
         self.healthy_label = healthy_label
         self.hypo_label = hypo_label
         self.hyper_label = hyper_label
@@ -226,7 +226,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.statusBar().showMessage('view_1 set to %s' % self.show_view_1)
         # print 'view_1 set to', self.show_view_1
 
-        print 'upravit update figur'
         self.form_widget.update_figures()
 
 
@@ -241,14 +240,13 @@ class Lession_editor(QtGui.QMainWindow):
         self.statusBar().showMessage('view_2 set to %s' % self.show_view_2)
         # print 'view_2 set to', self.show_view_2
 
-        print 'upravit update figur'
         self.form_widget.update_figures()
 
 
     def show_im_1_callback(self):
         # print 'data_1 set to im'
         self.statusBar().showMessage('data_1 set to im')
-        self.form_widget.data_1 = self.im
+        self.form_widget.data_1 = self.data
         self.form_widget.data_1_str = 'im'
         self.form_widget.update_figures()
 
@@ -259,7 +257,7 @@ class Lession_editor(QtGui.QMainWindow):
         if self.disp_smoothed:
             self.form_widget.data_2 = self.labels
         else:
-            self.form_widget.data_2 = self.im
+            self.form_widget.data_2 = self.data
         self.form_widget.data_2_str = 'im'
         self.form_widget.update_figures()
 
@@ -283,7 +281,7 @@ class Lession_editor(QtGui.QMainWindow):
     def show_contours_1_callback(self):
         # print 'data_2 set to contours'
         self.statusBar().showMessage('data_1 set to contours')
-        self.form_widget.data_1 = self.im
+        self.form_widget.data_1 = self.data
         self.form_widget.data_1_str = 'contours'
         self.form_widget.update_figures()
 
@@ -291,7 +289,7 @@ class Lession_editor(QtGui.QMainWindow):
     def show_contours_2_callback(self):
         # print 'data_2 set to contours'
         self.statusBar().showMessage('data_2 set to contours')
-        self.form_widget.data_2 = self.im
+        self.form_widget.data_2 = self.data
         self.form_widget.data_2_str = 'contours'
         self.form_widget.update_figures()
 

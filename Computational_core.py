@@ -56,13 +56,13 @@ class Computational_core():
     def init_params(self):
         params = dict()
         params['slice_idx'] = -1
-        params['sigma'] = 10  # sigma for gaussian blurr
+        # params['sigma'] = 10  # sigma for gaussian blurr
         params['alpha'] = 3  # weightening parameter for pairwise term
         params['beta'] = 1  # weightening parameter for unary term
         params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
-        params['k_std_h'] = 3  # weighting parameter for sigma of normal distribution of healthy parenchym
-        params['k_std_t'] = 3  # weighting parameter for sigma of normal distribution of tumor
-        params['tv_weight'] = 0.05  # weighting parameter for total variation filter
+        params['k_std_h'] = 3  # weightening parameter for sigma of normal distribution of healthy parenchym
+        params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
+        # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
         params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
         params['prob_w'] = 0.0001  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
 
@@ -82,7 +82,7 @@ class Computational_core():
         params['win_width'] = 350  # width of window for visualising abdomen
         params['win_level'] = 50  # level of window for visualising abdomen
 
-        params['unaries_as_cdf'] = True  # whether estimate the prob. model of outliers as cumulative density function
+        params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
 
         params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
         params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf

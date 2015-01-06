@@ -84,6 +84,8 @@ class Computational_core():
 
         params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
 
+        # These are not necessary now - user can edit the color model in the GUI.
+        # However, using it in automated mode can be usefull.
         params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
         params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
         params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right

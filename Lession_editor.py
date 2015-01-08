@@ -32,6 +32,10 @@ from sklearn.cluster import KMeans
 
 import pickle
 
+from xml.dom.minidom import Document
+import xml.dom.minidom
+# from xml.dom import minidom  # monkey patching
+
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -62,6 +66,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.hypo_label = hypo_label
         self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
+
+        # load parameters
+        self.params = self.load_parameters()
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.statusBar())
@@ -119,6 +126,26 @@ class Lession_editor(QtGui.QMainWindow):
         # connecting slider
         self.ui.slice_scrollB.valueChanged.connect(self.slider_changed)
 
+
+    def load_parameters(self, config_path='config.xml'):
+        xml_file = xml.dom.minidom.parse(config_path)
+        params = dict()
+        for nodes in xml_file.childNodes:
+            if nodes.nodeType == nodes.ELEMENT_NODE and nodes.nodeName == "PARAMETERS":
+                xmlData = nodes #ukazuje na <PARAMETERS>
+        for param in xmlData.childNodes:
+            if param.nodeType == param.ELEMENT_NODE:
+                name = param.childNodes[1].childNodes[0].data
+                value = param.childNodes[5].childNodes[0].data
+                #fill the data dictionary
+                params[name] = value
+
+        #print "number of ham symbols:%d" % len(hamCharsDict) #209
+        return params
+
+
+    def fill_parameters(self):
+        pass
 
     def hypo_mean_SB_callback(self, value):
         self.statusBar().showMessage('Hypodense model updated thru spin box.')

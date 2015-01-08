@@ -1,6 +1,8 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
+* nacitat hodnoty parametru z config.xml (read_parameters())
+* parametry napsat do prislusnych policek v GUI (fill_parameters())
 * zprovoznit segmentaci, resp. jeji vizualizaci
 * manualni vyber seedu
 * vylistovani vsech lozisek - napsani rozsahu rezu a velikost

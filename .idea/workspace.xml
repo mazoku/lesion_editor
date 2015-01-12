@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="48488e51-8ace-4261-88f7-e750ecda8e6f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lession_editor_GUI_tab.ui" afterPath="$PROJECT_DIR$/lession_editor_GUI_tab.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Lession_editor.py" afterPath="$PROJECT_DIR$/Lession_editor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TODO.txt" afterPath="$PROJECT_DIR$/TODO.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lession_editor_GUI.py" afterPath="$PROJECT_DIR$/lession_editor_GUI.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/mrf_segmentation.iml" afterPath="$PROJECT_DIR$/.idea/mrf_segmentation.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/upo.py" afterPath="$PROJECT_DIR$/upo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config.ini" />
     </list>
     <ignored path="mrf_segmentation.iws" />
     <ignored path=".idea/workspace.xml" />

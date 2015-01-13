@@ -1,9 +1,12 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
-* nacitat hodnoty parametru z config.xml (read_parameters())
 * parametry napsat do prislusnych policek v GUI (fill_parameters())
 * zprovoznit segmentaci, resp. jeji vizualizaci
 * manualni vyber seedu
 * vylistovani vsech lozisek - napsani rozsahu rezu a velikost
 * moznost najeti na lozisko pri kliknuti do listu (viz predchozi krok)
+
+* napsat validatory viz lineedit u win width
+* rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
+* moznost zadavat parametr alpha a beta jako float

@@ -1,12 +1,13 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
-* parametry napsat do prislusnych policek v GUI (fill_parameters())
-* zprovoznit segmentaci, resp. jeji vizualizaci
+* Lokalizace
+    * zprovoznit vizualizaci
+    * zoomovani nekdy prinasi nevyhody
+
 * manualni vyber seedu
 * vylistovani vsech lozisek - napsani rozsahu rezu a velikost
 * moznost najeti na lozisko pri kliknuti do listu (viz predchozi krok)
 
-* napsat validatory viz lineedit u win width
 * rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
 * moznost zadavat parametr alpha a beta jako float

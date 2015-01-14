@@ -26,6 +26,7 @@ import py3DSeedEditor
 # from mayavi import mlab
 
 import TumorVisualiser
+import Viewer_3D
 
 from sklearn import metrics
 from sklearn.cluster import KMeans
@@ -80,7 +81,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.n_slices = self.data.shape[0]
 
-        # nastaveni rozsahu scrollBaru podle poctu rezu
+        # seting up the range of the scrollbar to cope with the number of slices
         self.ui.slice_scrollB.setMaximum(self.n_slices - 1)
 
         # adding widget for displaying image data
@@ -429,25 +430,55 @@ class Lession_editor(QtGui.QMainWindow):
     def fill_parameters(self):
         # general parameters
         self.ui.win_wdth_SL.setValue(self.params['win_width'])
+        self.ui.win_width_LE.setText(str(self.params['win_width']))
+
         self.ui.win_lvl_SL.setValue(self.params['win_level'])
+        self.ui.win_level_LE.setText(str(self.params['win_level']))
+
         self.ui.voxel_size_SB.setValue(self.params['working_voxel_size'])
+        self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size']))
 
         # smoothing parameters
         self.ui.sigma_SL.setValue(self.params['sigma'])
+        self.ui.gaussian_sigma_LE.setText(str(self.params['sigma']))
+
         self.ui.sigma_range_SL.setValue(self.params['sigma_range'])
+        self.ui.bilateral_range_LE.setText(str(self.params['sigma_range']))
+
         self.ui.sigma_spatial_SL.setValue(self.params['sigma_spatial'])
+        self.ui.bilateral_spatial_LE.setText(str(self.params['sigma_spatial']))
+
         self.ui.tv_weight_SL.setValue(self.params['tv_weight'])
+        self.ui.tv_weight_LE.setText(str(self.params['tv_weight']))
 
         # color model parameters
         self.ui.frac_SL.setValue(self.params['perc'])
+        self.ui.perc_LE.setText(str(self.params['perc']))
+
         self.ui.heal_std_k_SL.setValue(self.params['k_std_h'])
+        self.ui.k_std_h_LE.setText(str(self.params['k_std_h']))
+
         self.ui.tum_std_k_SL.setValue(self.params['k_std_t'])
+        self.ui.k_std_t_LE.setText(str(self.params['k_std_t']))
 
         # localization parameters
+        self.ui.alpha_SL.setValue(self.params['alpha'])
+        self.ui.alpha_LE.setText(str(self.params['alpha']))
+
+        self.ui.beta_SL.setValue(self.params['beta'])
+        self.ui.beta_LE.setText(str(self.params['beta']))
+
         self.ui.min_area_SL.setValue(self.params['min_area'])
+        self.ui.min_area_LE.setText(str(self.params['min_area']))
+
         self.ui.max_area_SL.setValue(self.params['max_area'])
+        self.ui.max_area_LE.setText(str(self.params['max_area']))
+
         self.ui.min_comp_SL.setValue(self.params['min_compactness'])
+        self.ui.min_comp_LE.setText(str(self.params['min_compactness']))
+
         self.ui.comp_fact_SB.setValue(self.params['comp_fact'])
+        self.ui.comp_fact_LE.setText(str(self.params['comp_fact']))
 
 
 
@@ -537,6 +568,10 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def run_callback(self):
+        # Viewer_3D.run(self.data)
+        # viewer = Viewer_3D.Viewer_3D(self.data)
+        # viewer.show()
+
         # if no models are calculated so far, calculate them now
         if not self.cc.models:
             self.calculate_models_callback()

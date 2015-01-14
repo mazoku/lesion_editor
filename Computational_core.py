@@ -30,6 +30,8 @@ from sklearn.cluster import KMeans
 
 import pickle
 
+import Viewer_3D
+
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -606,6 +608,10 @@ class Computational_core():
         self.res = np.where(self.mask, self.res, -1)
         print '\t...done'
         self.status_bar.showMessage('Done')
+
+        # Viewer_3D.run(self.res)
+        self.viewer = Viewer_3D.Viewer_3D(self.res)
+        self.viewer.show()
 
         # plt.figure()
         # plt.subplot(2, n_labels, 1), plt.title('original')

@@ -76,7 +76,7 @@
            <bool>true</bool>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -227,7 +227,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>350</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -246,7 +246,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>2</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -291,7 +291,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>50</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -301,7 +301,7 @@
                      <number>1000</number>
                     </property>
                     <property name="value">
-                     <number>350</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -323,7 +323,7 @@
                      <number>1000</number>
                     </property>
                     <property name="value">
-                     <number>50</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -336,7 +336,7 @@
                      <number>10</number>
                     </property>
                     <property name="value">
-                     <number>2</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -421,7 +421,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>15</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -431,7 +431,7 @@
                      <number>10</number>
                     </property>
                     <property name="value">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -453,7 +453,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>0.05</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -472,7 +472,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>1</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -545,7 +545,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>0.05</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -555,7 +555,7 @@
                      <number>100</number>
                     </property>
                     <property name="value">
-                     <number>100</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -568,7 +568,7 @@
                      <number>50</number>
                     </property>
                     <property name="value">
-                     <number>15</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -581,7 +581,7 @@
                      <number>1000</number>
                     </property>
                     <property name="value">
-                     <number>100</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -665,7 +665,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>3</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -710,7 +710,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>1</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -720,7 +720,7 @@
                      <number>20</number>
                     </property>
                     <property name="value">
-                     <number>3</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -733,7 +733,7 @@
                      <number>20</number>
                     </property>
                     <property name="value">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -824,7 +824,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>30</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -850,7 +850,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>3</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -889,7 +889,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>3</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -899,7 +899,7 @@
                      <number>100</number>
                     </property>
                     <property name="value">
-                     <number>30</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -912,7 +912,7 @@
                      <number>10</number>
                     </property>
                     <property name="value">
-                     <number>3</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -925,7 +925,7 @@
                      <number>10</number>
                     </property>
                     <property name="value">
-                     <number>3</number>
+                     <number>0</number>
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -1336,7 +1336,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>30</string>
+                  <string>0</string>
                  </property>
                 </widget>
                </item>
@@ -1355,7 +1355,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>2</string>
+                  <string>0</string>
                  </property>
                 </widget>
                </item>
@@ -1384,7 +1384,7 @@
                   <number>50</number>
                  </property>
                  <property name="value">
-                  <number>2</number>
+                  <number>0</number>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1403,7 +1403,7 @@
                   <number>50</number>
                  </property>
                  <property name="value">
-                  <number>30</number>
+                  <number>0</number>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1438,7 +1438,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>50</string>
+                  <string>0</string>
                  </property>
                 </widget>
                </item>
@@ -1457,7 +1457,7 @@
                   <number>1</number>
                  </property>
                  <property name="value">
-                  <number>50</number>
+                  <number>0</number>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1483,7 +1483,7 @@
                   <number>10</number>
                  </property>
                  <property name="value">
-                  <number>3</number>
+                  <number>0</number>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1505,7 +1505,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>3</string>
+                  <string>0</string>
                  </property>
                 </widget>
                </item>
@@ -1528,7 +1528,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>468</width>
+                 <width>445</width>
                  <height>512</height>
                 </rect>
                </property>

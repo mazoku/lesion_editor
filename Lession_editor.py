@@ -73,7 +73,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.fill_parameters()
 
         # computational core
-        self.cc = Computational_core.Computational_core(fname, self.statusBar())
+        self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
 
         self.data = self.cc.data
         self.labels = np.zeros(self.data.shape, dtype=np.int)
@@ -579,6 +579,8 @@ class Lession_editor(QtGui.QMainWindow):
         # run localization
         self.statusBar().showMessage('Localization started...')
         self.cc.run()
+        self.labels = self.cc.res
+        pass
 
 
     def view_1_callback(self):

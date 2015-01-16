@@ -38,8 +38,9 @@ logging.basicConfig()
 
 class Computational_core():
 
-    def __init__(self, fname, status_bar):
-        self.params = self.init_params()
+    def __init__(self, fname, params, status_bar):
+        # self.params = self.init_params()
+        self.params = params
         self.models = None
         self.status_bar = status_bar
 
@@ -55,62 +56,62 @@ class Computational_core():
         self.smooth_data()
 
 
-    def init_params(self):
-        params = dict()
-        params['slice_idx'] = -1
-        # params['sigma'] = 10  # sigma for gaussian blurr
-        params['alpha'] = 3  # weightening parameter for pairwise term
-        params['beta'] = 1  # weightening parameter for unary term
-        params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
-        params['k_std_h'] = 3  # weightening parameter for sigma of normal distribution of healthy parenchym
-        params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
-        # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
-        params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
-        params['prob_w'] = 0.0001  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
-
-        params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
-
-        # data smoothing
-        # 0 ... no smoothing
-        # 1 ... gaussian blurr, param = sigma
-        # 2 ... bilateral filter, param = sigma_range (0.05)
-        # 3 ... total variation filter, param = weight (0.1)
-        params['smoothing'] = -1
-        params['sigma'] = 1
-        params['sigma_range'] = 0.05
-        params['sigma_spatial'] = 15
-        params['weight'] = 0.05
-
-        params['win_width'] = 350  # width of window for visualising abdomen
-        params['win_level'] = 50  # level of window for visualising abdomen
-
-        params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
-
-        # These are not necessary now - user can edit the color model in the GUI.
-        # However, using it in automated mode can be usefull.
-        params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
-        params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
-        params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right
-        params['hack_hyper_sigma'] = 0 #5  # hard widening of sigma of hyperdense pdf
-        params['hack_healthy_mu'] = -0 #5  # hard move of mean of healthy pdf to the right
-        params['hack_healthy_sigma'] = 0 #5  # hard widening of sigma of healthy pdf
-
-        params['show_healthy_pdf_estim'] = False
-        params['show_outlier_pdf_estim'] = False
-        params['show_estimated_pdfs'] = False
-        params['show_unaries'] = False
-
-        params['hypo_label'] = 0  # label of hypodense objects
-        params['healthy_label'] = 1
-        params['hyper_label'] = 2  # label of hyperdense objects
-
-        params['filtration'] = False  # whether to filtrate or not
-        params['min_area'] = 20
-        params['min_compactness'] = 0.2
-
-        params['erode_mask'] = True
-
-        return params
+    # def init_params(self):
+    #     params = dict()
+    #     params['slice_idx'] = -1
+    #     # params['sigma'] = 10  # sigma for gaussian blurr
+    #     params['alpha'] = 3  # weightening parameter for pairwise term
+    #     params['beta'] = 1  # weightening parameter for unary term
+    #     params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
+    #     params['k_std_h'] = 3  # weightening parameter for sigma of normal distribution of healthy parenchym
+    #     params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
+    #     # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
+    #     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
+    #     params['prob_w'] = 0.0001  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+    #
+    #     params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
+    #
+    #     # data smoothing
+    #     # 0 ... no smoothing
+    #     # 1 ... gaussian blurr, param = sigma
+    #     # 2 ... bilateral filter, param = sigma_range (0.05)
+    #     # 3 ... total variation filter, param = weight (0.1)
+    #     params['smoothing'] = -1
+    #     params['sigma'] = 1
+    #     params['sigma_range'] = 0.05
+    #     params['sigma_spatial'] = 15
+    #     params['weight'] = 0.05
+    #
+    #     params['win_width'] = 350  # width of window for visualising abdomen
+    #     params['win_level'] = 50  # level of window for visualising abdomen
+    #
+    #     params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
+    #
+    #     # These are not necessary now - user can edit the color model in the GUI.
+    #     # However, using it in automated mode can be usefull.
+    #     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
+    #     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
+    #     params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right
+    #     params['hack_hyper_sigma'] = 0 #5  # hard widening of sigma of hyperdense pdf
+    #     params['hack_healthy_mu'] = -0 #5  # hard move of mean of healthy pdf to the right
+    #     params['hack_healthy_sigma'] = 0 #5  # hard widening of sigma of healthy pdf
+    #
+    #     params['show_healthy_pdf_estim'] = False
+    #     params['show_outlier_pdf_estim'] = False
+    #     params['show_estimated_pdfs'] = False
+    #     params['show_unaries'] = False
+    #
+    #     params['hypo_label'] = 0  # label of hypodense objects
+    #     params['healthy_label'] = 1
+    #     params['hyper_label'] = 2  # label of hyperdense objects
+    #
+    #     params['filtration'] = False  # whether to filtrate or not
+    #     params['min_area'] = 20
+    #     params['min_compactness'] = 0.2
+    #
+    #     params['erode_mask'] = True
+    #
+    #     return params
 
 #-------------------------------------------------------------
     def load_data(self, slice_idx=-1):

@@ -14,7 +14,7 @@ from simple_viewer import Ui_Form
 class Viewer_3D(QtGui.QWidget):
     """Main class of the programm."""
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data, range=False, parent=None):
         QtGui.QWidget.__init__(self, parent)
         # self.ui = Ui_MainWindow()
         self.ui = Ui_Form()
@@ -23,6 +23,7 @@ class Viewer_3D(QtGui.QWidget):
         self.actual_slice = 0
         self.data = data
         self.n_slices = self.data.shape[0]
+        self.range = range
 
         # seting up the figure
         self.figure = plt.figure()
@@ -53,8 +54,12 @@ class Viewer_3D(QtGui.QWidget):
 
 
     def update_figures(self):
-        vmin = 0
-        vmax = 255
+        if self.range:
+            vmin = self.data.min()
+            vmax = self.data.max()
+        else:
+            vmin = 0
+            vmax = 255
         slice = self.data[self.actual_slice, :, :]
 
         plt.figure(self.figure.number)

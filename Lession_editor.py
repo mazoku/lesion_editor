@@ -49,7 +49,7 @@ import Computational_core
 class Lession_editor(QtGui.QMainWindow):
     """Main class of the programm."""
 
-    def __init__(self, fname, healthy_label=0, hypo_label=1, hyper_label=2, disp_smoothed=False, parent=None):
+    def __init__(self, fname, disp_smoothed=False, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -61,9 +61,9 @@ class Lession_editor(QtGui.QMainWindow):
         # self.labels = labels
         self.show_view_1 = True
         self.show_view_2 = False
-        self.healthy_label = healthy_label
-        self.hypo_label = hypo_label
-        self.hyper_label = hyper_label
+        # self.healthy_label = healthy_label
+        # self.hypo_label = hypo_label
+        # self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
 
         # load parameters
@@ -435,8 +435,8 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.win_lvl_SL.setValue(self.params['win_level'])
         self.ui.win_level_LE.setText(str(self.params['win_level']))
 
-        self.ui.voxel_size_SB.setValue(self.params['working_voxel_size'])
-        self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size']))
+        self.ui.voxel_size_SB.setValue(self.params['working_voxel_size_mm'])
+        self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size_mm']))
 
         # smoothing parameters
         self.ui.sigma_SL.setValue(self.params['sigma'])
@@ -579,8 +579,8 @@ class Lession_editor(QtGui.QMainWindow):
         # run localization
         self.statusBar().showMessage('Localization started...')
         self.cc.run()
+        self.form_widget.update_figures()
         self.labels = self.cc.res
-        pass
 
 
     def view_1_callback(self):

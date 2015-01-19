@@ -16,9 +16,9 @@ class Form_widget(QtGui.QWidget):
         self.labels = self.win.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
         self.n_slices = self.im.shape[0]  # numer of slices
-        self.healthy_label = self.win.healthy_label
-        self.hypo_label = self.win.hypo_label
-        self.hyper_label = self.win.hyper_label
+        self.healthy_label = self.win.params['healthy_label']
+        self.hypo_label = self.win.params['hypo_label']
+        self.hyper_label = self.win.params['hyper_label']
 
         super(Form_widget, self).__init__()
         self.init_UI_form()
@@ -81,6 +81,8 @@ class Form_widget(QtGui.QWidget):
     #     self.update_figures()
 
     def label2rgb(self, slice):
+        # if self.actual_slice > 30:
+        #     pass
         r = slice == self.hyper_label
         g = slice == self.healthy_label
         b = slice == self.hypo_label
@@ -123,6 +125,7 @@ class Form_widget(QtGui.QWidget):
             plt.subplot(122)
             self.figure.gca().cla()  # clearing the contours, just to be sure
             plt.imshow(slice_2, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
+            # plt.imshow(slice_2, interpolation='nearest')
             # displaying contours if desirable
             if self.data_2_str is 'contours':
                 self.draw_contours()

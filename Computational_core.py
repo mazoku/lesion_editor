@@ -51,6 +51,7 @@ class Computational_core():
         else:
             msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
             raise IOError(msg)
+        self.orig_shape = self.data.shape
 
         # smooth data if allowed
         self.smooth_data()
@@ -67,7 +68,7 @@ class Computational_core():
     #     params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
     #     # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
     #     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
-    #     params['prob_w'] = 0.0001  # prob_w * max_prob is a threshold for data that will be used for estimation of other pdfs
+    #     params['prob_w'] = 0.0001
     #
     #     params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
     #
@@ -152,6 +153,12 @@ class Computational_core():
         return data_res
 
 
+    def zoom_to_shape(self, data, shape):
+        zoom = np.array(shape, dtype=np.float) / np.array(self.data.shape, dtype=np.float)
+        data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
+        return data_res
+
+
     def load_pickle_data(self, fname, slice_idx=-1):
         fcontent = None
         try:
@@ -205,7 +212,7 @@ class Computational_core():
             ints = data[np.nonzero(mask)]
 
             n_pts = mask.sum()
-            perc_in = n_pts * perc
+            perc_in = n_pts * perc / 100
 
             peak_idx = np.argmax(hist)
             n_in = hist[peak_idx]
@@ -552,8 +559,8 @@ class Computational_core():
 
         # zooming the data
         print 'zooming data...'
-        self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxelsize_mm'])
-        self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxelsize_mm'])
+        self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxel_size_mm'])
+        self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxel_size_mm'])
         # data = data.astype(np.uint8)
 
         print 'calculating unary potentials...'
@@ -607,11 +614,15 @@ class Computational_core():
         self.res = result_graph.reshape(self.data.shape)
 
         self.res = np.where(self.mask, self.res, -1)
+
+        # zooming to the original size
+        self.res = self.zoom_to_shape(self.res, self.orig_shape)
+
         print '\t...done'
         self.status_bar.showMessage('Done')
 
-        # Viewer_3D.run(self.res)
-        self.viewer = Viewer_3D.Viewer_3D(self.res)
+        # debug visualization
+        self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
         self.viewer.show()
 
         # plt.figure()

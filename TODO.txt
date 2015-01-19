@@ -2,8 +2,8 @@
 ----------------------------------------
 
 * Lokalizace
-    * zprovoznit vizualizaci - nekde v CompCore se to reshapuje
-    * predavat params do ComputationalCore
+    * cheknout rekalkulovani
+    * snizovani rozliseni kvuli vypoctu muze smazat mala loziska
     * zoomovani nekdy prinasi nevyhody
 
 * manualni vyber seedu

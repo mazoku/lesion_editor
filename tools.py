@@ -1,7 +1,7 @@
 __author__ = 'Ryba'
 import numpy as np
 import matplotlib.pyplot as plt
-import skimage.exposure as skexp
+import skimage.exposure as skiexp
 from skimage.segmentation import mark_boundaries
 import os
 import glob
@@ -10,6 +10,7 @@ import cv2
 # from skimage import measure
 import skimage.measure as skimea
 import skimage.morphology as skimor
+import skimage.transform as skitra
 import skimage.filter as skifil
 # import skimage.restoration as skires
 import skimage.filter as skifil
@@ -17,6 +18,7 @@ import skimage.segmentation as skiseg
 import scipy.stats as scista
 import scipy.ndimage.morphology as scindimor
 import scipy.ndimage.measurements as scindimea
+import scipy.ndimage.interpolation as scindiint
 
 import pickle
 
@@ -26,7 +28,7 @@ import py3DSeedEditor
 #----------------------------------------------------------------------------------------------------------------------
 def get_seeds(im, minT=0.95, maxT=1.05, minInt=0, maxInt=255, debug=False):
     vals = im[np.where(np.logical_and(im>=minInt, im<=maxInt))]
-    hist, bins = skexp.histogram(vals)
+    hist, bins = skiexp.histogram(vals)
     max_peakIdx = hist.argmax()
 
     minT *= bins[max_peakIdx]
@@ -211,13 +213,13 @@ def windowing(data, level=50, width=300, sub1024=False, sliceId=2):
         if sliceId == 2:
             for idx in range(data.shape[2]):
                 #rescalovani intenzity tak, aby skala <minHU, maxHU> odpovidala intervalu <0,255>
-                data[:, :, idx] = skexp.rescale_intensity(data[:, :, idx], in_range=(minHU, maxHU), out_range=(0, 255))
+                data[:, :, idx] = skiexp.rescale_intensity(data[:, :, idx], in_range=(minHU, maxHU), out_range=(0, 255))
         elif sliceId == 0:
             for idx in range(data.shape[0]):
                 #rescalovani intenzity tak, aby skala <minHU, maxHU> odpovidala intervalu <0,255>
-                data[idx, :, :] = skexp.rescale_intensity(data[idx, :, :], in_range=(minHU, maxHU), out_range=(0, 255))
+                data[idx, :, :] = skiexp.rescale_intensity(data[idx, :, :], in_range=(minHU, maxHU), out_range=(0, 255))
     else:
-        data = skexp.rescale_intensity(data, in_range=(minHU, maxHU), out_range=(0, 255))
+        data = skiexp.rescale_intensity(data, in_range=(minHU, maxHU), out_range=(0, 255))
 
     return data.astype(np.uint8)
 
@@ -296,7 +298,7 @@ def analyse_histogram(data, roi=None, debug=False, dens_min=20, dens_max=255, mi
         roi = np.logical_and(data >= dens_min, data <= dens_max)
 
     voxels = data[np.nonzero(roi)]
-    hist, bins = skexp.histogram(voxels)
+    hist, bins = skiexp.histogram(voxels)
     max_peakIdx = hist.argmax()
 
     minT = minT * hist[max_peakIdx]
@@ -331,7 +333,7 @@ def intensity_probability(data, std=20, roi=None, dens_min=10, dens_max=255):
         # roi = np.logical_and(data >= dens_min, data <= dens_max)
         roi = np.ones(data.shape, dtype=np.bool)
     voxels = data[np.nonzero(roi)]
-    hist, bins = skexp.histogram(voxels)
+    hist, bins = skiexp.histogram(voxels)
 
     #zeroing histogram outside interval <dens_min, dens_max>
     hist[:dens_min] = 0
@@ -431,16 +433,23 @@ def eroding3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
 def resize3D(data, scale, sliceId=2):
     if sliceId == 2:
         n_slices = data.shape[2]
-        new_shape = cv2.resize(data[:,:,0], None, fx=scale, fy=scale).shape
-        new_data = np.zeros(np.hstack((new_shape,n_slices)))
+        # new_shape = cv2.resize(data[:,:,0], None, fx=scale, fy=scale).shape
+        new_shape = scindiint.zoom(data[:,:,0], scale).shape
+        new_data = np.zeros(np.hstack((new_shape,n_slices)), dtype=np.int)
         for i in range(n_slices):
-            new_data[:,:,i] = cv2.resize(data[:,:,i], None, fx=scale, fy=scale)
+            # new_data[:,:,i] = cv2.resize(data[:,:,i], None, fx=scale, fy=scale)
+            # new_data[:,:,i] = (255 * skitra.rescale(data[:,:,0], scale)).astype(np.int)
+            new_data[:,:,i] = scindiint.zoom(data[:,:,i], scale)
     elif sliceId == 0:
         n_slices = data.shape[0]
-        new_shape = cv2.resize(data[0,:,:], None, fx=scale, fy=scale).shape
-        new_data = np.zeros(np.hstack((n_slices, np.array(new_shape))))
+        # new_shape = cv2.resize(data[0,:,:], None, fx=scale, fy=scale).shape
+        # new_shape = skitra.rescale(data[0,:,:], scale).shape
+        new_shape =  scindiint.zoom(data[0,:,:], scale).shape
+        new_data = np.zeros(np.hstack((n_slices, new_shape)), dtype=np.int)
         for i in range(n_slices):
-            new_data[i,:,:] = cv2.resize(data[i,:,:], None, fx=scale, fy=scale)
+            # new_data[i,:,:] = cv2.resize(data[i,:,:], None, fx=scale, fy=scale)
+            # new_data[i,:,:] = (255 * skitra.rescale(data[i,:,:], scale)).astype(np.int)
+            new_data[i,:,:] = scindiint.zoom(data[i,:,:], scale)
     return new_data
 
 

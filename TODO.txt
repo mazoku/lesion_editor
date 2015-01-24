@@ -2,9 +2,9 @@
 ----------------------------------------
 
 * Lokalizace
-    * cheknout rekalkulovani
+    * zoomovani - vytvari tmavy okraj kvuli interpolaci?
     * snizovani rozliseni kvuli vypoctu muze smazat mala loziska
-    * zoomovani nekdy prinasi nevyhody
+    * lokalizovat na mensim poctu rezu?
 
 * manualni vyber seedu
 * vylistovani vsech lozisek - napsani rozsahu rezu a velikost

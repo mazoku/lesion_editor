@@ -231,6 +231,8 @@ class Computational_core():
             mu = bins[peak_idx] + params['hack_healthy_mu']
             sigma = k_std_l * np.std(inners) + params['hack_healthy_sigma']
 
+        mu = int(mu)
+        sigma = int(sigma)
         rv = scista.norm(mu, sigma)
 
         if show_me:
@@ -304,6 +306,8 @@ class Computational_core():
         sigma += hack_sigma
         #-----------
 
+        mu = int(mu)
+        sigma = int(sigma)
         rv = scista.norm(mu, sigma)
 
         if show_me:
@@ -558,9 +562,13 @@ class Computational_core():
             self.calculate_intensity_models()
 
         # zooming the data
-        print 'zooming data...'
-        self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxel_size_mm'])
-        self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxel_size_mm'])
+        if self.params['zoom']:
+            print 'zooming data...'
+            self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxel_size_mm'])
+            self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxel_size_mm'])
+        else:
+            self.data = tools.resize3D(self.data, self.params['scale'], sliceId=0)
+            self.mask = tools.resize3D(self.mask, self.params['scale'], sliceId=0)
         # data = data.astype(np.uint8)
 
         print 'calculating unary potentials...'
@@ -616,7 +624,10 @@ class Computational_core():
         self.res = np.where(self.mask, self.res, -1)
 
         # zooming to the original size
-        self.res = self.zoom_to_shape(self.res, self.orig_shape)
+        if self.params['zoom']:
+            self.res = self.zoom_to_shape(self.res, self.orig_shape)
+        else:
+            self.res = tools.resize3D(self.res, 1. / self.params['scale'], sliceId=0)
 
         print '\t...done'
         self.status_bar.showMessage('Done')

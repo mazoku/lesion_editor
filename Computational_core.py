@@ -457,6 +457,15 @@ class Computational_core():
         return eccs
 
 
+    def get_areas(self, labels):
+        areas = np.zeros(self.n_tums)
+        for i in range(labels):
+            lab = labels == (i + 1)
+            areas[i] = lab.sum()
+
+        return areas
+
+
     def filter_objects(self, feature_v, features, params):
         min_area = params['min_area']
         min_comp = params['min_compactness']
@@ -633,85 +642,62 @@ class Computational_core():
         self.status_bar.showMessage('Done')
 
         # debug visualization
-        self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
-        self.viewer.show()
+        # self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
+        # self.viewer.show()
 
-        # plt.figure()
-        # plt.subplot(2, n_labels, 1), plt.title('original')
-        # plt.imshow(data_o, 'gray', interpolation='nearest')
-        # plt.subplot(2, n_labels, 2), plt.title('graph cut')
-        # plt.imshow(res, 'jet', interpolation='nearest', vmin=res.min(), vmax=res.max()), plt.colorbar(ticks=np.unique(res))
-        # if n_labels == 2:
-        #     k = 3
-        # else:
-        #     k = 4
-        # plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
-        # plt.imshow(unaries[:, :, 0].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-        # plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
-        # plt.imshow(unaries[:, :, 1].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-        # if n_labels == 3:
-        #     plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
-        #     plt.imshow(unaries[:, :, 2].reshape(data_o.shape), 'gray', interpolation='nearest'), plt.colorbar()
-        # plt.show()
 
-        if self.params['filtration']:
-            print 'calculating features of hypodense tumors...'
-            labels_hypo, n_labels = scindimea.label(self.res == hypo_lab)
-            labels_hypo -= 1  # shifts background to -1
-            areas_hypo = np.zeros(n_labels)
-            comps_hypo = self.get_compactness(labels_hypo)
-            for i in range(n_labels):
-                lab = labels_hypo == (i + 1)
-                areas_hypo[i] = lab.sum()
-                print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
-                # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-            print '\t...done'
+        self.status_bar.showMessage('Extracting objects...')
+        labels_hypo, n_hypo = scindimea.label(self.res == hypo_lab)
+        labels_hypo -= 1  # shifts background to -1
+        labels_hyper, n_hyper = scindimea.label(self.res == hyper_lab)
+        labels_hyper -= 1  # shifts background to -1
+        self.n_tums = n_hypo + n_hyper
+        self.tums = labels_hypo + (labels_hyper + n_hypo)
+        self.status_bar.showMessage('Done')
 
-            print 'calculating features of hyperdense tumors...'
-            labels_hyper, n_labels = scindimea.label(self.res == hyper_lab)
-            labels_hyper -= 1  # shifts background to -1
-            areas_hyper = np.zeros(n_labels)
-            comps_hyper = self.get_compactness(labels_hyper)
-            for i in range(n_labels):
-                lab = labels_hyper == (i + 1)
-                areas_hyper[i] = lab.sum()
-                print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
-                # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-            print '\t...done'
+        self.status_bar.showMessage('Calculating object features...')
+        self.areas = self.get_areas(self.tums)
+        self.comps = self.get_compactness(self.tums)
+        # self.features = np.hstack((self.areas, self.comps))
 
-            print 'filtering false objects...'
-            features = ('area', 'compactness')
-            features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
-            features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
-            hypo_ok = self.filter_objects(features_hypo_v, features, self.params).sum(axis=1) == len(features)
-            hyper_ok = self.filter_objects(features_hyper_v, features, self.params).sum(axis=1) == len(features)
-            print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
-            print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
+        self.fill_table(self.areas, self.comps)
+        self.status_bar.showMessage('Done')
 
-        # if self.data.ndim == 2:
-        #     plt.figure()
-        #     plt.subplot(2, n_labels, 1), plt.title('original')
-        #     plt.imshow(self.data, 'gray', interpolation='nearest')
-        #     plt.subplot(2, n_labels, 2), plt.title('graph cut')
-        #     plt.imshow(self.res, 'jet', interpolation='nearest', vmin=self.res.min(), vmax=self.res.max()), plt.colorbar(ticks=np.unique(self.res))
-        #     if n_labels == 2:
-        #         k = 3
-        #     else:
-        #         k = 4
-        #     plt.subplot(2, n_labels, k), plt.title('unary labels = 0')
-        #     plt.imshow(self.unaries[:, :, 0], 'gray', interpolation='nearest'), plt.colorbar()
-        #     plt.subplot(2, n_labels, k + 1), plt.title('unary labels = 1')
-        #     plt.imshow(self.unaries[:, :, 1], 'gray', interpolation='nearest'), plt.colorbar()
-        #     if n_labels == 3:
-        #         plt.subplot(2, n_labels, k + 2), plt.title('unary labels = 2')
-        #         plt.imshow(self.unaries[:, :, 2], 'gray', interpolation='nearest'), plt.colorbar()
-        #     plt.show()
-        # elif self.data.ndim == 3:
-        #     # py3DSeedEditor.py3DSeedEditor(data_o).show()
-        #     # py3DSeedEditor.py3DSeedEditor(res).show()
-        #     # py3DSeedEditor.py3DSeedEditor(data_o, contour=res == 2).show()
+        # if self.params['filtration']:
+        #     print 'calculating features of hypodense tumors...'
+        #     labels_hypo, n_labels = scindimea.label(self.res == hypo_lab)
+        #     labels_hypo -= 1  # shifts background to -1
+        #     areas_hypo = np.zeros(n_labels)
+        #     comps_hypo = self.get_compactness(labels_hypo)
+        #     for i in range(n_labels):
+        #         lab = labels_hypo == (i + 1)
+        #         areas_hypo[i] = lab.sum()
+        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
+        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+        #     print '\t...done'
         #
-        #     plt.show()
+        #     print 'calculating features of hyperdense tumors...'
+        #     labels_hyper, n_labels = scindimea.label(self.res == hyper_lab)
+        #     labels_hyper -= 1  # shifts background to -1
+        #     areas_hyper = np.zeros(n_labels)
+        #     comps_hyper = self.get_compactness(labels_hyper)
+        #     for i in range(n_labels):
+        #         lab = labels_hyper == (i + 1)
+        #         areas_hyper[i] = lab.sum()
+        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
+        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
+        #     print '\t...done'
+        #
+        #     print 'filtering false objects...'
+        #     features = ('area', 'compactness')
+        #     features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
+        #     features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
+        #     hypo_ok = self.filter_objects(features_hypo_v, features, self.params).sum(axis=1) == len(features)
+        #     hyper_ok = self.filter_objects(features_hyper_v, features, self.params).sum(axis=1) == len(features)
+        #     print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
+        #     print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
+
+
         #     TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 
             # mayavi_visualization(res)

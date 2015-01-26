@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_tab.ui'
 #
-# Created: Wed Jan 14 13:47:51 2015
+# Created: Mon Jan 26 23:27:26 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -851,19 +851,22 @@ class Ui_MainWindow(object):
         self.comp_fact_LE.setObjectName(_fromUtf8("comp_fact_LE"))
         self.gridLayout_5.addWidget(self.comp_fact_LE, 3, 1, 1, 1)
         self.verticalLayout_12.addWidget(self.frame_12)
-        self.scrollArea = QtGui.QScrollArea(self.objects_T)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
-        self.scrollArea.setSizePolicy(sizePolicy)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
-        self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 445, 512))
-        self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.verticalLayout_12.addWidget(self.scrollArea)
+        self.objects_TV = QtGui.QTableView(self.objects_T)
+        self.objects_TV.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.objects_TV.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.objects_TV.setObjectName(_fromUtf8("objects_TV"))
+        self.verticalLayout_12.addWidget(self.objects_TV)
+        self.frame_13 = QtGui.QFrame(self.objects_T)
+        self.frame_13.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.frame_13.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame_13.setObjectName(_fromUtf8("frame_13"))
+        self.horizontalLayout_15 = QtGui.QHBoxLayout(self.frame_13)
+        self.horizontalLayout_15.setObjectName(_fromUtf8("horizontalLayout_15"))
+        self.remove_obj_BTN = QtGui.QPushButton(self.frame_13)
+        self.remove_obj_BTN.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.remove_obj_BTN.setObjectName(_fromUtf8("remove_obj_BTN"))
+        self.horizontalLayout_15.addWidget(self.remove_obj_BTN)
+        self.verticalLayout_12.addWidget(self.frame_13)
         self.tabWidget.addTab(self.objects_T, _fromUtf8(""))
         self.verticalLayout.addWidget(self.tabWidget)
         self.frame_2 = QtGui.QFrame(self.splitter)
@@ -1125,7 +1128,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -1184,6 +1187,7 @@ class Ui_MainWindow(object):
         self.min_comp_LE.setText(_translate("MainWindow", "0", None))
         self.label_18.setText(_translate("MainWindow", "Compact factor =", None))
         self.comp_fact_LE.setText(_translate("MainWindow", "0", None))
+        self.remove_obj_BTN.setText(_translate("MainWindow", "remove", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.objects_T), _translate("MainWindow", "Objects", None))
         self.label_2.setText(_translate("MainWindow", "VIEWER", None))
         self.prob_heal_1_CB.setText(_translate("MainWindow", "P(heal)", None))

@@ -43,6 +43,7 @@ logging.basicConfig()
 from lession_editor_GUI import Ui_MainWindow
 import Form_widget
 import Hist_widget
+import My_table_model as mtm
 
 import Computational_core
 
@@ -123,7 +124,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
         self.ui.heal_mean_SB.valueChanged.connect(self.heal_mean_SB_callback)
         self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
-
 
         # connecting slider
         self.ui.slice_scrollB.valueChanged.connect(self.slider_changed)
@@ -228,6 +228,15 @@ class Lession_editor(QtGui.QMainWindow):
         compf_val = QtGui.QIntValidator(self.ui.comp_fact_SB.maximum(), self.ui.comp_fact_SB.maximum())
         self.ui.comp_fact_LE.setValidator(compf_val)
         self.ui.comp_fact_LE.textChanged.connect(self.comp_fact_LE_changed)
+
+        # tableview selection changed
+        # self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
+
+
+    def selection_changed(self):
+        indexes = self.ui.objects_TV.selectionModel().selectedRows()
+        for index in indexes:
+            print index.row()
 
 
     def comp_fact_SB_changed(self, value):
@@ -573,14 +582,30 @@ class Lession_editor(QtGui.QMainWindow):
         # viewer.show()
 
         # if no models are calculated so far, calculate them now
-        if not self.cc.models:
-            self.calculate_models_callback()
+        # if not self.cc.models:
+        #     self.calculate_models_callback()
+        #
+        # # run localization
+        # self.statusBar().showMessage('Localization started...')
+        # self.cc.run()
+        # self.form_widget.update_figures()
+        # self.labels = self.cc.res
+        #
+        # # filling table with objects
+        # self.fill_table(self.cc.areas, self.cc.comps)
 
-        # run localization
-        self.statusBar().showMessage('Localization started...')
-        self.cc.run()
-        self.form_widget.update_figures()
-        self.labels = self.cc.res
+        areas = [10, 20, 30, 40]
+        comps = [0.1, 0.2, 0.3, 0.4]
+        self.fill_table(areas, comps)
+
+
+    def fill_table(self, areas, comps):
+        idxs = np.arange(1, len(areas)+1)
+        features = np.vstack((idxs, areas, comps)).T
+        self.table_model = mtm.MyTableModel(features)
+        self.ui.objects_TV.setModel(self.table_model)
+        self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
+        # self.tableview.verticalHeader().setVisible(True)
 
 
     def view_1_callback(self):

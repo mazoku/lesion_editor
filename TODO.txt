@@ -6,9 +6,12 @@
     * snizovani rozliseni kvuli vypoctu muze smazat mala loziska
     * lokalizovat na mensim poctu rezu?
 
+* Table
+    * vylistovani vsech lozisek a jejich parametru
+    * callback remove - odstraneni objektu
+    * pri kliknuti na objekt zobrazit v okne (zmenit self.actual_slice)
+
 * manualni vyber seedu
-* vylistovani vsech lozisek - napsani rozsahu rezu a velikost
-* moznost najeti na lozisko pri kliknuti do listu (viz predchozi krok)
 
 * rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
 * moznost zadavat parametr alpha a beta jako float

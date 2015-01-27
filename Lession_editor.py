@@ -86,7 +86,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_scrollB.setMaximum(self.n_slices - 1)
 
         # adding widget for displaying image data
-        self.form_widget = Form_widget.Form_widget(self)
+        self.form_widget = Form_widget.Form_widget(self, self.cc)
         data_viewer_layout = QtGui.QHBoxLayout()
         data_viewer_layout.addWidget(self.form_widget)
         self.ui.viewer_F.setLayout(data_viewer_layout)
@@ -253,33 +253,46 @@ class Lession_editor(QtGui.QMainWindow):
     def min_comp_SL_changed(self, value):
         self.ui.min_comp_LE.setText(str(value))
         self.params['min_compactness'] = value
+        self.cc.objects_filtration()
+        self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
 
     def min_comp_LE_changed(self, value):
         try:  # must be due to the possibility that no character could be entered
             self.ui.min_comp_SL.setValue(int(value))
             self.params['min_compactness'] = int(value)
+            self.cc.objects_filtration()
+            self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
         except:
             pass
 
     def max_area_SL_changed(self, value):
         self.ui.max_area_LE.setText(str(value))
         self.params['max_area'] = value
+        self.cc.objects_filtration()
+        self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
 
     def max_area_LE_changed(self, value):
         try:  # must be due to the possibility that no character could be entered
             self.ui.max_area_SL.setValue(int(value))
             self.params['max_area'] = int(value)
+            self.cc.objects_filtration()
+            self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
         except:
             pass
 
     def min_area_SL_changed(self, value):
         self.ui.min_area_LE.setText(str(value))
         self.params['min_area'] = value
+        self.cc.objects_filtration()
+        self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
+
 
     def min_area_LE_changed(self, value):
         try:  # must be due to the possibility that no character could be entered
             self.ui.min_area_SL.setValue(int(value))
             self.params['min_area'] = int(value)
+            self.cc.objects_filtration()
+            self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
         except:
             pass
 
@@ -415,7 +428,6 @@ class Lession_editor(QtGui.QMainWindow):
             self.params['win_level'] = int(value)
         except:
             pass
-
 
 
     def load_parameters(self, config_path='config.xml'):
@@ -581,31 +593,35 @@ class Lession_editor(QtGui.QMainWindow):
         # viewer = Viewer_3D.Viewer_3D(self.data)
         # viewer.show()
 
-        # if no models are calculated so far, calculate them now
-        # if not self.cc.models:
-        #     self.calculate_models_callback()
-        #
-        # # run localization
-        # self.statusBar().showMessage('Localization started...')
-        # self.cc.run()
-        # self.form_widget.update_figures()
-        # self.labels = self.cc.res
-        #
-        # # filling table with objects
-        # self.fill_table(self.cc.areas, self.cc.comps)
+        # run localization
+        self.statusBar().showMessage('Localization started...')
+        self.cc.run()
+        self.form_widget.update_figures()
+        self.labels = self.cc.res
+        # self.labels = self.cc.labels
 
-        areas = [10, 20, 30, 40]
-        comps = [0.1, 0.2, 0.3, 0.4]
-        self.fill_table(areas, comps)
+        # filling table with objects
+        self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
+
+        # self.cc.areas = np.array([10, 20, 30, 8])
+        # self.cc.comps = np.array([51, 60, 70, 80])
+        # self.cc.objects = np.array([[0,0,-1,3,3],[0,-1,-1,3,3],[-1,-1,-1,-1,-1],[1,1,-1,-1,2],[1,-1,-1,2,2]])
+        # self.cc.labels = np.unique(self.cc.objects)[1:]
+        # self.cc.n_objects = len(np.unique(self.cc.objects)) - 1
+        # self.fill_table(self.cc.labels, self.cc.areas, self.cc.comps)
 
 
-    def fill_table(self, areas, comps):
-        idxs = np.arange(1, len(areas)+1)
-        features = np.vstack((idxs, areas, comps)).T
+    def fill_table(self, labels, areas, comps):
+        # idxs = np.arange(1, len(areas)+1)
+        features = np.vstack((labels, areas, comps)).T
         self.table_model = mtm.MyTableModel(features)
         self.ui.objects_TV.setModel(self.table_model)
         self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
         # self.tableview.verticalHeader().setVisible(True)
+
+
+    # def update_table_model(self):
+    #     self.ui.objects_TV
 
 
     def view_1_callback(self):

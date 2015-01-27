@@ -9,9 +9,10 @@ import numpy as np
 # Main widget containing figures etc
 class Form_widget(QtGui.QWidget):
 
-    def __init__(self, window):
+    def __init__(self, window, cc):
 
         self.win = window  # link to the main window
+        self.cc = cc  # link to the computational core
         self.im = self.win.data  # input data
         self.labels = self.win.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
@@ -103,7 +104,16 @@ class Form_widget(QtGui.QWidget):
         if self.data_2_str is 'labels':
             vmin2 = self.data_2.min()
             vmax2 = self.data_2.max()
-            slice_2 = self.label2rgb(self.data_2[self.actual_slice, :, :])
+            try:
+                slice = self.data_2[self.actual_slice, :, :]
+                heal = np.where(slice == self.healthy_label)
+                ok_labels = self.cc.labels[self.cc.filtered_idxs]
+                slice_2 = np.where(np.in1d(slice, ok_labels).reshape(slice.shape), slice, -1)
+                slice_2 = np.where(heal, self.healthy_label, slice_2)
+                slice_2 = self.label2rgb(slice_2)
+            except:
+                slice_2 = self.label2rgb(self.data_2[self.actual_slice, :, :])
+
         else:
             vmin2 = 0
             vmax2 = 255

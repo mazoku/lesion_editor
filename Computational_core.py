@@ -44,6 +44,9 @@ class Computational_core():
         self.models = None
         self.status_bar = status_bar
 
+        self.labels = None
+        self.filtered_idxs = None
+
         ext_list = ('pklz', 'pickle')
         self.fname = fname
         if self.fname.split('.')[-1] in ext_list:
@@ -431,6 +434,7 @@ class Computational_core():
 
     def get_compactness(self, labels):
         nlabels = labels.max() + 1
+        # nlabels = len(np.unique(labels)) - 1
         eccs = np.zeros(nlabels)
 
         for lab in range(nlabels):
@@ -458,37 +462,38 @@ class Computational_core():
 
 
     def get_areas(self, labels):
-        areas = np.zeros(self.n_tums)
-        for i in range(labels):
-            lab = labels == (i + 1)
-            areas[i] = lab.sum()
+        nlabels = labels.max() + 1
+        areas = np.zeros(nlabels)
+        for i in range(nlabels):
+            obj = labels == i
+            areas[i] = obj.sum()
 
         return areas
 
 
-    def filter_objects(self, feature_v, features, params):
-        min_area = params['min_area']
-        min_comp = params['min_compactness']
-
-        obj_ok = np.zeros(feature_v.shape, dtype=np.bool)
-        area_idx = -1
-        comp_idx = -1
-        try:
-            area_idx = features.index('area')
-        except ValueError:
-            pass
-        try:
-            comp_idx = features.index('compactness')
-        except ValueError:
-            pass
-
-        if area_idx != -1:
-            obj_ok[:, area_idx] = feature_v[:, area_idx] > min_area
-
-        if comp_idx != -1:
-            obj_ok[:, comp_idx] = feature_v[:, comp_idx] > min_comp
-
-        return obj_ok
+    # def filter_objects(self, feature_v, features, params):
+    #     min_area = params['min_area']
+    #     min_comp = params['min_compactness']
+    #
+    #     obj_ok = np.zeros(feature_v.shape, dtype=np.bool)
+    #     area_idx = -1
+    #     comp_idx = -1
+    #     try:
+    #         area_idx = features.index('area')
+    #     except ValueError:
+    #         pass
+    #     try:
+    #         comp_idx = features.index('compactness')
+    #     except ValueError:
+    #         pass
+    #
+    #     if area_idx != -1:
+    #         obj_ok[:, area_idx] = feature_v[:, area_idx] > min_area
+    #
+    #     if comp_idx != -1:
+    #         obj_ok[:, comp_idx] = feature_v[:, comp_idx] > min_comp
+    #
+    #     return obj_ok
 
 
     def smooth_data(self):
@@ -526,6 +531,20 @@ class Computational_core():
         self.models['rv_heal'] = self.rv_heal
         self.models['rv_hypo'] = self.rv_hypo
         self.models['rv_hyper'] = self.rv_hyper
+
+
+    def objects_filtration(self):
+        min_area = self.params['min_area']
+        max_area = self.params['max_area']
+        min_compactness = self.params['min_compactness']
+
+        self.filtered_idxs = np.ones(self.n_objects, dtype=np.bool)
+
+        for i in range(self.n_objects):
+            # TODO: test the compactness
+            if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
+                self.filtered_idxs[i] = False
+
 
 
     def run(self):
@@ -651,16 +670,25 @@ class Computational_core():
         labels_hypo -= 1  # shifts background to -1
         labels_hyper, n_hyper = scindimea.label(self.res == hyper_lab)
         labels_hyper -= 1  # shifts background to -1
-        self.n_tums = n_hypo + n_hyper
-        self.tums = labels_hypo + (labels_hyper + n_hypo)
+        self.n_objects = n_hypo + n_hyper
+        # self.objects = labels_hypo + (labels_hyper + n_hypo)
+        self.objects = labels_hypo
+        self.objects = np.where(labels_hyper >= 0, labels_hyper + n_hypo, self.objects)
         self.status_bar.showMessage('Done')
 
         self.status_bar.showMessage('Calculating object features...')
-        self.areas = self.get_areas(self.tums)
-        self.comps = self.get_compactness(self.tums)
+        print 'Calculating object features...'
+        self.areas = self.get_areas(self.objects)
+        # self.comps = self.get_compactness(self.objects)
+        self.comps = np.zeros(self.n_objects)
+        self.labels = np.unique(self.objects)[1:]  # from 1 because the first idex is background (-1)
         # self.features = np.hstack((self.areas, self.comps))
 
-        self.fill_table(self.areas, self.comps)
+        print 'Initial filtration...'
+        self.objects_filtration()
+
+        # self.fill_table(self.areas, self.comps)
+        print 'Done'
         self.status_bar.showMessage('Done')
 
         # if self.params['filtration']:

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_tab.ui'
 #
-# Created: Mon Jan 26 23:27:26 2015
+# Created: Tue Jan 27 15:31:31 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -793,7 +793,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.max_area_SL.sizePolicy().hasHeightForWidth())
         self.max_area_SL.setSizePolicy(sizePolicy)
-        self.max_area_SL.setMaximum(50)
+        self.max_area_SL.setMaximum(500)
         self.max_area_SL.setProperty("value", 0)
         self.max_area_SL.setOrientation(QtCore.Qt.Horizontal)
         self.max_area_SL.setObjectName(_fromUtf8("max_area_SL"))
@@ -1128,7 +1128,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

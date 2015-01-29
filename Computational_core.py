@@ -585,10 +585,6 @@ class Computational_core():
         #
         # data_d = np.where(data_d < 0, 0, data_d)
 
-        # calculating intensity models if necesarry
-        if not self.models:
-            self.calculate_intensity_models()
-
         # zooming the data
         if self.params['zoom']:
             print 'zooming data...'
@@ -598,6 +594,11 @@ class Computational_core():
             self.data = tools.resize3D(self.data, self.params['scale'], sliceId=0)
             self.mask = tools.resize3D(self.mask, self.params['scale'], sliceId=0)
         # data = data.astype(np.uint8)
+
+
+        # calculating intensity models if necesarry
+        if not self.models:
+            self.calculate_intensity_models()
 
         print 'calculating unary potentials...'
         self.status_bar.showMessage('Calculating unary potentials...')

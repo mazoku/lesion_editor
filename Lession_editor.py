@@ -432,7 +432,7 @@ class Lession_editor(QtGui.QMainWindow):
 
     def load_parameters(self, config_path='config.xml'):
         config = ConfigParser.ConfigParser()
-        config.read('/home/tomas/Projects/mrf_segmentation/config.ini')
+        config.read('config.ini')
 
         params = dict()
 
@@ -568,13 +568,15 @@ class Lession_editor(QtGui.QMainWindow):
 
     def calculate_models_callback(self):
         self.statusBar().showMessage('Calculating intensity models...')
-
         self.cc.calculate_intensity_models()
+        self.statusBar().showMessage('Intensity models calculated.')
+        self.update_models()
+
+
+    def update_models(self):
         self.hist_widget.update_heal_rv(self.cc.models['rv_heal'])
         self.hist_widget.update_hypo_rv(self.cc.models['rv_hypo'])
         self.hist_widget.update_hyper_rv(self.cc.models['rv_hyper'])
-
-        self.statusBar().showMessage('Intensity models calculated.')
 
         self.ui.heal_mean_SB.setValue(self.cc.models['rv_heal'].mean())
         self.ui.heal_std_SB.setValue(self.cc.models['rv_heal'].std())
@@ -596,7 +598,10 @@ class Lession_editor(QtGui.QMainWindow):
         # run localization
         self.statusBar().showMessage('Localization started...')
         self.cc.run()
+        self.update_models()
+
         self.form_widget.update_figures()
+        # self.hist_widget.update_figures()
         self.labels = self.cc.res
         # self.labels = self.cc.labels
 
@@ -724,13 +729,13 @@ if __name__ == '__main__':
     # venous 0.6mm - good
     # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
     # venous 5mm - ok, but wrong approach
-    # fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
+    fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
 
     # hypo in venous -----------------------
     # arterial - bad
     # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz'
     # venous - good
-    fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz'
+    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz'
 
     # hyper, 1 on the border -------------------
     # arterial 0.6mm - not that bad
@@ -746,7 +751,7 @@ if __name__ == '__main__':
     # targeted
     # arterial 0.6mm - bad
     # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Arterial_0.75_I26f_3-.pklz'
-    # venous 0.6mm - b  ad
+    # venous 0.6mm - bad
     # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Venous_0.75_I26f_3-.pklz'
 
     # parameters --------------------------------

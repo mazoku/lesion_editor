@@ -172,15 +172,15 @@ class Form_widget(QtGui.QWidget):
 
     def draw_contours(self):
         try:
-            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.healthy_label, [0.5], colors='g', linewidths=2)
+            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.healthy_label, [0.2], colors='g', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.5], colors='b', linewidths=2)
+            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.2], colors='b', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.5], colors='r', linewidths=2)
+            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.2], colors='r', linewidths=2)
         except:
             print 'contour fail: ', sys.exc_info()[0]
 

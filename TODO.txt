@@ -1,17 +1,24 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
+* General
+    * predelat zoom na cv2.resize?
+
+* Vizualizace
+    * kontury nefunguji - ale v iPython notebooku kod funguje
+
 * Lokalizace
     * zoomovani - vytvari tmavy okraj kvuli interpolaci?
     * snizovani rozliseni kvuli vypoctu muze smazat mala loziska
     * lokalizovat na mensim poctu rezu?
 
 * Table
-    * filtrace pomoci slideru
     * filtrace se spousti 2x, jednou po updatu uzivatelem a jednou jak je zretezen slider s line editem
-    * vylistovani vsech lozisek a jejich parametru
     * callback remove - odstraneni objektu
-    * pri kliknuti na objekt zobrazit v okne (zmenit self.actual_slice)
+    * pri kliknuti na objekt zobrazit ve figure (zmenit self.actual_slice)
+    * pri kliknuti do figure zobrazit v tabulce
+
+* mel bych si ukladat rescalovana data, aby se mi pri opakovanem spousteni vypoctu dale nezmensovala
 
 * manualni vyber seedu
 

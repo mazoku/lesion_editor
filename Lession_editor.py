@@ -754,32 +754,7 @@ if __name__ == '__main__':
     # venous 0.6mm - bad
     # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Venous_0.75_I26f_3-.pklz'
 
-    # parameters --------------------------------
-    # params = dict()
-    # params['hypo_label'] = 1
-    # params['hyper_label'] = 2
-    healthy_label = 0
-    hypo_label = 1
-    hyper_label = 2
-
-    # preparing data -----------------------------
-    size = 100
-    n_slices = 4
-    im = np.zeros((size, size, n_slices))
-    step = size / n_slices
-    for i in range(n_slices):
-        im[i * step:(i + 1) * step, :, i] = 150
-
-    labels = np.zeros((size, size, n_slices))
-    for i in range(n_slices):
-        if np.mod(i, 2) == 0:
-            lab = 1
-        else:
-            lab = 2
-        labels[:, i * step:(i + 1) * step, i] = lab
-
     # runing application -------------------------
-    # run(im, labels, healthy_label, hypo_label, hyper_label)
     app = QtGui.QApplication(sys.argv)
     le = Lession_editor(fname)
     le.show()

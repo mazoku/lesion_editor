@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: lesioneditor
+Version: 0.0.1
+Summary: Editor for localization of liver lesions
+Home-page: https://github.com/mazoku/lesion_editor
+Author: Tomas Ryba
+Author-email: rybato@gmail.com
+License: MIT
+Description: UNKNOWN
+Keywords: lesion localization
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 2.7

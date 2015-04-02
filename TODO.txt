@@ -24,3 +24,7 @@
 
 * rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
 * moznost zadavat parametr alpha a beta jako float
+
+
+-------------------------
+* pocitat z eroze, ale pote dorustat do neerodovane

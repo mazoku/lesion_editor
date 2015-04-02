@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_tab.ui'
 #
-# Created: Tue Jan 27 15:31:31 2015
+# Created: Thu Apr  2 13:45:51 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -434,6 +434,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_11.addWidget(self.frame_15)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_11.addItem(spacerItem)
+        self.horizontalLayout_16 = QtGui.QHBoxLayout()
+        self.horizontalLayout_16.setObjectName(_fromUtf8("horizontalLayout_16"))
+        self.test_BTN = QtGui.QPushButton(self.tab)
+        self.test_BTN.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.test_BTN.setObjectName(_fromUtf8("test_BTN"))
+        self.horizontalLayout_16.addWidget(self.test_BTN)
+        self.verticalLayout_11.addLayout(self.horizontalLayout_16)
         self.tabWidget.addTab(self.tab, _fromUtf8(""))
         self.color_model_T = QtGui.QWidget()
         self.color_model_T.setObjectName(_fromUtf8("color_model_T"))
@@ -1161,6 +1168,7 @@ class Ui_MainWindow(object):
         self.label_22.setText(_translate("MainWindow", "beta =", None))
         self.beta_LE.setText(_translate("MainWindow", "0", None))
         self.run_BTN.setText(_translate("MainWindow", "Run localization", None))
+        self.test_BTN.setText(_translate("MainWindow", "Test Button", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "MAIN", None))
         self.perc_LE.setText(_translate("MainWindow", "0", None))
         self.label_13.setText(_translate("MainWindow", "heal. std k =", None))

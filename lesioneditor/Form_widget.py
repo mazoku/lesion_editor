@@ -14,7 +14,8 @@ class Form_widget(QtGui.QWidget):
         self.win = window  # link to the main window
         self.cc = cc  # link to the computational core
         self.im = self.win.data  # input data
-        self.labels = self.win.labels  # input labeling
+        # self.labels = self.win.labels  # input labeling
+        self.labels = self.cc.res  # input labeling
         self.actual_slice = 0  # index of current data slice
         self.n_slices = self.im.shape[0]  # numer of slices
         self.healthy_label = self.win.params['healthy_label']
@@ -171,16 +172,22 @@ class Form_widget(QtGui.QWidget):
         self.canvas.draw()
 
     def draw_contours(self):
+        plt.hold(True)
         try:
-            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.healthy_label, [0.2], colors='g', linewidths=2)
+            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.healthy_label, [0.1], colors='g', linewidths=2)
+            plt.hold(True)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.2], colors='b', linewidths=2)
+            # self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.2], colors='b', linewidths=2)
+            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.hypo_label, [0.1], colors='b', linewidths=2)
+            plt.hold(True)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
-            self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.2], colors='r', linewidths=2)
+            # self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.2], colors='r', linewidths=2)
+            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.hyper_label, [0.1], colors='r', linewidths=2)
+            plt.hold(False)
         except:
             print 'contour fail: ', sys.exc_info()[0]
 

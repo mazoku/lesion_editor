@@ -82,6 +82,10 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.n_slices = self.data.shape[0]
 
+        # seting up the callback for the test button --------------------------------------
+        self.ui.test_BTN.clicked.connect(self.test_callback)
+        #----------------------------------------------------------------------------------
+
         # seting up the range of the scrollbar to cope with the number of slices
         self.ui.slice_scrollB.setMaximum(self.n_slices - 1)
 
@@ -130,6 +134,12 @@ class Lession_editor(QtGui.QMainWindow):
 
         # connecting sliders with their line edit
         self.connect_SL_and_LE()
+
+
+    def test_callback(self):
+        n_rows, n_cols, n_slices = self.cc.labels.shape
+        self.cc.labels = np.zeros(self.labels.shape)
+        self.cc.labels[n_rows/3.:2*n_rows/3., n_cols/3.:2*n_cols/3.] = self.hypo
 
 
     def connect_SL_and_LE(self):

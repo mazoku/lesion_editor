@@ -56,6 +56,8 @@ class Computational_core():
             raise IOError(msg)
         self.orig_shape = self.data.shape
 
+        self.res = np.zeros(self.orig_shape)
+
         # smooth data if allowed
         self.smooth_data()
 

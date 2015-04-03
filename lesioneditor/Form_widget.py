@@ -165,10 +165,6 @@ class Form_widget(QtGui.QWidget):
             plt.figure(self.figure.number)
             plt.clf()
 
-        # creating overaly from itensity model
-        if self.win.ui.prob_heal_1_CB.isChecked():
-            print 'checked'
-
         self.canvas.draw()
 
     def draw_contours(self):

@@ -97,40 +97,21 @@
               <property name="frameShadow">
                <enum>QFrame::Raised</enum>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>
-                <widget class="QPushButton" name="load_data_BTN">
-                 <property name="cursor">
-                  <cursorShape>PointingHandCursor</cursorShape>
-                 </property>
+                <widget class="QRadioButton" name="serie_1_RB">
                  <property name="text">
-                  <string>Load data</string>
+                  <string>Serie #1: not loaded</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_12">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
+                <widget class="QRadioButton" name="serie_2_RB">
                  <property name="text">
-                  <string>Serie:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="file_path_L">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>not loaded</string>
+                  <string>Serie #2: not loaded</string>
                  </property>
                 </widget>
                </item>
@@ -1601,6 +1582,9 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
+             <widget class="QComboBox" name="figure_1_CB"/>
+            </item>
+            <item>
              <widget class="QFrame" name="left_view_btns_F">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -1775,6 +1759,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <widget class="QComboBox" name="figure_2_CB"/>
+            </item>
             <item>
              <widget class="QFrame" name="right_view_btns_F">
               <property name="sizePolicy">
@@ -2022,8 +2009,26 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSerie">
+    <property name="title">
+     <string>Serie</string>
+    </property>
+    <addaction name="actionLoad_serie_1"/>
+    <addaction name="actionLoad_serie_2"/>
+   </widget>
+   <addaction name="menuSerie"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLoad_serie_1">
+   <property name="text">
+    <string>Load serie #1</string>
+   </property>
+  </action>
+  <action name="actionLoad_serie_2">
+   <property name="text">
+    <string>Load serie #2</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

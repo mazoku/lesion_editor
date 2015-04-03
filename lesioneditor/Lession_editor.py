@@ -75,6 +75,10 @@ class Lession_editor(QtGui.QMainWindow):
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
+        if self.cc.data is not None:
+            for i in fname:
+                self.ui.figure_1_CB.addItem(i.split('/')[-1])
+                self.ui.figure_2_CB.addItem(i.split('/')[-1])
 
         self.data = self.cc.data
         self.labels = np.zeros(self.data.shape, dtype=np.int)
@@ -739,7 +743,8 @@ if __name__ == '__main__':
     # venous 0.6mm - good
     # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
     # venous 5mm - ok, but wrong approach
-    fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
+    fnames = list()
+    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
 
     # hypo in venous -----------------------
     # arterial - bad
@@ -766,7 +771,7 @@ if __name__ == '__main__':
 
     # runing application -------------------------
     app = QtGui.QApplication(sys.argv)
-    le = Lession_editor(fname)
+    le = Lession_editor(fnames)
     le.show()
     sys.exit(app.exec_())
 

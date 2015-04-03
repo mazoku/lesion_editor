@@ -49,108 +49,35 @@ class Computational_core():
 
         ext_list = ('pklz', 'pickle')
         self.fname = fname
-        if self.fname.split('.')[-1] in ext_list:
-            self.data, self.mask, self.voxel_size = self.load_pickle_data(self.fname)
-        else:
-            msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
-            raise IOError(msg)
-        self.orig_shape = self.data.shape
+        self.data_1 = None
+        self.data_2 = None
 
-        self.res = np.zeros(self.orig_shape)
+        # loading data - both series if provided
+        if len(self.fname) > 0:
+            name = self.fname[0]
+            if name.split('.')[-1] in ext_list:
+                self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
+            else:
+                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+                raise IOError(msg)
+        if len(self.fname) > 1:
+            name = self.fname[1]
+            if name.split('.')[-1] in ext_list:
+                self.data_2, self.mask_2, self.voxel_size_2 = self.load_pickle_data(name)
+            else:
+                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+                raise IOError(msg)
+
+        self.orig_shape_1 = self.data_1.shape
+        self.orig_shape_2 = self.data_2.shape
+
+        self.res_1 = np.zeros(self.orig_shape_1)
+        self.res_2 = np.zeros(self.orig_shape_2)
 
         # smooth data if allowed
-        self.smooth_data()
+        self.data_1 = self.smooth_data(self.data_1)
+        self.data_2 = self.smooth_data(self.data_2)
 
-
-    # def init_params(self):
-    #     params = dict()
-    #     params['slice_idx'] = -1
-    #     # params['sigma'] = 10  # sigma for gaussian blurr
-    #     params['alpha'] = 3  # weightening parameter for pairwise term
-    #     params['beta'] = 1  # weightening parameter for unary term
-    #     params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
-    #     params['k_std_h'] = 3  # weightening parameter for sigma of normal distribution of healthy parenchym
-    #     params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
-    #     # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
-    #     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
-    #     params['prob_w'] = 0.0001
-    #
-    #     params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
-    #
-    #     # data smoothing
-    #     # 0 ... no smoothing
-    #     # 1 ... gaussian blurr, param = sigma
-    #     # 2 ... bilateral filter, param = sigma_range (0.05)
-    #     # 3 ... total variation filter, param = weight (0.1)
-    #     params['smoothing'] = -1
-    #     params['sigma'] = 1
-    #     params['sigma_range'] = 0.05
-    #     params['sigma_spatial'] = 15
-    #     params['weight'] = 0.05
-    #
-    #     params['win_width'] = 350  # width of window for visualising abdomen
-    #     params['win_level'] = 50  # level of window for visualising abdomen
-    #
-    #     params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
-    #
-    #     # These are not necessary now - user can edit the color model in the GUI.
-    #     # However, using it in automated mode can be usefull.
-    #     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
-    #     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
-    #     params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right
-    #     params['hack_hyper_sigma'] = 0 #5  # hard widening of sigma of hyperdense pdf
-    #     params['hack_healthy_mu'] = -0 #5  # hard move of mean of healthy pdf to the right
-    #     params['hack_healthy_sigma'] = 0 #5  # hard widening of sigma of healthy pdf
-    #
-    #     params['show_healthy_pdf_estim'] = False
-    #     params['show_outlier_pdf_estim'] = False
-    #     params['show_estimated_pdfs'] = False
-    #     params['show_unaries'] = False
-    #
-    #     params['hypo_label'] = 0  # label of hypodense objects
-    #     params['healthy_label'] = 1
-    #     params['hyper_label'] = 2  # label of hyperdense objects
-    #
-    #     params['filtration'] = False  # whether to filtrate or not
-    #     params['min_area'] = 20
-    #     params['min_compactness'] = 0.2
-    #
-    #     params['erode_mask'] = True
-    #
-    #     return params
-
-#-------------------------------------------------------------
-    def load_data(self, slice_idx=-1):
-        print 'TODO: must be recoded to be consistent with outputs given by self.load_pickle_data(...)'
-    # TODO: must be recoded to be consistent with outputs given by self.load_pickle_data(...)
-    #     # 33 ... hypodense
-    #     # 41 ... small tumor
-    #     # 138 ... hyperdense
-    #
-    #     # labels = np.load('label_im.npy')
-    #     data = np.load('input_data.npy')
-    #     o_data = np.load('input_orig_data.npy')
-    #     mask = np.load('mask.npy')
-    #
-    #     # to be sure that the mask is only binary
-    #     mask = np.where(mask > 0, 1, 0)
-    #
-    #     if slice_idx != -1:
-    #         data_s = data[slice_idx, :, :]
-    #         o_data_s = o_data[slice_idx, :, :]
-    #         mask_s = mask[slice_idx, :, :]
-    #
-    #         data, _ = tools.crop_to_bbox(data_s, mask_s)
-    #         o_data, _ = tools.crop_to_bbox(o_data_s, mask_s)
-    #         mask, _ = tools.crop_to_bbox(mask_s, mask_s)
-    #
-    #     # plt.figure()
-    #     # plt.subplot(131), plt.imshow(data_bbox, 'gray')
-    #     # plt.subplot(132), plt.imshow(o_data_bbox, 'gray')
-    #     # plt.subplot(133), plt.imshow(mask_bbox, 'gray')
-    #     # plt.show()
-    #
-    #     return data, o_data, mask
 
     def data_zoom(self, data, voxelsize_mm, working_voxelsize_mm):
         zoom = voxelsize_mm / (1.0 * working_voxelsize_mm)
@@ -190,14 +117,6 @@ class Computational_core():
         if slice_idx != -1:
             data = data[slice_idx, :, :]
             mask = mask[slice_idx, :, :]
-
-            # data, _ = tools.crop_to_bbox(data_s, mask_s)
-            # mask, _ = tools.crop_to_bbox(mask_s, mask_s)
-
-        # plt.figure()
-        # plt.subplot(121), plt.imshow(data_bbox, 'gray')
-        # plt.subplot(122), plt.imshow(mask_bbox, 'gray')
-        # plt.show()
 
         return data, mask, voxel_size
 
@@ -259,7 +178,7 @@ class Computational_core():
             plt.title('estimated normal pdf of healthy parenchym')
             # plt.show()
 
-        return mu, sigma, rv
+        return rv
 
 
     def estimate_outlier_pdf(self, data, mask, rv_healthy, outlier_type, params):
@@ -498,41 +417,39 @@ class Computational_core():
     #     return obj_ok
 
 
-    def smooth_data(self):
+    def smooth_data(self, data):
         # smoothing data
         print 'smoothing data...'
         if self.params['smoothing'] == 1:
-            self.data = skifil.gaussian_filter(self.data, )
+            data = skifil.gaussian_filter(self.data, sigma=self.params['sigma'])
         elif self.params['smoothing'] == 2:
-            self.data = tools.smoothing_bilateral(self.data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
+            data = tools.smoothing_bilateral(data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
         elif self.params['smoothing'] == 3:
-            self.data = tools.smoothing_tv(self.data, weight=self.params['weight'], sliceId=0)
+            data = tools.smoothing_tv(data, weight=self.params['weight'], sliceId=0)
         else:
             print '\tcurrently switched off'
 
+        return data
 
-    def calculate_intensity_models(self):
+
+    def calculate_intensity_models(self, data, mask):
         print 'calculating intensity models...'
         # liver pdf ------------
-        self.mu_heal, self.sigma_heal, self.rv_heal = self.estimate_healthy_pdf(self.data, self.mask, self.params)
-        print '\tliver pdf: mu = ', self.mu_heal, ', sigma = ', self.sigma_heal
+        rv_heal = self.estimate_healthy_pdf(data, mask, self.params)
+        print '\tliver pdf: mu = ', rv_heal.mean(), ', sigma = ', rv_heal.std()
         # hypodense pdf ------------
-        self.mu_hypo, self.sigma_hypo, self.rv_hypo = self.estimate_outlier_pdf(self.data, self.mask, self.rv_heal, 'hypo', self.params)
-        print '\thypodense pdf: mu = ', self.mu_hypo, ', sigma= ', self.sigma_hypo
+        rv_hypo = self.estimate_outlier_pdf(data, mask, self.rv_heal, 'hypo', self.params)
+        print '\thypodense pdf: mu = ', rv_hypo.mean(), ', sigma = ', rv_hypo.std()
         # hyperdense pdf ------------
-        self.mu_hyper, self.sigma_hyper, self.rv_hyper = self.estimate_outlier_pdf(self.data, self.mask, self.rv_heal, 'hyper', self.params)
-        print '\thyperdense pdf: mu = ', self.mu_hyper, ', sigma= ', self.sigma_hyper
+        rv_hyper = self.estimate_outlier_pdf(data, mask, self.rv_heal, 'hyper', self.params)
+        print '\thyperdense pdf: mu = ', rv_hyper.mean(), ', sigma = ', rv_hyper.std()
 
-        self.models = dict()
-        # self.models['mu_heal'] = self.mu_heal
-        # self.models['sigma_heal'] = self.sigma_heal
-        # self.models['mu_hypo'] = self.mu_hypo
-        # self.models['sigma_hypo'] = self.sigma_hypo
-        # self.models['mu_hyper'] = self.mu_hyper
-        # self.models['sigma_hyper'] = self.sigma_hyper
-        self.models['rv_heal'] = self.rv_heal
-        self.models['rv_hypo'] = self.rv_hypo
-        self.models['rv_hyper'] = self.rv_hyper
+        models = dict()
+        models['rv_heal'] = rv_heal
+        models['rv_hypo'] = rv_hypo
+        models['rv_hyper'] = rv_hyper
+
+        return models
 
 
     def objects_filtration(self):

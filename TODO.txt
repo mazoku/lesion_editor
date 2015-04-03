@@ -1,32 +1,32 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
-* General
-    * predelat zoom na cv2.resize?
+- General
+    - predelat zoom na cv2.resize?
 
-* Vizualizace
-    * kontury nefunguji - ale v iPython notebooku kod funguje
+- Vizualizace
+    - kontury nefunguji - ale v iPython notebooku kod funguje
 
-* Lokalizace
-    * zoomovani - vytvari tmavy okraj kvuli interpolaci?
-    * snizovani rozliseni kvuli vypoctu muze smazat mala loziska
-    * lokalizovat na mensim poctu rezu?
+- Lokalizace
+    - zoomovani - vytvari tmavy okraj kvuli interpolaci?
+    - snizovani rozliseni kvuli vypoctu muze smazat mala loziska
+    - lokalizovat na mensim poctu rezu?
 
-* Table
-    * filtrace se spousti 2x, jednou po updatu uzivatelem a jednou jak je zretezen slider s line editem
-    * callback remove - odstraneni objektu
-    * pri kliknuti na objekt zobrazit ve figure (zmenit self.actual_slice)
-    * pri kliknuti do figure zobrazit v tabulce
+- Table
+    - filtrace se spousti 2x, jednou po updatu uzivatelem a jednou jak je zretezen slider s line editem
+    - callback remove - odstraneni objektu
+    - pri kliknuti na objekt zobrazit ve figure (zmenit self.actual_slice)
+    - pri kliknuti do figure zobrazit v tabulce
 
-* mel bych si ukladat rescalovana data, aby se mi pri opakovanem spousteni vypoctu dale nezmensovala
+- mel bych si ukladat rescalovana data, aby se mi pri opakovanem spousteni vypoctu dale nezmensovala
 
-* manualni vyber seedu
+- manualni vyber seedu
 
-* rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
-* moznost zadavat parametr alpha a beta jako float
+- rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
+- moznost zadavat parametr alpha a beta jako float
 
 
--------------------------
-* pocitat z eroze, ale pote dorustat do neerodovane
-* ppst
-    * tlacitko a nejaky chooser pro tridu (health, hypo, hyper)
+duben  -------------------------
+- pocitat z eroze, ale pote dorustat do neerodovane
+- ppst
+    - tlacitko a nejaky chooser pro tridu (health, hypo, hyper)

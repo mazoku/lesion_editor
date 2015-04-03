@@ -28,3 +28,5 @@
 
 -------------------------
 * pocitat z eroze, ale pote dorustat do neerodovane
+* ppst
+    * tlacitko a nejaky chooser pro tridu (health, hypo, hyper)

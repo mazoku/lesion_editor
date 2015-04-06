@@ -11,11 +11,13 @@ import scipy.stats as scista
 # Main widget containing figures etc
 class Hist_widget(QtGui.QWidget):
 
-    def __init__(self, window):
+    def __init__(self, window, cc):
 
         self.win = window  # link to the main window
-        self.data = self.win.data  # input data
-        self.mask = self.win.mask
+        # self.data = self.win.data  # input data
+        # self.mask = self.win.mask
+        self.data = self.cc.data_1.data  # input data
+        self.mask = self.data_1.mask
         # self.labels = self.win.labels  # input labeling
         # self.actual_slice = 0  # index of current data slice
         # self.n_slices = self.im.shape[2]  # numer of slices

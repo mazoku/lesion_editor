@@ -13,9 +13,10 @@ class Form_widget(QtGui.QWidget):
 
         self.win = window  # link to the main window
         self.cc = cc  # link to the computational core
-        self.im = self.win.data  # input data
+        # self.im = self.win.data  # input data
+        self.im = self.cc.data_1.data  # input data
         # self.labels = self.win.labels  # input labeling
-        self.labels = self.cc.res  # input labeling
+        self.labels = self.cc.data_1.labels  # input labeling
         self.actual_slice = 0  # index of current data slice
         self.n_slices = self.im.shape[0]  # numer of slices
         self.healthy_label = self.win.params['healthy_label']

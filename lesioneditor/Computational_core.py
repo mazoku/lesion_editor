@@ -32,6 +32,8 @@ import pickle
 
 import Viewer_3D
 
+import Data
+
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -49,34 +51,38 @@ class Computational_core():
 
         ext_list = ('pklz', 'pickle')
         self.fname = fname
-        self.data_1 = None
-        self.data_2 = None
+        self.data_1 = Data.Data()
+        self.data_2 = Data.Data()
 
         # loading data - both series if provided
         if len(self.fname) > 0:
             name = self.fname[0]
             if name.split('.')[-1] in ext_list:
-                self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
+                self.data_1.load_data(name)
+                # self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
             else:
                 msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
                 raise IOError(msg)
         if len(self.fname) > 1:
             name = self.fname[1]
             if name.split('.')[-1] in ext_list:
-                self.data_2, self.mask_2, self.voxel_size_2 = self.load_pickle_data(name)
+                self.data_2.load_data(name)
+                # self.data_2, self.mask_2, self.voxel_size_2 = self.load_pickle_data(name)
             else:
                 msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
                 raise IOError(msg)
 
-        self.orig_shape_1 = self.data_1.shape
-        self.orig_shape_2 = self.data_2.shape
+        # if self.data_1 is not None:
+        #     self.orig_shape_1 = self.data_1.shape
+        #     self.res_1 = np.zeros(self.orig_shape_1)
+        # if self.data_2 is not None:
+        #     self.orig_shape_2 = self.data_2.shape
+        #     self.res_2 = np.zeros(self.orig_shape_2)
 
-        self.res_1 = np.zeros(self.orig_shape_1)
-        self.res_2 = np.zeros(self.orig_shape_2)
 
         # smooth data if allowed
-        self.data_1 = self.smooth_data(self.data_1)
-        self.data_2 = self.smooth_data(self.data_2)
+        self.data_1.data = self.smooth_data(self.data_1.data)
+        self.data_2.data = self.smooth_data(self.data_2.data)
 
 
     def data_zoom(self, data, voxelsize_mm, working_voxelsize_mm):
@@ -91,34 +97,34 @@ class Computational_core():
         return data_res
 
 
-    def load_pickle_data(self, fname, slice_idx=-1):
-        fcontent = None
-        try:
-            import gzip
-            f = gzip.open(fname, 'rb')
-            fcontent = f.read()
-            f.close()
-        except Exception as e:
-            logger.warning("Input gzip exception: " + str(e))
-            f = open(fname, 'rb')
-            fcontent = f.read()
-            f.close()
-        data_dict = pickle.loads(fcontent)
-
-        data = tools.windowing(data_dict['data3d'], level=self.params['win_level'], width=self.params['win_width'])
-
-        mask = data_dict['segmentation']
-
-        voxel_size = data_dict['voxelsize_mm']
-        # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
-        # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
-
-
-        if slice_idx != -1:
-            data = data[slice_idx, :, :]
-            mask = mask[slice_idx, :, :]
-
-        return data, mask, voxel_size
+    # def load_pickle_data(self, fname, slice_idx=-1):
+    #     fcontent = None
+    #     try:
+    #         import gzip
+    #         f = gzip.open(fname, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     except Exception as e:
+    #         logger.warning("Input gzip exception: " + str(e))
+    #         f = open(fname, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     data_dict = pickle.loads(fcontent)
+    #
+    #     data = tools.windowing(data_dict['data3d'], level=self.params['win_level'], width=self.params['win_width'])
+    #
+    #     mask = data_dict['segmentation']
+    #
+    #     voxel_size = data_dict['voxelsize_mm']
+    #     # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
+    #     # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
+    #
+    #
+    #     if slice_idx != -1:
+    #         data = data[slice_idx, :, :]
+    #         mask = mask[slice_idx, :, :]
+    #
+    #     return data, mask, voxel_size
 
 
     def estimate_healthy_pdf(self, data, mask, params):
@@ -418,16 +424,17 @@ class Computational_core():
 
 
     def smooth_data(self, data):
-        # smoothing data
-        print 'smoothing data...'
-        if self.params['smoothing'] == 1:
-            data = skifil.gaussian_filter(self.data, sigma=self.params['sigma'])
-        elif self.params['smoothing'] == 2:
-            data = tools.smoothing_bilateral(data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
-        elif self.params['smoothing'] == 3:
-            data = tools.smoothing_tv(data, weight=self.params['weight'], sliceId=0)
-        else:
-            print '\tcurrently switched off'
+        if data is not None:
+            # smoothing data
+            print 'smoothing data...'
+            if self.params['smoothing'] == 1:
+                data = skifil.gaussian_filter(self.data, sigma=self.params['sigma'])
+            elif self.params['smoothing'] == 2:
+                data = tools.smoothing_bilateral(data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
+            elif self.params['smoothing'] == 3:
+                data = tools.smoothing_tv(data, weight=self.params['weight'], sliceId=0)
+            else:
+                print '\tcurrently switched off'
 
         return data
 

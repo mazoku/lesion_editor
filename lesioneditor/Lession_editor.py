@@ -75,16 +75,17 @@ class Lession_editor(QtGui.QMainWindow):
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
-        if self.cc.data is not None:
-            for i in fname:
-                self.ui.figure_1_CB.addItem(i.split('/')[-1])
-                self.ui.figure_2_CB.addItem(i.split('/')[-1])
+        if self.cc.data_1.loaded:
+            self.ui.figure_1_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+        if self.cc.data_2.loaded:
+            self.ui.figure_2_CB.addItem(self.cc.data_2.filename.split('/')[-1])
 
-        self.data = self.cc.data
-        self.labels = np.zeros(self.data.shape, dtype=np.int)
-        self.mask = self.cc.mask
+        # self.data = self.cc.data
+        # self.labels = np.zeros(self.data.shape, dtype=np.int)
+        # self.mask = self.cc.mask
 
-        self.n_slices = self.data.shape[0]
+        # self.n_slices = self.data.shape[0]
+        self.n_slices = self.cc.data_1.n_slices
 
         # seting up the callback for the test button --------------------------------------
         self.ui.test_BTN.clicked.connect(self.test_callback)
@@ -100,7 +101,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.viewer_F.setLayout(data_viewer_layout)
 
         # adding widget for displaying data histograms
-        self.hist_widget = Hist_widget.Hist_widget(self)
+        self.hist_widget = Hist_widget.Hist_widget(self, self.cc)
         hist_viewer_layout = QtGui.QHBoxLayout()
         hist_viewer_layout.addWidget(self.hist_widget)
         self.ui.histogram_F.setLayout(hist_viewer_layout)

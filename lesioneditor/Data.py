@@ -18,6 +18,7 @@ class Data:
         self.voxel_size = None
         self.orig_shape = None
         self.labels = None
+        self.labels_v = None
         self.n_rows = None
         self.n_cols = None
         self.n_slices = None

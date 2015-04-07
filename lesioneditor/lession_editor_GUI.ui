@@ -1582,7 +1582,14 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QComboBox" name="figure_1_CB"/>
+             <widget class="QComboBox" name="figure_1_CB">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QFrame" name="left_view_btns_F">
@@ -1760,7 +1767,14 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <widget class="QComboBox" name="figure_2_CB"/>
+             <widget class="QComboBox" name="figure_2_CB">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QFrame" name="right_view_btns_F">
@@ -1959,6 +1973,61 @@
          </widget>
         </item>
         <item>
+         <widget class="QFrame" name="frame_7">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="slice_number_1_LBL">
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QScrollBar" name="slice_1_SB">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QScrollBar" name="slice_2_SB">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="slice_number_2_LBL">
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
            <widget class="QLabel" name="slice_number_LBL">
@@ -2021,12 +2090,12 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Load_serie_1">
    <property name="text">
-    <string>Load serie #1</string>
+    <string>Load serie #1...</string>
    </property>
   </action>
   <action name="action_Load_serie_2">
    <property name="text">
-    <string>Load serie #2</string>
+    <string>Load serie #2...</string>
    </property>
   </action>
  </widget>

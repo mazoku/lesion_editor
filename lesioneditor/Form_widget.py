@@ -14,11 +14,12 @@ class Form_widget(QtGui.QWidget):
         self.win = window  # link to the main window
         self.cc = cc  # link to the computational core
         # self.im = self.win.data  # input data
-        self.im = self.cc.data_1.data  # input data
+        # self.im = self.cc.data_1.data  # input data
         # self.labels = self.win.labels  # input labeling
-        self.labels = self.cc.data_1.labels  # input labeling
-        self.actual_slice = 0  # index of current data slice
-        self.n_slices = self.im.shape[0]  # numer of slices
+        # self.labels = self.cc.data_1.labels  # input labeling
+        # self.actual_slice_1 = self.win.view_1_curr_idx  # index of current data slice
+        # self.actual_slice_2 = self.win.view_2_curr_idx  # index of current data slice
+        # self.n_slices = self.im.shape[0]  # numer of slices
         self.healthy_label = self.win.params['healthy_label']
         self.hypo_label = self.win.params['hypo_label']
         self.hyper_label = self.win.params['hyper_label']
@@ -26,49 +27,31 @@ class Form_widget(QtGui.QWidget):
         super(Form_widget, self).__init__()
         self.init_UI_form()
 
+
     def init_UI_form(self):
 
         # QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
+        # self.data_l = self.im  # data to be shown in view_1
+        # self.data_r = self.im  # data to be shown in view_2
+        if self.win.ui.figure_1_CB.currentIndex() == 0:
+            self.data_L = self.cc.data_1
+        elif self.win.ui.figure_1_CB.currentIndex() == 1:
+            self.data_L = self.cc.data_2
+        if self.win.ui.figure_2_CB.currentIndex() == 0:
+            self.data_R = self.cc.data_1
+        elif self.win.ui.figure_1_CB.currentIndex() == 1:
+            self.data_R = self.cc.data_2
 
-        self.data_1 = self.im  # data to be shown in view_1
-        self.data_2 = self.labels  # data to be shown in view_2
-        self.data_1_str = 'im'
-        self.data_2_str = 'labels'
+        self.data_L_str = 'im'
+        self.data_R_str = 'im'
 
         self.figure = plt.figure()
         self.axes = self.figure.add_axes([0, 0, 1, 1])
 
         self.canvas = FigureCanvas(self.figure)
 
-        # Just some button connected to `plot` method
-        # self.button = QtGui.QPushButton('Plot')
-        # self.button.clicked.connect(self.plot)
-
-        # slider
-        # self.slider = QtGui.QSlider(QtCore.Qt.Vertical, self)
-        # self.slider = QtGui.QSlider(QtCore.Qt.Horizontal, self)
-        # self.slider.setMinimum(0)
-        # self.slider.setMaximum(self.n_slices - 1)
-        # # self.slider.setMaximum(10)
-        # self.slider.valueChanged[int].connect(self.slider_change)
-        # self.slider.setSingleStep(1)  # step for arrows
-        # self.slider.setPageStep(1)  # step for mouse wheel
-        #
-        # # set the layout
-        # self.slice_label = QtGui.QLabel('slice #: %i/%i' % (self.actual_slice + 1, self.n_slices))
-        # slider_layout = QtGui.QHBoxLayout()
-        # # self.slice_label = QtGui.QLabel('slice #:\n%i/%i' % (self.actual_slice + 1, self.n_slices))
-        # # slider_layout = QtGui.QVBoxLayout()
-        # slider_layout.addWidget(self.slice_label)
-        # slider_layout.addWidget(self.slider)
-        # slider_frame = QtGui.QFrame()
-        # slider_frame.setLayout(slider_layout)
-
-        # layout = QtGui.QHBoxLayout()
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.canvas, 1)
-        # layout.addWidget(slider_frame)
-        # layout.addWidget(self.button)
         self.setLayout(layout)
 
         # conenction to wheel events
@@ -76,16 +59,8 @@ class Form_widget(QtGui.QWidget):
 
         self.update_figures()
 
-    # def slider_change(self, value):
-    #     # self.win.status_bar.showMessage('slider changed to %i' % value)
-    #     # self.win.statusBar().showMessage('actual slice changed to %i' % value)
-    #     self.actual_slice = value
-    #     self.update_slice_label()
-    #     self.update_figures()
 
     def label2rgb(self, slice):
-        # if self.actual_slice > 30:
-        #     pass
         r = slice == self.hyper_label
         g = slice == self.healthy_label
         b = slice == self.hypo_label
@@ -93,97 +68,101 @@ class Form_widget(QtGui.QWidget):
 
         return slice_rgb
 
+
     def update_figures(self):
         # setting the minimal and maximal to scale luminance data
-        if self.data_1_str is 'labels':
-            vmin1 = self.data_1.min()
-            vmax1 = self.data_1.max()
-            slice_1 = self.label2rgb(self.data_1[self.actual_slice, :, :])
+        if self.data_L_str is 'labels':
+            vmin1 = self.data_L.labels.min()
+            vmax1 = self.data_L.labels.max()
+            slice_L = self.label2rgb(self.data_L.labels[self.win.view_L_curr_idx, :, :])
         else:
             vmin1 = 0
             vmax1 = 255
-            slice_1 = self.data_1[self.actual_slice, :, :]
-        if self.data_2_str is 'labels':
-            vmin2 = self.data_2.min()
-            vmax2 = self.data_2.max()
-            try:
-                slice = self.data_2[self.actual_slice, :, :]
-                heal = np.where(slice == self.healthy_label)
-                ok_labels = self.cc.labels[self.cc.filtered_idxs]
-                slice_2 = np.where(np.in1d(slice, ok_labels).reshape(slice.shape), slice, -1)
-                slice_2 = np.where(heal, self.healthy_label, slice_2)
-                slice_2 = self.label2rgb(slice_2)
-            except:
-                slice_2 = self.label2rgb(self.data_2[self.actual_slice, :, :])
+            # slice_L = self.data_L.labels[self.win.view_L_curr_idx, :, :]
+            slice_L = self.data_L.data[self.win.view_L_curr_idx, :, :]
+        if self.data_R_str is 'labels':
+            vmin2 = self.data_R.labels.min()
+            vmax2 = self.data_R.labels.max()
+            # try:
+            #     slice = self.data_R.labels[self.win.view_2_curr_idx, :, :]
+            #     heal = np.where(slice == self.healthy_label)
+                # ok_labels = self.data_R.labels_v[self.cc.filtered_idxs]
+                # slice_R = np.where(np.in1d(slice, ok_labels).reshape(slice.shape), slice, -1)
+                # slice_R = np.where(heal, self.healthy_label, slice_R)
+                # slice_R = self.label2rgb(slice_R)
+            # except:
+            #     slice_R = self.label2rgb(self.data_2[self.actual_slice, :, :])
+            slice_R = self.label2rgb(self.data_R.labels[self.win.view_R_curr_idx, :, :])
 
         else:
             vmin2 = 0
             vmax2 = 255
             if self.win.disp_smoothed:
                 vmax2 = self.labels.max()
-            slice_2 = self.data_2[self.actual_slice, :, :]
+            slice_R = self.data_R.data[self.win.view_R_curr_idx, :, :]
 
         # if both views are enabled
         if self.win.show_view_1 and self.win.show_view_2:
             plt.figure(self.figure.number)
             plt.subplot(121)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(slice_1, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
+            plt.imshow(slice_L, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
             # displaying contours if desirable
-            if self.data_1_str is 'contours':
-                self.draw_contours()
-            plt.title('view_1: %s' % self.data_1_str)
+            if self.data_L_str is 'contours':
+                self.draw_contours(self.data_L.labels[self.win.view_L_curr_idx, :, :])
+            plt.title('view_L: %s' % self.data_L_str)
 
             plt.subplot(122)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(slice_2, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
+            plt.imshow(slice_R, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
             # plt.imshow(slice_2, interpolation='nearest')
             # displaying contours if desirable
-            if self.data_2_str is 'contours':
-                self.draw_contours()
-            plt.title('view_2: %s' % self.data_2_str)
+            if self.data_R_str is 'contours':
+                self.draw_contours(self.data_R.labels[self.win.view_R_curr_idx, :, :])
+            plt.title('view_R: %s' % self.data_R_str)
 
         # if only the first view is enabled
         elif self.win.show_view_1:
             plt.figure(self.figure.number)
             plt.subplot(111)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(slice_1, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
-            if self.data_1_str is 'contours':
-                self.draw_contours()
-            plt.title('view_1: %s' % self.data_1_str)
+            plt.imshow(slice_L, 'gray', interpolation='nearest', vmin=vmin1, vmax=vmax1)
+            if self.data_L_str is 'contours':
+                self.draw_contours(self.data_L.labels[self.win.view_L_curr_idx, :, :])
+            plt.title('view_L: %s' % self.data_L_str)
 
         # if only the second view is enabled
         elif self.win.show_view_2:
             plt.figure(self.figure.number)
             plt.subplot(111)
             self.figure.gca().cla()  # clearing the contours, just to be sure
-            plt.imshow(slice_2, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
-            if self.data_2_str is 'contours':
-                self.draw_contours()
-            plt.title('view_2: %s' % self.data_2_str)
+            plt.imshow(slice_R, 'gray', interpolation='nearest', vmin=vmin2, vmax=vmax2)
+            if self.data_R_str is 'contours':
+                self.draw_contours(self.data_R.labels[self.win.view_R_curr_idx, :, :])
+            plt.title('view_R: %s' % self.data_R_str)
         else:
             plt.figure(self.figure.number)
             plt.clf()
 
         self.canvas.draw()
 
-    def draw_contours(self):
+
+    def draw_contours(self, labels):
         plt.hold(True)
         try:
-            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.healthy_label, [0.1], colors='g', linewidths=2)
+            self.figure.gca().contour(labels == self.healthy_label, [0.1], colors='g', linewidths=2)
             plt.hold(True)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
             # self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hypo_label, [0.2], colors='b', linewidths=2)
-            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.hypo_label, [0.1], colors='b', linewidths=2)
+            self.figure.gca().contour(labels == self.hypo_label, [0.1], colors='b', linewidths=2)
             plt.hold(True)
         except:
             print 'contour fail: ', sys.exc_info()[0]
         try:
             # self.figure.gca().contour(self.labels[self.actual_slice, :, :] == self.hyper_label, [0.2], colors='r', linewidths=2)
-            self.figure.gca().contour(self.cc.res[self.actual_slice, :, :] == self.hyper_label, [0.1], colors='r', linewidths=2)
+            self.figure.gca().contour(labels == self.hyper_label, [0.1], colors='r', linewidths=2)
             plt.hold(False)
         except:
             print 'contour fail: ', sys.exc_info()[0]
@@ -191,18 +170,30 @@ class Form_widget(QtGui.QWidget):
     # def update_slice_label(self):
     #     self.slice_label.setText('slice #: %i/%i' % (self.actual_slice + 1, self.n_slices))
 
+
     def next_slice(self):
-        self.actual_slice += 1
-        if self.actual_slice >= self.n_slices:
-            self.actual_slice = 0
+        if self.win.view_L_curr_idx < self.data_L.n_slices - 1:
+            self.win.view_L_curr_idx += 1
+        if self.win.view_R_curr_idx < self.data_R.n_slices - 1:
+            self.win.view_R_curr_idx += 1
+
 
     def prev_slice(self):
-        # print 'actual: ', self.actual_slice
-        self.actual_slice -= 1
-        # print 'new: ', self.actual_slice
-        if self.actual_slice < 0:
-            self.actual_slice = self.n_slices - 1
-            # print 'remaped to: ', self.actual_slice
+        if self.win.view_L_curr_idx > 0:
+            self.win.view_L_curr_idx -= 1
+        if self.win.view_R_curr_idx > 0:
+            self.win.view_R_curr_idx -= 1
+
+
+    def scroll_next(self):
+        self.next_slice()
+        self.update_figures()
+
+
+    def scroll_prev(self):
+        self.prev_slice()
+        self.update_figures()
+
 
     def on_scroll(self, event):
         '''mouse wheel is used for setting slider value'''
@@ -213,4 +204,4 @@ class Form_widget(QtGui.QWidget):
         # self.slider.setValue(self.actual_slice)
         # self.slider_change(self.actual_slice)
         self.update_figures()
-        self.win.slice_change(self.actual_slice)
+        self.win.slice_change(self.win.view_L_curr_idx)

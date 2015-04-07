@@ -66,6 +66,8 @@ class Lession_editor(QtGui.QMainWindow):
         # self.hypo_label = hypo_label
         # self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
+        self.view_L_curr_idx = 0
+        self.view_R_curr_idx = 0
 
         # load parameters
         self.params = self.load_parameters()
@@ -76,23 +78,46 @@ class Lession_editor(QtGui.QMainWindow):
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
         if self.cc.data_1.loaded:
+            self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
             self.ui.figure_1_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            self.ui.figure_2_CB.addItem(self.cc.data_1.filename.split('/')[-1])
         if self.cc.data_2.loaded:
+            self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
+            self.ui.figure_1_CB.addItem(self.cc.data_2.filename.split('/')[-1])
             self.ui.figure_2_CB.addItem(self.cc.data_2.filename.split('/')[-1])
 
-        # self.data = self.cc.data
-        # self.labels = np.zeros(self.data.shape, dtype=np.int)
-        # self.mask = self.cc.mask
+        # radio buttons
+        self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
+        self.ui.serie_2_RB.clicked.connect(self.serie_2_RB_callback)
+        if self.ui.serie_1_RB.isChecked():
+            self.cc.active_serie = 1
+        else:
+            self.cc.active_serie = 2
+
+        self.ui.action_Load_serie_1.triggered.connect(lambda: self.action_Load_serie_callback(1))
+        self.ui.action_Load_serie_2.triggered.connect(lambda: self.action_Load_serie_callback(2))
 
         # self.n_slices = self.data.shape[0]
-        self.n_slices = self.cc.data_1.n_slices
+        # self.n_slices = self.cc.data_1.n_slices
 
         # seting up the callback for the test button --------------------------------------
-        self.ui.test_BTN.clicked.connect(self.test_callback)
+        # self.ui.test_BTN.clicked.connect(self.test_callback)
         #----------------------------------------------------------------------------------
 
         # seting up the range of the scrollbar to cope with the number of slices
-        self.ui.slice_scrollB.setMaximum(self.n_slices - 1)
+        if self.cc.active_serie == 1:
+            self.ui.slice_scrollB.setMaximum(self.cc.data_1.n_slices - 1)
+            self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices - 1)
+        else:
+            self.ui.slice_scrollB.setMaximum(self.cc.data_2.n_slices - 1)
+            self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices - 1)
+
+        if self.cc.data_2.loaded:
+            self.ui.slice_2_SB.setMaximum(self.cc.data_2.n_slices - 1)
+
+        # combo boxes - for figure views
+        self.ui.figure_1_CB.currentIndexChanged.connect(self.figure_1_CB_callback)
+        self.ui.figure_2_CB.currentIndexChanged.connect(self.figure_2_CB_callback)
 
         # adding widget for displaying image data
         self.form_widget = Form_widget.Form_widget(self, self.cc)
@@ -134,8 +159,10 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.heal_mean_SB.valueChanged.connect(self.heal_mean_SB_callback)
         self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
 
-        # connecting slider
+        # connecting scrollbars
         self.ui.slice_scrollB.valueChanged.connect(self.slider_changed)
+        self.ui.slice_1_SB.valueChanged.connect(self.slider_1_changed)
+        self.ui.slice_2_SB.valueChanged.connect(self.slider_2_changed)
 
         # connecting sliders with their line edit
         self.connect_SL_and_LE()
@@ -145,6 +172,16 @@ class Lession_editor(QtGui.QMainWindow):
         n_rows, n_cols, n_slices = self.cc.labels.shape
         self.cc.labels = np.zeros(self.labels.shape)
         self.cc.labels[n_rows/3.:2*n_rows/3., n_cols/3.:2*n_cols/3.] = self.hypo
+
+
+    def serie_1_RB_callback(self):
+        self.cc.active_serie = 1
+        self.cc.actual_data = self.cc.data_1
+
+
+    def serie_2_RB_callback(self):
+        self.cc.active_serie = 2
+        self.cc.actual_data = self.cc.data_2
 
 
     def connect_SL_and_LE(self):
@@ -571,14 +608,47 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def slider_changed(self, val):
+        if val > self.view_L_curr_idx:
+            self.form_widget.scroll_next()
+        else:
+            self.form_widget.scroll_prev()
         self.slice_change(val)
-        self.form_widget.actual_slice = val
-        self.form_widget.update_figures()
+        self.slice_1_change(val)
+        # self.form_widget.actual_slice = val
+        # self.form_widget.update_figures()
 
 
     def slice_change(self, val):
         self.ui.slice_scrollB.setValue(val)
         self.ui.slice_number_LBL.setText('slice # = %i' % (val + 1))
+
+
+    def slider_1_changed(self, val):
+        self.view_1_curr_idx = val
+        if val > self.view_L_curr_idx:
+            self.form_widget.scroll_next()
+        else:
+            self.form_widget.scroll_prev()
+        self.slice_1_change(val)
+        self.slice_2_change(val)
+        self.slice_change(val)
+
+
+    def slider_2_changed(self, val):
+        self.view_2_curr_idx = val
+        # self.form_widget.actual_slice_2 = val
+        self.slice_2_change(val)
+        self.form_widget.update_figures()
+
+
+    def slice_1_change(self, val):
+        self.ui.slice_1_SB.setValue(val)
+        self.ui.slice_number_1_LBL.setText(str(val + 1))
+
+
+    def slice_2_change(self, val):
+        self.ui.slice_2_SB.setValue(val)
+        self.ui.slice_number_2_LBL.setText(str(val + 1))
 
 
     def calculate_models_callback(self):
@@ -617,7 +687,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.form_widget.update_figures()
         # self.hist_widget.update_figures()
-        self.labels = self.cc.res
+        self.labels = self.cc.actual_data.labels
         # self.labels = self.cc.labels
 
         # filling table with objects
@@ -675,52 +745,89 @@ class Lession_editor(QtGui.QMainWindow):
     def show_im_1_callback(self):
         # print 'data_1 set to im'
         self.statusBar().showMessage('data_1 set to im')
-        self.form_widget.data_1 = self.data
-        self.form_widget.data_1_str = 'im'
+        # self.form_widget.data_1 = self.data
+        self.form_widget.data_L_str = 'im'
         self.form_widget.update_figures()
 
 
     def show_im_2_callback(self):
         # print 'data_2 set to im'
         self.statusBar().showMessage('data_2 set to im')
-        if self.disp_smoothed:
-            self.form_widget.data_2 = self.labels
-        else:
-            self.form_widget.data_2 = self.data
-        self.form_widget.data_2_str = 'im'
+        # if self.disp_smoothed:
+        #     self.form_widget.data_2 = self.labels
+        # else:
+        #     self.form_widget.data_2 = self.data
+        self.form_widget.data_R_str = 'im'
         self.form_widget.update_figures()
 
 
     def show_labels_1_callback(self):
         # print 'data_1 set to labels'
         self.statusBar().showMessage('data_1 set to labels')
-        self.form_widget.data_1 = self.labels
-        self.form_widget.data_1_str = 'labels'
+        # self.form_widget.data_1 = self.labels
+        self.form_widget.data_L_str = 'labels'
         self.form_widget.update_figures()
 
 
     def show_labels_2_callback(self):
         # print 'data_2 set to labels'
         self.statusBar().showMessage('data_2 set to labels')
-        self.form_widget.data_2 = self.labels
-        self.form_widget.data_2_str = 'labels'
+        # self.form_widget.data_1 = self.labels
+        self.form_widget.data_R_str = 'labels'
         self.form_widget.update_figures()
 
 
     def show_contours_1_callback(self):
         # print 'data_2 set to contours'
         self.statusBar().showMessage('data_1 set to contours')
-        self.form_widget.data_1 = self.data
-        self.form_widget.data_1_str = 'contours'
+        # self.form_widget.data_1 = self.data
+        self.form_widget.data_L_str = 'contours'
         self.form_widget.update_figures()
 
 
     def show_contours_2_callback(self):
         # print 'data_2 set to contours'
         self.statusBar().showMessage('data_2 set to contours')
-        self.form_widget.data_2 = self.data
-        self.form_widget.data_2_str = 'contours'
+        # self.form_widget.data_2 = self.data
+        self.form_widget.data_R_str = 'contours'
         self.form_widget.update_figures()
+
+
+    def figure_1_CB_callback(self):
+        if self.ui.figure_1_CB.currentIndex() == 0:
+            self.form_widget.data_L = self.cc.data_1
+            # self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices)
+        elif self.ui.figure_1_CB.currentIndex() == 1:
+            self.form_widget.data_L = self.cc.data_2
+
+        if self.view_L_curr_idx >= self.form_widget.data_L.n_slices:
+            self.view_L_curr_idx = self.form_widget.data_L.n_slices - 1
+            self.slice_change(self.view_L_curr_idx)
+
+        self.ui.slice_1_SB.setMaximum(self.form_widget.data_L.n_slices - 1)
+        self.ui.slice_scrollB.setMaximum(self.form_widget.data_L.n_slices - 1)
+
+        self.form_widget.update_figures()
+
+    def figure_2_CB_callback(self):
+        if self.ui.figure_2_CB.currentIndex() == 0:
+            self.form_widget.data_R = self.cc.data_1
+            self.ui.slice_2_SB.setMaximum(self.cc.data_1.n_slices)
+        elif self.ui.figure_2_CB.currentIndex() == 1:
+            self.form_widget.data_R = self.cc.data_2
+            self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices)
+
+        if self.view_R_curr_idx >= self.form_widget.data_R.n_slices:
+            self.view_R_curr_idx = self.form_widget.data_R.n_slices - 1
+            self.slice_change(self.view_R_curr_idx)
+
+        self.form_widget.update_figures()
+
+
+    def action_Load_serie_callback(self, serie_number):
+        print serie_number
+
+        #TODO: tadyyyyyyy
 
 
     def run(self, im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):
@@ -746,6 +853,7 @@ if __name__ == '__main__':
     # venous 5mm - ok, but wrong approach
     fnames = list()
     fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
+    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz')
 
     # hypo in venous -----------------------
     # arterial - bad

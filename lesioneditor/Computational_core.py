@@ -53,6 +53,8 @@ class Computational_core():
         self.fname = fname
         self.data_1 = Data.Data()
         self.data_2 = Data.Data()
+        self.actual_data = self.data_1
+        self.active_serie = 1
 
         # loading data - both series if provided
         if len(self.fname) > 0:
@@ -92,7 +94,7 @@ class Computational_core():
 
 
     def zoom_to_shape(self, data, shape):
-        zoom = np.array(shape, dtype=np.float) / np.array(self.data.shape, dtype=np.float)
+        zoom = np.array(shape, dtype=np.float) / np.array(data.shape, dtype=np.float)
         data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
         return data_res
 
@@ -259,7 +261,7 @@ class Computational_core():
             plt.title('estimated normal pdf of %sdense obejcts' % outlier_type)
             plt.show()
 
-        return mu, sigma, rv
+        return rv
 
 
     def get_unaries(self, data, mask, models, params):
@@ -267,7 +269,7 @@ class Computational_core():
         rv_hyper = models['rv_hyper']
         rv_hypo = models['rv_hypo']
         # mu_heal = models['mu_heal']
-        mu_heal = self.mu_heal
+        mu_heal = rv_heal.mean()
 
         if params['erode_mask']:
             if data.ndim == 3:
@@ -445,10 +447,10 @@ class Computational_core():
         rv_heal = self.estimate_healthy_pdf(data, mask, self.params)
         print '\tliver pdf: mu = ', rv_heal.mean(), ', sigma = ', rv_heal.std()
         # hypodense pdf ------------
-        rv_hypo = self.estimate_outlier_pdf(data, mask, self.rv_heal, 'hypo', self.params)
+        rv_hypo = self.estimate_outlier_pdf(data, mask, rv_heal, 'hypo', self.params)
         print '\thypodense pdf: mu = ', rv_hypo.mean(), ', sigma = ', rv_hypo.std()
         # hyperdense pdf ------------
-        rv_hyper = self.estimate_outlier_pdf(data, mask, self.rv_heal, 'hyper', self.params)
+        rv_hyper = self.estimate_outlier_pdf(data, mask, rv_heal, 'hyper', self.params)
         print '\thyperdense pdf: mu = ', rv_hyper.mean(), ', sigma = ', rv_hyper.std()
 
         models = dict()
@@ -514,17 +516,17 @@ class Computational_core():
         # zooming the data
         if self.params['zoom']:
             print 'zooming data...'
-            self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxel_size_mm'])
-            self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxel_size_mm'])
+            self.actual_data.data = self.data_zoom(self.actual_data.data, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
+            self.actual_data.mask = self.data_zoom(self.actual_data.mask, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
         else:
-            self.data = tools.resize3D(self.data, self.params['scale'], sliceId=0)
-            self.mask = tools.resize3D(self.mask, self.params['scale'], sliceId=0)
+            data = tools.resize3D(self.actual_data.data, self.params['scale'], sliceId=0)
+            mask = tools.resize3D(self.actual_data.mask, self.params['scale'], sliceId=0)
         # data = data.astype(np.uint8)
 
 
         # calculating intensity models if necesarry
         if not self.models:
-            self.calculate_intensity_models()
+            self.models = self.calculate_intensity_models(data, mask)
 
         print 'calculating unary potentials...'
         self.status_bar.showMessage('Calculating unary potentials...')
@@ -532,7 +534,7 @@ class Computational_core():
         # unaries = data_d
         # # as we convert to int, we need to multipy to get sensible values
         # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
-        self.unaries = beta * self.get_unaries(self.data, self.mask, self.models, self.params)
+        self.unaries = beta * self.get_unaries(data, mask, self.models, self.params)
         n_labels = self.unaries.shape[2]
 
         print 'calculating pairwise potentials...'
@@ -544,12 +546,12 @@ class Computational_core():
         self.status_bar.showMessage('Deriving graph edges...')
         # use the gerneral graph algorithm
         # first, we construct the grid graph
-        inds = np.arange(self.data.size).reshape(self.data.shape)
-        if self.data.ndim == 2:
+        inds = np.arange(data.size).reshape(data.shape)
+        if data.ndim == 2:
             horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
             vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
             self.edges = np.vstack([horz, vert]).astype(np.int32)
-        elif self.data.ndim == 3:
+        elif data.ndim == 3:
             # horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
             # vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
             horz = np.c_[inds[:, :, :-1].ravel(), inds[:, :, 1:].ravel()]
@@ -557,7 +559,7 @@ class Computational_core():
             dept = np.c_[inds[:-1, :, :].ravel(), inds[1:, :, :].ravel()]
             self.edges = np.vstack([horz, vert, dept]).astype(np.int32)
         # deleting edges with nodes outside the mask
-        nodes_in = np.ravel_multi_index(np.nonzero(self.mask), self.data.shape)
+        nodes_in = np.ravel_multi_index(np.nonzero(mask), data.shape)
         rows_inds = np.in1d(self.edges, nodes_in).reshape(self.edges.shape).sum(axis=1) == 2
         self.edges = self.edges[rows_inds, :]
 
@@ -574,15 +576,15 @@ class Computational_core():
         # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
         # print 'tu: ', unaries.reshape(-1, n_labels).shape
         result_graph = pygco.cut_from_graph(self.edges, self.unaries.reshape(-1, n_labels), self.pairwise)
-        self.res = result_graph.reshape(self.data.shape)
+        labels = result_graph.reshape(data.shape)
 
-        self.res = np.where(self.mask, self.res, -1)
+        labels = np.where(mask, labels, -1)
 
         # zooming to the original size
         if self.params['zoom']:
-            self.res = self.zoom_to_shape(self.res, self.orig_shape)
+            self.actual_data.labels = self.zoom_to_shape(labels, self.actual_data.orig_shape)
         else:
-            self.res = tools.resize3D(self.res, 1. / self.params['scale'], sliceId=0)
+            self.actual_data.labels = tools.resize3D(labels, 1. / self.params['scale'], sliceId=0)
 
         print '\t...done'
         self.status_bar.showMessage('Done')
@@ -593,9 +595,9 @@ class Computational_core():
 
 
         self.status_bar.showMessage('Extracting objects...')
-        labels_hypo, n_hypo = scindimea.label(self.res == hypo_lab)
+        labels_hypo, n_hypo = scindimea.label(self.actual_data.labels == hypo_lab)
         labels_hypo -= 1  # shifts background to -1
-        labels_hyper, n_hyper = scindimea.label(self.res == hyper_lab)
+        labels_hyper, n_hyper = scindimea.label(self.actual_data.labels == hyper_lab)
         labels_hyper -= 1  # shifts background to -1
         self.n_objects = n_hypo + n_hyper
         # self.objects = labels_hypo + (labels_hyper + n_hypo)

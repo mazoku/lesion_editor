@@ -23,6 +23,8 @@ class Form_widget(QtGui.QWidget):
         self.healthy_label = self.win.params['healthy_label']
         self.hypo_label = self.win.params['hypo_label']
         self.hyper_label = self.win.params['hyper_label']
+        self.win_w = self.win.params['win_width']
+        self.win_l = self.win.params['win_level']
 
         super(Form_widget, self).__init__()
         self.init_UI_form()
@@ -69,6 +71,25 @@ class Form_widget(QtGui.QWidget):
         return slice_rgb
 
 
+    def window_slice(self, ctslice):
+        if self.win_w > 0:
+            mul = 255. / float(self.win_w)
+        else:
+            mul = 0
+
+        lb =self.win_l - self.win_w / 2
+        # aux = (ctslice.ravel(order='F') - lb) * mul
+        aux = (ctslice - lb) * mul
+        # idxs = np.where(aux < 0)[0]
+        # aux[idxs] = 0
+        # idxs = np.where(aux > 255)[0]
+        # aux[idxs] = 255
+        aux = np.where(aux < 0, 0, aux)
+        aux = np.where(aux > 255, 255, aux)
+
+        return aux.astype(np.uint8)
+
+
     def update_figures(self):
         # setting the minimal and maximal to scale luminance data
         if self.data_L_str is 'labels':
@@ -79,7 +100,7 @@ class Form_widget(QtGui.QWidget):
             vmin1 = 0
             vmax1 = 255
             # slice_L = self.data_L.labels[self.win.view_L_curr_idx, :, :]
-            slice_L = self.data_L.data[self.win.view_L_curr_idx, :, :]
+            slice_L = self.window_slice(self.data_L.data[self.win.view_L_curr_idx, :, :])
         if self.data_R_str is 'labels':
             vmin2 = self.data_R.labels.min()
             vmax2 = self.data_R.labels.max()
@@ -93,14 +114,14 @@ class Form_widget(QtGui.QWidget):
             # except:
             #     slice_R = self.label2rgb(self.data_2[self.actual_slice, :, :])
             slice_R = self.label2rgb(self.data_R.labels[self.win.view_R_curr_idx, :, :])
-
         else:
             vmin2 = 0
             vmax2 = 255
             if self.win.disp_smoothed:
                 vmax2 = self.labels.max()
-            slice_R = self.data_R.data[self.win.view_R_curr_idx, :, :]
+            slice_R = self.window_slice(self.data_R.data[self.win.view_R_curr_idx, :, :])
 
+        # preparing slice ---------------------------------------------------
         # if both views are enabled
         if self.win.show_view_1 and self.win.show_view_2:
             plt.figure(self.figure.number)

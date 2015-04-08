@@ -61,6 +61,20 @@ class Computational_core():
             name = self.fname[0]
             if name.split('.')[-1] in ext_list:
                 self.data_1.load_data(name)
+
+                # -------------------------------------------------------
+                import sys
+                import os
+                path_to_script = os.path.dirname(os.path.abspath(__file__))
+                sys.path.append(os.path.join(path_to_script, "../../pyseg_base/pysegbase"))
+                from seed_editor_qt import QTSeedEditor
+                pyed = QTSeedEditor(self.data_1.data,
+                            # voxelSize=self.params['working_voxel_size_mm'],
+                            volume_unit='ml')
+                pyed.exec_()
+                # TODO: predelat ala QTSeedEditor !!
+                # -------------------------------------------------------
+
                 # self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
             else:
                 msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)

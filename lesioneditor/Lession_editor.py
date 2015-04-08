@@ -494,9 +494,10 @@ class Lession_editor(QtGui.QMainWindow):
                 try:
                     params[option] = config.getint(section, option)
                 except ValueError:
-                    params[option] = config.getfloat(section, option)
-                except:
-                    params[option] = config.get(section, option)
+                    try:
+                        params[option] = config.getfloat(section, option)
+                    except ValueError:
+                        params[option] = config.get(section, option)
         return params
 
 
@@ -825,9 +826,9 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def action_Load_serie_callback(self, serie_number):
-        print serie_number
-
-        #TODO: tadyyyyyyy
+        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir'])
+        print 'Does not work yet.'
+        print fname
 
 
     def run(self, im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):

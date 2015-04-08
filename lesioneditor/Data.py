@@ -45,7 +45,8 @@ class Data:
             f.close()
         data_dict = pickle.loads(fcontent)
 
-        self.data = tools.windowing(data_dict['data3d'], level=self.win_level, width=self.win_width)
+        # self.data = tools.windowing(data_dict['data3d'], level=self.win_level, width=self.win_width)
+        self.data = data_dict['data3d']
         self.mask = data_dict['segmentation']
 
         self.voxel_size = data_dict['voxelsize_mm']

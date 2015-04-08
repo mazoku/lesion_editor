@@ -80,7 +80,7 @@ class SliceBox(QLabel):
 
         self.drawing = False
         self.modified = False
-        self.seed_mark = None
+        # self.seed_mark = None
         self.last_position = None
         self.imagesize = QSize(int(sliceSize[0] * grid[0]),
                                int(sliceSize[1] * grid[1]))
@@ -93,9 +93,9 @@ class SliceBox(QLabel):
         self.contours = None
         self.contours_old = None
         self.mask_points = None
-        self.erase_region_button = None
-        self.erase_fun = None
-        self.erase_mode = 'inside'
+        # self.erase_region_button = None
+        # self.erase_fun = None
+        # self.erase_mode = 'inside'
         self.contour_mode = 'fill'
         self.scroll_fun = None
 
@@ -103,7 +103,7 @@ class SliceBox(QLabel):
         #     self.seeds_colortable = CONTOURS_COLORTABLE
         #     self.box_buttons = BOX_BUTTONS_DRAW
         #     self.mode_draw = True
-        # 
+        #
         # else:
         #     self.seeds_colortable = SEEDS_COLORTABLE
         #     self.box_buttons = BOX_BUTTONS_SEED
@@ -207,7 +207,7 @@ class SliceBox(QLabel):
             cnt = self.gen_contours(aux)
 
             self.composeRgba(img, cnt,
-                             CONTOURLINES_COLORTABLE[ii - 1,...])
+                             CO/NTOURLINES_COLORTABLE[ii - 1,...])
 
 
     def gen_contours(self, sl):

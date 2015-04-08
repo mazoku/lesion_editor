@@ -99,15 +99,15 @@ class SliceBox(QLabel):
         self.contour_mode = 'fill'
         self.scroll_fun = None
 
-        if mode == 'draw':
-            self.seeds_colortable = CONTOURS_COLORTABLE
-            self.box_buttons = BOX_BUTTONS_DRAW
-            self.mode_draw = True
-
-        else:
-            self.seeds_colortable = SEEDS_COLORTABLE
-            self.box_buttons = BOX_BUTTONS_SEED
-            self.mode_draw = False
+        # if mode == 'draw':
+        #     self.seeds_colortable = CONTOURS_COLORTABLE
+        #     self.box_buttons = BOX_BUTTONS_DRAW
+        #     self.mode_draw = True
+        # 
+        # else:
+        #     self.seeds_colortable = SEEDS_COLORTABLE
+        #     self.box_buttons = BOX_BUTTONS_SEED
+        #     self.mode_draw = False
 
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
         self.setPixmap(QPixmap.fromImage(self.image))
@@ -120,79 +120,79 @@ class SliceBox(QLabel):
         painter.end()
 
 
-    def drawSeedMark(self, x, y):
-        xx = self.mask_points[0] + x
-        yy = self.mask_points[1] + y
-        idx = np.arange(len(xx))
-        idx[np.where(xx < 0)] = -1
-        idx[np.where(xx >= self.slice_size[0])] = -1
-        idx[np.where(yy < 0)] = -1
-        idx[np.where(yy >= self.slice_size[1])] = -1
-        ii = idx[np.where(idx >= 0)]
-        xx = xx[ii]
-        yy = yy[ii]
-
-        self.seeds[yy * self.slice_size[0] + xx] = self.seed_mark
-
-
-    def drawLine(self, p0, p1):
-        """
-        Draw line to slice image and seed matrix.
-
-        Parameters
-        ----------
-        p0 : tuple of int
-            Line star point.
-        p1 : tuple of int
-            Line end point.
-        """
-
-        x0, y0 = p0
-        x1, y1 = p1
-        dx = np.abs(x1-x0)
-        dy = np.abs(y1-y0)
-        if x0 < x1:
-            sx = 1
-
-        else:
-            sx = -1
-
-        if y0 < y1:
-            sy = 1
-
-        else:
-            sy = -1
-
-        err = dx - dy
-
-        while True:
-            self.drawSeedMark(x0,y0)
-
-            if x0 == x1 and y0 == y1:
-                break
-
-            e2 = 2*err
-            if e2 > -dy:
-                err = err - dy
-                x0 = x0 + sx
-
-            if e2 <  dx:
-                err = err + dx
-                y0 = y0 + sy
+    # def drawSeedMark(self, x, y):
+    #     xx = self.mask_points[0] + x
+    #     yy = self.mask_points[1] + y
+    #     idx = np.arange(len(xx))
+    #     idx[np.where(xx < 0)] = -1
+    #     idx[np.where(xx >= self.slice_size[0])] = -1
+    #     idx[np.where(yy < 0)] = -1
+    #     idx[np.where(yy >= self.slice_size[1])] = -1
+    #     ii = idx[np.where(idx >= 0)]
+    #     xx = xx[ii]
+    #     yy = yy[ii]
+    #
+    #     self.seeds[yy * self.slice_size[0] + xx] = self.seed_mark
 
 
-    def drawSeeds(self, pos):
-        if pos[0] < 0 or pos[0] >= self.slice_size[0] \
-                or pos[1] < 0 or pos[1] >= self.slice_size[1]:
-            return
+    # def drawLine(self, p0, p1):
+    #     """
+    #     Draw line to slice image and seed matrix.
+    #
+    #     Parameters
+    #     ----------
+    #     p0 : tuple of int
+    #         Line star point.
+    #     p1 : tuple of int
+    #         Line end point.
+    #     """
+    #
+    #     x0, y0 = p0
+    #     x1, y1 = p1
+    #     dx = np.abs(x1-x0)
+    #     dy = np.abs(y1-y0)
+    #     if x0 < x1:
+    #         sx = 1
+    #
+    #     else:
+    #         sx = -1
+    #
+    #     if y0 < y1:
+    #         sy = 1
+    #
+    #     else:
+    #         sy = -1
+    #
+    #     err = dx - dy
+    #
+    #     while True:
+    #         self.drawSeedMark(x0,y0)
+    #
+    #         if x0 == x1 and y0 == y1:
+    #             break
+    #
+    #         e2 = 2*err
+    #         if e2 > -dy:
+    #             err = err - dy
+    #             x0 = x0 + sx
+    #
+    #         if e2 <  dx:
+    #             err = err + dx
+    #             y0 = y0 + sy
 
-        self.drawLine(self.last_position, pos)
-        self.updateSlice()
 
-        self.modified = True
-        self.last_position = pos
-
-        self.update()
+    # def drawSeeds(self, pos):
+    #     if pos[0] < 0 or pos[0] >= self.slice_size[0] \
+    #             or pos[1] < 0 or pos[1] >= self.slice_size[1]:
+    #         return
+    #
+    #     self.drawLine(self.last_position, pos)
+    #     self.updateSlice()
+    #
+    #     self.modified = True
+    #     self.last_position = pos
+    #
+    #     self.update()
 
 
     def get_contours(self, img, sl):
@@ -337,13 +337,13 @@ class SliceBox(QLabel):
         self.updateSlice()
 
 
-    def getSliceSeeds(self):
-        if self.modified:
-            self.modified = False
-            return self.seeds.reshape(self.slice_size, order='F')
-
-        else:
-            return None
+    # def getSliceSeeds(self):
+    #     if self.modified:
+    #         self.modified = False
+    #         return self.seeds.reshape(self.slice_size, order='F')
+    #
+    #     else:
+    #         return None
 
 
     def gridPosition(self, pos):
@@ -352,33 +352,33 @@ class SliceBox(QLabel):
 
 
     # mouse events
-    def mousePressEvent(self, event):
-        if event.button() in self.box_buttons:
-            self.drawing = True
-            self.seed_mark = self.box_buttons[event.button()]
-            self.last_position = self.gridPosition(event.pos())
-
-        elif event.button() == Qt.MiddleButton:
-            self.drawing = False
-            self.erase_region_button = True
-
-
-    def mouseMoveEvent(self, event):
-        if self.drawing:
-            self.drawSeeds(self.gridPosition(event.pos()))
-
-
-    def mouseReleaseEvent(self, event):
-        if (event.button() in self.box_buttons) and self.drawing:
-            self.drawSeeds(self.gridPosition(event.pos()))
-            self.drawing = False
-
-        if event.button() == Qt.MiddleButton\
-          and self.erase_region_button == True:
-            self.eraseRegion(self.gridPosition(event.pos()),
-                             self.erase_mode)
-
-            self.erase_region_button == False
+    # def mousePressEvent(self, event):
+    #     if event.button() in self.box_buttons:
+    #         self.drawing = True
+    #         self.seed_mark = self.box_buttons[event.button()]
+    #         self.last_position = self.gridPosition(event.pos())
+    #
+    #     elif event.button() == Qt.MiddleButton:
+    #         self.drawing = False
+    #         self.erase_region_button = True
+    #
+    #
+    # def mouseMoveEvent(self, event):
+    #     if self.drawing:
+    #         self.drawSeeds(self.gridPosition(event.pos()))
+    #
+    #
+    # def mouseReleaseEvent(self, event):
+    #     if (event.button() in self.box_buttons) and self.drawing:
+    #         self.drawSeeds(self.gridPosition(event.pos()))
+    #         self.drawing = False
+    #
+    #     if event.button() == Qt.MiddleButton\
+    #       and self.erase_region_button == True:
+    #         self.eraseRegion(self.gridPosition(event.pos()),
+    #                          self.erase_mode)
+    #
+    #         self.erase_region_button == False
 
 
     def resizeSlice(self, new_slice_size=None, new_grid=None):
@@ -405,17 +405,17 @@ class SliceBox(QLabel):
         self.updateSlice()
 
 
-    def leaveEvent(self, event):
-        self.drawing = False
+    # def leaveEvent(self, event):
+    #     self.drawing = False
 
 
-    def enterEvent(self, event):
-        self.drawing = False
-        self.emit(SIGNAL('focus_slider'))
+    # def enterEvent(self, event):
+    #     self.drawing = False
+    #     self.emit(SIGNAL('focus_slider'))
 
 
-    def setMaskPoints(self, mask):
-        self.mask_points = mask
+    # def setMaskPoints(self, mask):
+    #     self.mask_points = mask
 
 
     def getCW(self):
@@ -426,14 +426,14 @@ class SliceBox(QLabel):
         self.cw[key] = val
 
 
-    def eraseRegion(self, pos, mode):
-        if self.erase_fun is not None:
-            self.erase_fun(pos, mode)
-            self.updateSlice()
+    # def eraseRegion(self, pos, mode):
+    #     if self.erase_fun is not None:
+    #         self.erase_fun(pos, mode)
+    #         self.updateSlice()
 
 
-    def setEraseFun(self, fun):
-        self.erase_fun = fun
+    # def setEraseFun(self, fun):
+    #     self.erase_fun = fun
 
 
     def setScrollFun(self, fun):

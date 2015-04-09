@@ -68,13 +68,18 @@ class Lession_editor(QtGui.QMainWindow):
         # self.hypo_label = hypo_label
         # self.hyper_label = hyper_label
         self.disp_smoothed = disp_smoothed
-        self.view_L_curr_idx = 0
-        self.view_R_curr_idx = 0
+        # self.view_L_curr_idx = 0
+        # self.view_R_curr_idx = 0
 
         # load parameters
         self.params = self.load_parameters()
         self.win_l = self.params['win_level']
         self.win_w = self.params['win_width']
+
+        self.data_L = None
+        self.data_R = None
+        self.actual_slice_L = 0
+        self.actual_slice_R = 0
 
         # fill parameters to widgets
         self.fill_parameters()
@@ -87,10 +92,12 @@ class Lession_editor(QtGui.QMainWindow):
             self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
             self.ui.figure_1_CB.addItem(self.cc.data_1.filename.split('/')[-1])
             self.ui.figure_2_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            self.data_L = self.cc.data_1
         if self.cc.data_2.loaded:
             self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
             self.ui.figure_1_CB.addItem(self.cc.data_2.filename.split('/')[-1])
             self.ui.figure_2_CB.addItem(self.cc.data_2.filename.split('/')[-1])
+            self.data_R = self.cc.data_2
 
         # radio buttons
         self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
@@ -112,14 +119,14 @@ class Lession_editor(QtGui.QMainWindow):
 
         # seting up the range of the scrollbar to cope with the number of slices
         if self.cc.active_serie == 1:
-            self.ui.slice_scrollB.setMaximum(self.cc.data_1.n_slices - 1)
-            self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices - 1)
+            self.ui.slice_C_SB.setMaximum(self.cc.data_1.n_slices - 1)
+            self.ui.slice_L_SB.setMaximum(self.cc.data_1.n_slices - 1)
         else:
-            self.ui.slice_scrollB.setMaximum(self.cc.data_2.n_slices - 1)
-            self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices - 1)
+            self.ui.slice_C_SB.setMaximum(self.cc.data_2.n_slices - 1)
+            self.ui.slice_L_SB.setMaximum(self.cc.data_2.n_slices - 1)
 
         if self.cc.data_2.loaded:
-            self.ui.slice_2_SB.setMaximum(self.cc.data_2.n_slices - 1)
+            self.ui.slice_R_SB.setMaximum(self.cc.data_2.n_slices - 1)
 
         # combo boxes - for figure views
         self.ui.figure_1_CB.currentIndexChanged.connect(self.figure_1_CB_callback)
@@ -179,9 +186,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
 
         # connecting scrollbars
-        self.ui.slice_scrollB.valueChanged.connect(self.slider_changed)
-        self.ui.slice_1_SB.valueChanged.connect(self.slider_1_changed)
-        self.ui.slice_2_SB.valueChanged.connect(self.slider_2_changed)
+        self.ui.slice_C_SB.valueChanged.connect(self.slider_C_changed)
+        self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
+        self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
 
         # connecting sliders with their line edit
         self.connect_SL_and_LE()
@@ -644,24 +651,34 @@ class Lession_editor(QtGui.QMainWindow):
 
 
 
-    def slider_changed(self, val):
+    def slider_C_changed(self, val):
         # if val > self.view_L_curr_idx:
         #     self.form_widget.scroll_next()
         # else:
         #     self.form_widget.scroll_prev()
         # self.slice_change(val)
         # self.slice_1_change(val)
+        if val == self.actual_slice_L:
+            return
+
         if (val > 0) and (val < self.data_L.n_slices):
+            diff = val - self.actual_slice_L
             self.actual_slice_L = val
         else:
             return
 
-        if val < self.data_R.n_slices:
-            self.actual_slice_R = val
-        else:
-            self.actual_slice_R = self.data_R.n_slices
+        new_slice_R = self.actual_slice_R + diff
+        if new_slice_R < 0:
+            new_slice_R = 0
+        elif new_slice_R >= self.data_R.n_slices:
+            new_slice_R = self.data_R.n_slices - 1
 
+        self.actual_slice_R = new_slice_R
 
+        self.ui.slice_L_SB.setValue(self.actual_slice_L)
+        self.ui.slice_R_SB.setValue(self.actual_slice_R)
+
+        print 'new_L = %i, new_R = %i' % (self.actual_slice_L, self.actual_slice_R)
 
 
     def slice_change(self, val):
@@ -669,8 +686,17 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_number_LBL.setText('slice # = %i' % (val + 1))
 
 
-    def slider_1_changed(self, val):
-        pass
+    def slider_L_changed(self, val):
+        if val == self.actual_slice_L:
+            return
+
+        if (val > 0) and (val < self.data_L.n_slices):
+            self.actual_slice_L = val
+        else:
+            return
+
+        self.ui.slice_C_SB.setValue(self.actual_slice_L)
+
         # self.view_1_curr_idx = val
         # if val > self.view_L_curr_idx:
         #     self.form_widget.scroll_next()
@@ -681,7 +707,7 @@ class Lession_editor(QtGui.QMainWindow):
         # self.slice_change(val)
 
 
-    def slider_2_changed(self, val):
+    def slider_R_changed(self, val):
         pass
         # self.view_2_curr_idx = val
         # # self.form_widget.actual_slice_2 = val
@@ -689,12 +715,12 @@ class Lession_editor(QtGui.QMainWindow):
         # self.form_widget.update_figures()
 
 
-    def slice_1_change(self, val):
+    def slice_L_change(self, val):
         self.ui.slice_1_SB.setValue(val)
         self.ui.slice_number_1_LBL.setText(str(val + 1))
 
 
-    def slice_2_change(self, val):
+    def slice_R_change(self, val):
         self.ui.slice_2_SB.setValue(val)
         self.ui.slice_number_2_LBL.setText(str(val + 1))
 

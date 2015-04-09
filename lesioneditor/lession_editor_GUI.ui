@@ -1995,14 +1995,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QScrollBar" name="slice_1_SB">
+            <widget class="QScrollBar" name="slice_L_SB">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QScrollBar" name="slice_2_SB">
+            <widget class="QScrollBar" name="slice_R_SB">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -2049,7 +2049,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QScrollBar" name="slice_scrollB">
+           <widget class="QScrollBar" name="slice_C_SB">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>

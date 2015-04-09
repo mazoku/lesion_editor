@@ -57,31 +57,14 @@ def erase_reg(arr, p, val=0):
 
 
 class SliceBox(QLabel):
-    """
-    Widget for marking reagions of interest in DICOM slices.
-    """
 
     def __init__(self, sliceSize, grid, mode='seeds'):
-        """
-        Initialize SliceBox.
-
-        Parameters
-        ----------
-        sliceSize : tuple of int
-            Size of slice matrix.
-        grid : tuple of float
-            Pixel size:
-            imageSize = (grid1 * sliceSize1, grid2 * sliceSize2)
-        mode : str
-            Editor mode.
-        """
 
         QLabel.__init__(self)
 
-        self.drawing = False
-        self.modified = False
-        # self.seed_mark = None
-        self.last_position = None
+        # self.drawing = False
+        # self.modified = False
+        # self.last_position = None
         self.imagesize = QSize(int(sliceSize[0] * grid[0]),
                                int(sliceSize[1] * grid[1]))
         self.grid = grid
@@ -93,106 +76,29 @@ class SliceBox(QLabel):
         self.contours = None
         self.contours_old = None
         self.mask_points = None
-        # self.erase_region_button = None
-        # self.erase_fun = None
-        # self.erase_mode = 'inside'
         self.contour_mode = 'fill'
+        # self.actual_slice = 0
+        # self.n_slices = 0
         self.scroll_fun = None
-
-        # if mode == 'draw':
-        #     self.seeds_colortable = CONTOURS_COLORTABLE
-        #     self.box_buttons = BOX_BUTTONS_DRAW
-        #     self.mode_draw = True
-        #
-        # else:
-        #     self.seeds_colortable = SEEDS_COLORTABLE
-        #     self.box_buttons = BOX_BUTTONS_SEED
-        #     self.mode_draw = False
 
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
         self.setPixmap(QPixmap.fromImage(self.image))
         self.setScaledContents(True)
 
 
+    # def set_data(self, data, type):
+    #     self.data = data
+    #     self.n_slices, self.n_rows, self.n_cols = data.shape
+    #     self.type = type
+    #
+    #     self.imagesize = QSize(int(self.n_rows * self.grid[0]),
+    #                            int(self.n_cols * self.grid[1]))
+    #     self.slice_size = (self.n_rows, self.n_cols)
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.drawImage(event.rect(), self.image)
         painter.end()
-
-
-    # def drawSeedMark(self, x, y):
-    #     xx = self.mask_points[0] + x
-    #     yy = self.mask_points[1] + y
-    #     idx = np.arange(len(xx))
-    #     idx[np.where(xx < 0)] = -1
-    #     idx[np.where(xx >= self.slice_size[0])] = -1
-    #     idx[np.where(yy < 0)] = -1
-    #     idx[np.where(yy >= self.slice_size[1])] = -1
-    #     ii = idx[np.where(idx >= 0)]
-    #     xx = xx[ii]
-    #     yy = yy[ii]
-    #
-    #     self.seeds[yy * self.slice_size[0] + xx] = self.seed_mark
-
-
-    # def drawLine(self, p0, p1):
-    #     """
-    #     Draw line to slice image and seed matrix.
-    #
-    #     Parameters
-    #     ----------
-    #     p0 : tuple of int
-    #         Line star point.
-    #     p1 : tuple of int
-    #         Line end point.
-    #     """
-    #
-    #     x0, y0 = p0
-    #     x1, y1 = p1
-    #     dx = np.abs(x1-x0)
-    #     dy = np.abs(y1-y0)
-    #     if x0 < x1:
-    #         sx = 1
-    #
-    #     else:
-    #         sx = -1
-    #
-    #     if y0 < y1:
-    #         sy = 1
-    #
-    #     else:
-    #         sy = -1
-    #
-    #     err = dx - dy
-    #
-    #     while True:
-    #         self.drawSeedMark(x0,y0)
-    #
-    #         if x0 == x1 and y0 == y1:
-    #             break
-    #
-    #         e2 = 2*err
-    #         if e2 > -dy:
-    #             err = err - dy
-    #             x0 = x0 + sx
-    #
-    #         if e2 <  dx:
-    #             err = err + dx
-    #             y0 = y0 + sy
-
-
-    # def drawSeeds(self, pos):
-    #     if pos[0] < 0 or pos[0] >= self.slice_size[0] \
-    #             or pos[1] < 0 or pos[1] >= self.slice_size[1]:
-    #         return
-    #
-    #     self.drawLine(self.last_position, pos)
-    #     self.updateSlice()
-    #
-    #     self.modified = True
-    #     self.last_position = pos
-    #
-    #     self.update()
 
 
     def get_contours(self, img, sl):
@@ -207,7 +113,7 @@ class SliceBox(QLabel):
             cnt = self.gen_contours(aux)
 
             self.composeRgba(img, cnt,
-                             CO/NTOURLINES_COLORTABLE[ii - 1,...])
+                             CONTOURLINES_COLORTABLE[ii - 1,...])
 
 
     def gen_contours(self, sl):
@@ -257,8 +163,21 @@ class SliceBox(QLabel):
         bg[idxs] = cmap[fg[idxs] - 1]
 
 
-    def updateSlice(self):
+    def window_slice(self, ctslice):
+        if self.win_w > 0:
+            mul = 255. / float(self.win_w)
+        else:
+            mul = 0
 
+        lb =self.win_l - self.win_w / 2
+        aux = (ctslice - lb) * mul
+        aux = np.where(aux < 0, 0, aux)
+        aux = np.where(aux > 255, 255, aux)
+
+        return aux.astype(np.uint8)
+
+
+    def updateSlice(self):
         if self.ctslice_rgba is None:
             return
 
@@ -337,48 +256,9 @@ class SliceBox(QLabel):
         self.updateSlice()
 
 
-    # def getSliceSeeds(self):
-    #     if self.modified:
-    #         self.modified = False
-    #         return self.seeds.reshape(self.slice_size, order='F')
-    #
-    #     else:
-    #         return None
-
-
     def gridPosition(self, pos):
         return (int(pos.x() / self.grid[0]),
                 int(pos.y() / self.grid[1]))
-
-
-    # mouse events
-    # def mousePressEvent(self, event):
-    #     if event.button() in self.box_buttons:
-    #         self.drawing = True
-    #         self.seed_mark = self.box_buttons[event.button()]
-    #         self.last_position = self.gridPosition(event.pos())
-    #
-    #     elif event.button() == Qt.MiddleButton:
-    #         self.drawing = False
-    #         self.erase_region_button = True
-    #
-    #
-    # def mouseMoveEvent(self, event):
-    #     if self.drawing:
-    #         self.drawSeeds(self.gridPosition(event.pos()))
-    #
-    #
-    # def mouseReleaseEvent(self, event):
-    #     if (event.button() in self.box_buttons) and self.drawing:
-    #         self.drawSeeds(self.gridPosition(event.pos()))
-    #         self.drawing = False
-    #
-    #     if event.button() == Qt.MiddleButton\
-    #       and self.erase_region_button == True:
-    #         self.eraseRegion(self.gridPosition(event.pos()),
-    #                          self.erase_mode)
-    #
-    #         self.erase_region_button == False
 
 
     def resizeSlice(self, new_slice_size=None, new_grid=None):
@@ -405,35 +285,12 @@ class SliceBox(QLabel):
         self.updateSlice()
 
 
-    # def leaveEvent(self, event):
-    #     self.drawing = False
-
-
-    # def enterEvent(self, event):
-    #     self.drawing = False
-    #     self.emit(SIGNAL('focus_slider'))
-
-
-    # def setMaskPoints(self, mask):
-    #     self.mask_points = mask
-
-
     def getCW(self):
         return self.cw
 
 
     def setCW(self, val, key):
         self.cw[key] = val
-
-
-    # def eraseRegion(self, pos, mode):
-    #     if self.erase_fun is not None:
-    #         self.erase_fun(pos, mode)
-    #         self.updateSlice()
-
-
-    # def setEraseFun(self, fun):
-    #     self.erase_fun = fun
 
 
     def setScrollFun(self, fun):
@@ -445,3 +302,32 @@ class SliceBox(QLabel):
         nd = d / abs(d)
         if self.scroll_fun is not None:
             self.scroll_fun(-nd)
+
+
+    # def selectSlice(self, value, force=False):
+    #     if (value < 0) or (value >= self.n_slices):
+    #         return
+    #
+    #     # if (value != self.actual_slice) or force:
+    #         # self.saveSliceSeeds()
+    #         # if self.seeds_modified:
+    #         #     if self.mode == 'crop':
+    #         #         self.updateCropBounds()
+    #         #
+    #         #     elif self.mode == 'mask':
+    #         #         self.updateMaskRegion()
+    #
+    #     if self.contours is None:
+    #         contours = None
+    #
+    #     else:
+    #         contours = self.contours_aview[...,value]
+    #
+    #     # slider_val = self.n_slices - value
+    #     # self.slider.setValue(slider_val)
+    #     # self.slider.label.setText('Slice: %d / %d' % (slider_val, self.n_slices))
+    #
+    #     self.setSlice(self.img_aview[...,value],
+    #                             self.seeds_aview[...,value],
+    #                             contours)
+    #     self.actual_slice = value

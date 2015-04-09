@@ -47,6 +47,8 @@ import My_table_model as mtm
 
 import Computational_core
 
+import data_view_widget
+
 class Lession_editor(QtGui.QMainWindow):
     """Main class of the programm."""
 
@@ -71,9 +73,13 @@ class Lession_editor(QtGui.QMainWindow):
 
         # load parameters
         self.params = self.load_parameters()
+        self.win_l = self.params['win_level']
+        self.win_w = self.params['win_width']
 
         # fill parameters to widgets
         self.fill_parameters()
+
+        self.voxel_size = self.params['voxel_size']
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
@@ -120,9 +126,22 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.figure_2_CB.currentIndexChanged.connect(self.figure_2_CB_callback)
 
         # adding widget for displaying image data
-        self.form_widget = Form_widget.Form_widget(self, self.cc)
+        # self.form_widget = Form_widget.Form_widget(self, self.cc)
+        if self.cc.actual_data.loaded:
+            shape = self.cc.actual_data.shape
+        else:
+            shape = (0,0)
+        height = 500
+        vscale = self.voxel_size / float(np.min(self.voxel_size))
+        grid = height / float(shape[1] * vscale[1])
+        mgrid = (grid * vscale[0], grid * vscale[1])
+        self.view_L = data_view_widget.SliceBox(shape[1:], mgrid)
+        self.view_L.setCW(self.win_l, 'c')
+        self.view_L.setCW(self.win_w, 'w')
+        self.view_L.setSlice(self.cc.actual_data.data[0,:,:])
         data_viewer_layout = QtGui.QHBoxLayout()
-        data_viewer_layout.addWidget(self.form_widget)
+        # data_viewer_layout.addWidget(self.form_widget)
+        data_viewer_layout.addWidget(self.view_L)
         self.ui.viewer_F.setLayout(data_viewer_layout)
 
         # adding widget for displaying data histograms
@@ -497,7 +516,12 @@ class Lession_editor(QtGui.QMainWindow):
                     try:
                         params[option] = config.getfloat(section, option)
                     except ValueError:
-                        params[option] = config.get(section, option)
+                        if option == 'voxel_size':
+                            str = config.get(section, option)
+                            params[option] = np.array(map(int, str.split(', ')))
+                        else:
+                            params[option] = config.get(section, option)
+
         return params
 
 
@@ -604,19 +628,40 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_figures()
 
 
-    def wheelEvent(self, event):
-        print event.delta() / 120
+    # def wheelEvent(self, event):
+    #     print event.delta() / 120
+
+
+    def scroll_event(self, value, who):
+        if who == 0:  # left viewer
+            new = self.actual_slice_L + value
+            if (new < 0) or (new >= self.data_L.n_slices):
+                return
+        elif who == 1:  # right viewer
+            new = self.actual_slice_R + value
+            if (new < 0) or (new >= self.data_R.n_slices):
+                return
+
 
 
     def slider_changed(self, val):
-        if val > self.view_L_curr_idx:
-            self.form_widget.scroll_next()
+        # if val > self.view_L_curr_idx:
+        #     self.form_widget.scroll_next()
+        # else:
+        #     self.form_widget.scroll_prev()
+        # self.slice_change(val)
+        # self.slice_1_change(val)
+        if (val > 0) and (val < self.data_L.n_slices):
+            self.actual_slice_L = val
         else:
-            self.form_widget.scroll_prev()
-        self.slice_change(val)
-        self.slice_1_change(val)
-        # self.form_widget.actual_slice = val
-        # self.form_widget.update_figures()
+            return
+
+        if val < self.data_R.n_slices:
+            self.actual_slice_R = val
+        else:
+            self.actual_slice_R = self.data_R.n_slices
+
+
 
 
     def slice_change(self, val):
@@ -625,21 +670,23 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def slider_1_changed(self, val):
-        self.view_1_curr_idx = val
-        if val > self.view_L_curr_idx:
-            self.form_widget.scroll_next()
-        else:
-            self.form_widget.scroll_prev()
-        self.slice_1_change(val)
-        self.slice_2_change(val)
-        self.slice_change(val)
+        pass
+        # self.view_1_curr_idx = val
+        # if val > self.view_L_curr_idx:
+        #     self.form_widget.scroll_next()
+        # else:
+        #     self.form_widget.scroll_prev()
+        # self.slice_1_change(val)
+        # self.slice_2_change(val)
+        # self.slice_change(val)
 
 
     def slider_2_changed(self, val):
-        self.view_2_curr_idx = val
-        # self.form_widget.actual_slice_2 = val
-        self.slice_2_change(val)
-        self.form_widget.update_figures()
+        pass
+        # self.view_2_curr_idx = val
+        # # self.form_widget.actual_slice_2 = val
+        # self.slice_2_change(val)
+        # self.form_widget.update_figures()
 
 
     def slice_1_change(self, val):
@@ -796,31 +843,34 @@ class Lession_editor(QtGui.QMainWindow):
 
     def figure_1_CB_callback(self):
         if self.ui.figure_1_CB.currentIndex() == 0:
-            self.form_widget.data_L = self.cc.data_1
+            self.data_L = self.cc.data_1
             # self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices)
         elif self.ui.figure_1_CB.currentIndex() == 1:
-            self.form_widget.data_L = self.cc.data_2
+            self.data_L = self.cc.data_2
 
-        if self.view_L_curr_idx >= self.form_widget.data_L.n_slices:
-            self.view_L_curr_idx = self.form_widget.data_L.n_slices - 1
-            self.slice_change(self.view_L_curr_idx)
+        if self.actual_slice_L >= self.data_L.n_slices:
+            self.actual_slice_L = self.data_L.n_slices - 1
+            self.slice_change(self.actual_slice_L)
 
-        self.ui.slice_1_SB.setMaximum(self.form_widget.data_L.n_slices - 1)
-        self.ui.slice_scrollB.setMaximum(self.form_widget.data_L.n_slices - 1)
+        self.ui.slice_1_SB.setMaximum(self.data_L.n_slices - 1)
+        self.ui.slice_scrollB.setMaximum(self.data_L.n_slices - 1)
 
         self.form_widget.update_figures()
 
     def figure_2_CB_callback(self):
         if self.ui.figure_2_CB.currentIndex() == 0:
-            self.form_widget.data_R = self.cc.data_1
-            self.ui.slice_2_SB.setMaximum(self.cc.data_1.n_slices)
+            self.data_R = self.cc.data_1
+            # self.ui.slice_2_SB.setMaximum(self.cc.data_1.n_slices)
         elif self.ui.figure_2_CB.currentIndex() == 1:
-            self.form_widget.data_R = self.cc.data_2
-            self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices)
+            self.data_R = self.cc.data_2
+            # self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices)
 
-        if self.view_R_curr_idx >= self.form_widget.data_R.n_slices:
-            self.view_R_curr_idx = self.form_widget.data_R.n_slices - 1
-            self.slice_change(self.view_R_curr_idx)
+        if self.actual_slice_R >= self.data_R.n_slices:
+            self.actual_slice_R = self.data_R.n_slices - 1
+            self.slice_change(self.actual_slice_R)
+
+        self.ui.slice_2_SB.setMaximum(self.data_R.n_slices - 1)
+        # self.ui.slice_scrollB.setMaximum(self.data_R.n_slices - 1)
 
         self.form_widget.update_figures()
 

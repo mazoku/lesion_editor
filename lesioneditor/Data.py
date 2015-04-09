@@ -16,6 +16,7 @@ class Data:
         self.data = data
         self.mask = mask
         self.voxel_size = None
+        self.shape = None
         self.orig_shape = None
         self.labels = None
         self.labels_v = None
@@ -58,6 +59,7 @@ class Data:
             self.mask = self.mask[slice_idx, :, :]
 
         self.orig_shape = self.data.shape
+        self.shape = self.data.shape
         self.n_slices, self.n_rows, self.n_cols = self.orig_shape
         self.labels = np.zeros(self.orig_shape)
 

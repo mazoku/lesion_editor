@@ -658,10 +658,12 @@ class Lession_editor(QtGui.QMainWindow):
         #     self.form_widget.scroll_prev()
         # self.slice_change(val)
         # self.slice_1_change(val)
+        actual_L = self.actual_slice_L
+        actual_R =self.actual_slice_R
         if val == self.actual_slice_L:
             return
 
-        if (val > 0) and (val < self.data_L.n_slices):
+        if (val >= 0) and (val < self.data_L.n_slices):
             diff = val - self.actual_slice_L
             self.actual_slice_L = val
         else:
@@ -690,10 +692,12 @@ class Lession_editor(QtGui.QMainWindow):
         if val == self.actual_slice_L:
             return
 
-        if (val > 0) and (val < self.data_L.n_slices):
+        if (val >= 0) and (val < self.data_L.n_slices):
             self.actual_slice_L = val
         else:
             return
+
+        print 'new_L = %i, new_R = %i' % (self.actual_slice_L, self.actual_slice_R)
 
         self.ui.slice_C_SB.setValue(self.actual_slice_L)
 

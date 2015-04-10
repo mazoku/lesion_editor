@@ -27,6 +27,14 @@ CONTOURS_COLORS = {
     13: [0, 0, 255],
 }
 
+# VIEW_TABLE = {'axial': (2,1,0),
+#               'sagittal': (1,0,2),
+#               'coronal': (2,0,1)}
+
+# VIEW_TABLE = {'axial': (1,0),
+#               'sagittal': (1,0,2),
+#               'coronal': (2,0,1)}
+
 CONTOURS_COLORTABLE = np.zeros((256,4), dtype=np.uint8)
 CONTOURS_COLORTABLE[:,:3] = 255
 CONTOURLINES_COLORTABLE = np.zeros((256,2,4), dtype=np.uint8)
@@ -84,6 +92,10 @@ class SliceBox(QLabel):
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
         self.setPixmap(QPixmap.fromImage(self.image))
         self.setScaledContents(True)
+
+        self.actual_view = 'axial'
+        # self.act_transposition = VIEW_TABLE[self.actual_view]
+        self.act_transposition = (1,0)
 
 
     # def set_data(self, data, type):
@@ -204,7 +216,7 @@ class SliceBox(QLabel):
                 self.get_contours(img, self.contours)
 
         image = QImage(img.flatten(),
-                     self.slice_size[0], self.slice_size[1],
+                     self.slice_size[1], self.slice_size[0],
                      QImage.Format_ARGB32).scaled(self.imagesize)
         painter = QPainter(self.image)
         painter.drawImage(0, 0, image)
@@ -238,18 +250,17 @@ class SliceBox(QLabel):
 
 
     def setSlice(self, ctslice=None, seeds=None, contours=None):
+        ctslice = np.transpose(ctslice)
         if ctslice is not None:
             self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
 
         if seeds is not None:
             self.seeds = seeds.ravel(order='F')
-
         else:
             self.seeds = None
 
         if contours is not None:
             self.contours = contours.ravel(order='F')
-
         else:
             self.contours = None
 

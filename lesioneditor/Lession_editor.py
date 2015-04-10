@@ -635,10 +635,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_figures()
 
 
-    # def wheelEvent(self, event):
-    #     print event.delta() / 120
-
-
     def scroll_event(self, value, who):
         if who == 0:  # left viewer
             new = self.actual_slice_L + value
@@ -648,7 +644,6 @@ class Lession_editor(QtGui.QMainWindow):
             new = self.actual_slice_R + value
             if (new < 0) or (new >= self.data_R.n_slices):
                 return
-
 
 
     def slider_C_changed(self, val):
@@ -674,6 +669,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.setValue(self.actual_slice_L)
         self.ui.slice_R_SB.setValue(self.actual_slice_R)
 
+        self.view_L.setSlice(self.data_L.data[self.actual_slice_L, :, :])
+        self.view_R.setSlice(self.data_R.data[self.actual_slice_R, :, :])
+
 
     def slider_L_changed(self, val):
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
@@ -688,6 +686,8 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_C_SB.setValue(self.actual_slice_L)
 
+        self.view_L.setSlice(self.data_L.data[self.actual_slice_L, :, :])
+
 
     def slider_R_changed(self, val):
         if (val >= 0) and (val < self.data_R.n_slices):
@@ -696,6 +696,8 @@ class Lession_editor(QtGui.QMainWindow):
             return
 
         self.ui.slice_number_R_LBL.setText('%i/%i' % (self.actual_slice_R + 1, self.data_R.n_slices))
+
+        self.view_R.setSlice(self.data_L.data[self.actual_slice_R, :, :])
 
 
     def calculate_models_callback(self):

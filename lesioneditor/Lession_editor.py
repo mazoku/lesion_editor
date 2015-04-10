@@ -652,14 +652,8 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def slider_C_changed(self, val):
-        # if val > self.view_L_curr_idx:
-        #     self.form_widget.scroll_next()
-        # else:
-        #     self.form_widget.scroll_prev()
-        # self.slice_change(val)
-        # self.slice_1_change(val)
-        actual_L = self.actual_slice_L
-        actual_R =self.actual_slice_R
+        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (val + 1, self.data_L.n_slices))
+
         if val == self.actual_slice_L:
             return
 
@@ -680,15 +674,10 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.setValue(self.actual_slice_L)
         self.ui.slice_R_SB.setValue(self.actual_slice_R)
 
-        print 'new_L = %i, new_R = %i' % (self.actual_slice_L, self.actual_slice_R)
-
-
-    def slice_change(self, val):
-        self.ui.slice_scrollB.setValue(val)
-        self.ui.slice_number_LBL.setText('slice # = %i' % (val + 1))
-
 
     def slider_L_changed(self, val):
+        self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
+
         if val == self.actual_slice_L:
             return
 
@@ -697,36 +686,16 @@ class Lession_editor(QtGui.QMainWindow):
         else:
             return
 
-        print 'new_L = %i, new_R = %i' % (self.actual_slice_L, self.actual_slice_R)
-
         self.ui.slice_C_SB.setValue(self.actual_slice_L)
-
-        # self.view_1_curr_idx = val
-        # if val > self.view_L_curr_idx:
-        #     self.form_widget.scroll_next()
-        # else:
-        #     self.form_widget.scroll_prev()
-        # self.slice_1_change(val)
-        # self.slice_2_change(val)
-        # self.slice_change(val)
 
 
     def slider_R_changed(self, val):
-        pass
-        # self.view_2_curr_idx = val
-        # # self.form_widget.actual_slice_2 = val
-        # self.slice_2_change(val)
-        # self.form_widget.update_figures()
+        if (val >= 0) and (val < self.data_R.n_slices):
+            self.actual_slice_R = val
+        else:
+            return
 
-
-    def slice_L_change(self, val):
-        self.ui.slice_1_SB.setValue(val)
-        self.ui.slice_number_1_LBL.setText(str(val + 1))
-
-
-    def slice_R_change(self, val):
-        self.ui.slice_2_SB.setValue(val)
-        self.ui.slice_number_2_LBL.setText(str(val + 1))
+        self.ui.slice_number_R_LBL.setText('%i/%i' % (self.actual_slice_R + 1, self.data_R.n_slices))
 
 
     def calculate_models_callback(self):

@@ -1982,15 +1982,15 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QLabel" name="slice_number_1_LBL">
+            <widget class="QLabel" name="slice_number_L_LBL">
              <property name="maximumSize">
               <size>
-               <width>30</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
              <property name="text">
-              <string>0</string>
+              <string>0/0</string>
              </property>
             </widget>
            </item>
@@ -2012,15 +2012,15 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="slice_number_2_LBL">
+            <widget class="QLabel" name="slice_number_R_LBL">
              <property name="maximumSize">
               <size>
-               <width>30</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
              <property name="text">
-              <string>0</string>
+              <string>0/0</string>
              </property>
             </widget>
            </item>
@@ -2030,7 +2030,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <item>
-           <widget class="QLabel" name="slice_number_LBL">
+           <widget class="QLabel" name="slice_number_C_LBL">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -2044,7 +2044,7 @@
              </size>
             </property>
             <property name="text">
-             <string>slice # =</string>
+             <string>slice # = 0/0</string>
             </property>
            </widget>
           </item>

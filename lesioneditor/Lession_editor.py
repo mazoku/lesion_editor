@@ -85,6 +85,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.fill_parameters()
 
         self.voxel_size = self.params['voxel_size']
+        self.view_widget_width = 50
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
@@ -114,7 +115,7 @@ class Lession_editor(QtGui.QMainWindow):
         # self.n_slices = self.cc.data_1.n_slices
 
         # seting up the callback for the test button --------------------------------------
-        # self.ui.test_BTN.clicked.connect(self.test_callback)
+        self.ui.test_BTN.clicked.connect(self.test_callback)
         #----------------------------------------------------------------------------------
 
         # seting up the range of the scrollbar to cope with the number of slices
@@ -138,17 +139,32 @@ class Lession_editor(QtGui.QMainWindow):
             shape = self.cc.actual_data.shape
         else:
             shape = (0,0)
-        height = 500
+        # height = 200
         vscale = self.voxel_size / float(np.min(self.voxel_size))
-        grid = height / float(shape[1] * vscale[1])
+        grid = self.view_widget_width / float(shape[0] * vscale[0])
         mgrid = (grid * vscale[0], grid * vscale[1])
         self.view_L = data_view_widget.SliceBox(shape[1:], mgrid)
         self.view_L.setCW(self.win_l, 'c')
         self.view_L.setCW(self.win_w, 'w')
-        self.view_L.setSlice(self.cc.actual_data.data[0,:,:])
+        # self.view_L.setSlice(self.cc.actual_data.data[0,:,:])
+        if self.cc.data_1.loaded:
+            self.view_L.setSlice(self.cc.data_1.data[0,:,:])
+        elif self.cc.data_2.loaded:
+            self.view_L.setSlice(self.cc.data_2.data[0,:,:])
+
+        self.view_R = data_view_widget.SliceBox(shape[1:], mgrid)
+        self.view_R.setCW(self.win_l, 'c')
+        self.view_R.setCW(self.win_w, 'w')
+        if self.cc.data_2.loaded:
+            self.view_R.setSlice(self.cc.data_2.data[0,:,:])
+        elif self.cc.data_1.loaded:
+            self.view_R.setSlice(self.cc.data_1.data[0,:,:])
+
+
         data_viewer_layout = QtGui.QHBoxLayout()
         # data_viewer_layout.addWidget(self.form_widget)
         data_viewer_layout.addWidget(self.view_L)
+        # data_viewer_layout.addWidget(self.view_R)
         self.ui.viewer_F.setLayout(data_viewer_layout)
 
         # adding widget for displaying data histograms
@@ -195,9 +211,8 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def test_callback(self):
-        n_rows, n_cols, n_slices = self.cc.labels.shape
-        self.cc.labels = np.zeros(self.labels.shape)
-        self.cc.labels[n_rows/3.:2*n_rows/3., n_cols/3.:2*n_cols/3.] = self.hypo
+        wl = self.ui.frame_L.width()
+        print 'wl = %i, wr = %i' % (self.ui.frame_L.width(), self.ui.frame_R.width())
 
 
     def serie_1_RB_callback(self):

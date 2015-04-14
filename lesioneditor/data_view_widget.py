@@ -66,16 +66,19 @@ def erase_reg(arr, p, val=0):
 
 class SliceBox(QLabel):
 
-    def __init__(self, sliceSize, grid, mode='seeds'):
+    # def __init__(self, sliceSize, grid, mode='seeds'):
+    def __init__(self, sliceSize, mode='seeds'):
 
         QLabel.__init__(self)
 
         # self.drawing = False
         # self.modified = False
         # self.last_position = None
-        self.imagesize = QSize(int(sliceSize[0] * grid[0]),
-                               int(sliceSize[1] * grid[1]))
-        self.grid = grid
+        # self.imagesize = QSize(int(sliceSize[0] * grid[0]),
+        #                        int(sliceSize[1] * grid[1]))
+
+        self.imagesize = QSize(sliceSize[0], sliceSize[1])
+        # self.grid = grid
         self.slice_size = sliceSize
         self.ctslice_rgba = None
         self.cw = {'c': 1.0, 'w': 1.0}
@@ -268,8 +271,9 @@ class SliceBox(QLabel):
 
 
     def gridPosition(self, pos):
-        return (int(pos.x() / self.grid[0]),
-                int(pos.y() / self.grid[1]))
+        # return (int(pos.x() / self.grid[0]),
+        #         int(pos.y() / self.grid[1]))
+        return (int(pos.x()), int(pos.y()))
 
 
     def resizeSlice(self, new_slice_size=None, new_grid=None, new_image_size=None):
@@ -283,10 +287,12 @@ class SliceBox(QLabel):
         if new_image_size is not None:
             self.imagesize = new_image_size
         else:
-            self.imagesize = QSize(int(self.slice_size[0] * self.grid[0]),
-                                   int(self.slice_size[1] * self.grid[1]))
+            # self.imagesize = QSize(int(self.slice_size[0] * self.grid[0]),
+            #                        int(self.slice_size[1] * self.grid[1]))
+            self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
-        self.setPixmap(QPixmap.fromImage(self.image))
+        # self.setPixmap(QPixmap.fromImage(self.image))
+        self.setPixmap(self._pixmap.scaled(QPixmap.fromImage(self.image), Qt.KeepAspectRatio)
 
 
     def resizeEvent(self, event):
@@ -300,10 +306,10 @@ class SliceBox(QLabel):
 
 
     def set_width(self, new_width):
-        new_grid = new_width / float(self.slice_size[0])
-        mul = new_grid / self.grid[0]
+        # new_grid = new_width / float(self.slice_size[0])
+        # mul = new_grid / self.grid[0]
 
-        self.grid = np.array(self.grid) * mul
+        # self.grid = np.array(self.grid) * mul
         self.resizeSlice()
         self.updateSlice()
 

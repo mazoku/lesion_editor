@@ -144,7 +144,8 @@ class Lession_editor(QtGui.QMainWindow):
         vscale = self.voxel_size / float(np.min(self.voxel_size))
         grid = self.view_widget_width / float(shape[0] * vscale[0])
         mgrid = (grid * vscale[0], grid * vscale[1])
-        self.view_L = data_view_widget.SliceBox(shape[1:], mgrid)
+        # self.view_L = data_view_widget.SliceBox(shape[1:], mgrid)
+        self.view_L = data_view_widget.SliceBox(shape[1:])
         self.view_L.setCW(self.win_l, 'c')
         self.view_L.setCW(self.win_w, 'w')
         # self.view_L.setSlice(self.cc.actual_data.data[0,:,:])
@@ -153,7 +154,8 @@ class Lession_editor(QtGui.QMainWindow):
         elif self.cc.data_2.loaded:
             self.view_L.setSlice(self.cc.data_2.data[0,:,:])
 
-        self.view_R = data_view_widget.SliceBox(shape[1:], mgrid)
+        # self.view_R = data_view_widget.SliceBox(shape[1:], mgrid)
+        self.view_R = data_view_widget.SliceBox(shape[1:])
         self.view_R.setCW(self.win_l, 'c')
         self.view_R.setCW(self.win_w, 'w')
         if self.cc.data_2.loaded:
@@ -214,9 +216,11 @@ class Lession_editor(QtGui.QMainWindow):
     def test_callback(self):
         self.two_views = not self.two_views
         if self.two_views:
-            self.view_L.setFixedSize(self.view_L.size() / 2)
+            # self.view_L.setFixedSize(self.view_L.size() / 2)
+            self.view_L.resize(self.view_L.pixmap().size() / 2)
         else:
-            self.view_L.setFixedSize(self.view_L.size() * 2)
+            # self.view_L.setFixedSize(self.view_L.size() * 2)
+            self.view_L.resize(self.view_L.pixmap().size() * 2)
 
 
     def serie_1_RB_callback(self):

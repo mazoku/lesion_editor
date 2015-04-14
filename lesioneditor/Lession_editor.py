@@ -86,6 +86,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.voxel_size = self.params['voxel_size']
         self.view_widget_width = 50
+        self.two_views = False
 
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
@@ -211,8 +212,11 @@ class Lession_editor(QtGui.QMainWindow):
 
 
     def test_callback(self):
-        wl = self.ui.frame_L.width()
-        print 'wl = %i, wr = %i' % (self.ui.frame_L.width(), self.ui.frame_R.width())
+        self.two_views = not self.two_views
+        if self.two_views:
+            self.view_L.setFixedSize(self.view_L.size() / 2)
+        else:
+            self.view_L.setFixedSize(self.view_L.size() * 2)
 
 
     def serie_1_RB_callback(self):

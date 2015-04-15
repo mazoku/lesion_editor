@@ -87,7 +87,10 @@ class SliceBox(QLabel):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawImage(event.rect(), self.image)
+        # painter.drawImage(event.rect(), self.image)
+        rect = event.rect()
+        self.setPixmap(self.pixmap().scaled(rect.width(), rect.height(), Qt.KeepAspectRatio))
+        painter.drawPixmap(event.rect(), self.pixmap())
         # painter.drawPixmap(event.rect(), self.pixmap())
         painter.end()
 

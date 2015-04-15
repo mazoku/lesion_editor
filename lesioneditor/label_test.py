@@ -5,6 +5,8 @@ import skimage.io as skiio
 import skimage.exposure as skiexp
 import sys
 
+import matplotlib.pyplot as plt
+
 from PyQt4.QtCore import Qt, QSize, QString, SIGNAL
 from PyQt4.QtGui import QImage, QMainWindow,\
     QApplication, QSlider, QPushButton,\
@@ -14,8 +16,7 @@ from PyQt4.QtGui import QImage, QMainWindow,\
 
 
 # BGRA order
-GRAY_COLORTABLE = np.array([[ii, ii, ii, 255] for ii in range(256)],
-                           dtype=np.uint8)
+GRAY_COLORTABLE = np.array([[ii, ii, ii, 255] for ii in range(256)], dtype=np.uint8)
 
 class ImageViewer(QMainWindow):
     def __init__(self, img):
@@ -25,14 +26,19 @@ class ImageViewer(QMainWindow):
 
         # viewer frame
         self.frame_viewer = QFrame()
-        self.view_L = SliceBox(self.image.shape)
-        self.view_L.setSlice(self.image)
+        self.view_L = SliceBox(self.image)
+        # self.view_L.setSlice(self.image)
+        self.view_L.setMinimumSize(QSize(1,1))
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHeightForWidth(True)
         self.view_L.setSizePolicy(sizePolicy)
-        self.view_R = SliceBox(self.image.shape)
-        self.view_R.setSlice(self.image)
+
+        self.view_R = SliceBox(self.image)
+        # self.view_R.setSlice(self.image)
+        self.view_R.setMinimumSize(QSize(1,1))
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.view_R.setSizePolicy(sizePolicy)
         self.view_R.setVisible(False)
+
         self.layout_viewer = QHBoxLayout()
         self.layout_viewer.addWidget(self.view_L)
         self.layout_viewer.addWidget(self.view_R)
@@ -62,59 +68,37 @@ class ImageViewer(QMainWindow):
     def btn_callback(self):
         self.two_views = not self.two_views
         if self.two_views:
-            # new_size = self.view_L.size() / 2
+            # TODO: oba labely at maji stejnou velikost
+            new_w = self.frame_viewer.width() / 2
+            new_h = self.frame_viewer.height() / 2
+            self.view_L.resizeSlice(new_w, new_h)
+            self.view_R.resizeSlice(new_w, new_h)
             self.view_R.setVisible(True)
         else:
             self.view_R.setVisible(False)
-        # print self.view_L.size(), ' -> ', new_size
-        # self.view_L.resizeSlice(new_image_size=new_size)
 
 
 class SliceBox(QLabel):
 
-    def __init__(self, sliceSize, mode='seeds'):
+    def __init__(self, img):
 
         QLabel.__init__(self)
 
-        self.imagesize = QSize(sliceSize[0], sliceSize[1])
-        self.slice_size = sliceSize
-        self.ctslice_rgba = None
+        self.setSlice(img)
 
-        self.image = QImage(self.imagesize, QImage.Format_RGB32)
-        self.setPixmap(QPixmap.fromImage(self.image))
-        # self.setScaledContents(True)
-
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        # painter.drawImage(event.rect(), self.image)
-        rect = event.rect()
-        self.setPixmap(self.pixmap().scaled(rect.width(), rect.height(), Qt.KeepAspectRatio))
-        painter.drawPixmap(event.rect(), self.pixmap())
-        # painter.drawPixmap(event.rect(), self.pixmap())
-        painter.end()
+        self.qimage = QImage(self.image.repeat(4),
+                     self.imageshape[1], self.imageshape[0],
+                     QImage.Format_RGB32).scaled(self.imagesize, aspectRatioMode=Qt.KeepAspectRatio)
+        self.setPixmap(QPixmap.fromImage(self.qimage))
+        self.orig_pixmap = self.pixmap().copy()
 
 
-    def resizeSlice(self, scale=None, new_image_size=None):
-
-        if new_image_size is not None:
-            self.imagesize = new_image_size
-        else:
-            self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
-
-        if scale is None:
-            scale = 1
-            # self.imagesize *= scale
-        # self.image = QImage(self.imagesize, QImage.Format_RGB32)
-        new_size = (self.imagesize.width(), self.imagesize.height()) * scale
-        self.setPixmap(self.pixmap().scaled(new_size[0], new_size[1], Qt.KeepAspectRatio))
-        # else:
-        #     self.setPixmap(QPixmap.fromImage(self.image))
-        # self.updateSlice()
+    def resizeSlice(self, w, h):
+        self.setPixmap(self.orig_pixmap.scaled(w, h, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
 
     def resizeEvent(self, event):
-        self.resizeSlice()
+        self.resizeSlice(self.width(), self.height())
 
 
     def updateSlice(self):
@@ -123,14 +107,10 @@ class SliceBox(QLabel):
 
         img = self.ctslice_rgba.copy()
 
-        image = QImage(img.flatten(),
-                     self.slice_size[1], self.slice_size[0],
-                     QImage.Format_ARGB32).scaled(self.imagesize, aspectRatioMode=Qt.KeepAspectRatio)
-        painter = QPainter(self.image)
-        painter.drawImage(0, 0, image)
-        painter.end()
-
-        self.update()
+        self.qimage = QImage(img.flatten(),
+                      self.imageshape[1], self.imageshape[0],
+                      QImage.Format_ARGB32).scaled(self.imagesize, aspectRatioMode=Qt.KeepAspectRatio)
+        self.setPixmap(QPixmap.fromImage(self.qimage))
 
 
     def getSliceRGBA(self, ctslice):
@@ -139,14 +119,17 @@ class SliceBox(QLabel):
 
 
     def setSlice(self, ctslice=None, seeds=None, contours=None):
-        ctslice = np.transpose(ctslice)
-        if ctslice is not None:
-            self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
-        self.updateSlice()
 
-    # def set_width(self, new_width):
-    #     self.resizeSlice()
-    #     self.updateSlice()
+        if ctslice is not None:
+            # ctslice = np.transpose(ctslice)
+            self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
+
+        self.image = ctslice
+        self.imageshape = ctslice.shape
+
+        self.imagesize = QSize(self.imageshape[0], self.imageshape[1])
+
+        self.updateSlice()
 
 
 ################################################################################
@@ -154,7 +137,7 @@ class SliceBox(QLabel):
 if __name__ == '__main__':
     fname = '/home/tomas/Dropbox/images/puma.png'
     img = skiio.imread(fname, as_grey=True)
-    img = skiexp.rescale_intensity(img, (0,1), (0,255))
+    img = skiexp.rescale_intensity(img, (0,1), (0,255)).astype(np.uint8)
 
     app = QApplication(sys.argv)
     win = ImageViewer(img)

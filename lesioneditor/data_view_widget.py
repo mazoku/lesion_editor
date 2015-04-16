@@ -292,7 +292,7 @@ class SliceBox(QLabel):
             self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
         # self.setPixmap(QPixmap.fromImage(self.image))
-        self.setPixmap(self._pixmap.scaled(QPixmap.fromImage(self.image), Qt.KeepAspectRatio)
+        # self.setPixmap(self._pixmap.scaled(QPixmap.fromImage(self.image), Qt.KeepAspectRatio)
 
 
     def resizeEvent(self, event):

@@ -27,12 +27,14 @@ class ImageViewer(QMainWindow):
         # viewer frame
         self.frame_viewer = QFrame()
         self.view_L = SliceBox(self.image)
+        self.view_L.setFrameShape(QFrame.Box)
         # self.view_L.setSlice(self.image)
         self.view_L.setMinimumSize(QSize(1,1))
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.view_L.setSizePolicy(sizePolicy)
 
         self.view_R = SliceBox(self.image)
+        self.view_R.setFrameShape(QFrame.Box)
         # self.view_R.setSlice(self.image)
         self.view_R.setMinimumSize(QSize(1,1))
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -68,14 +70,24 @@ class ImageViewer(QMainWindow):
     def btn_callback(self):
         self.two_views = not self.two_views
         if self.two_views:
-            # TODO: oba labely at maji stejnou velikost
+            self.view_R.setVisible(True)
             new_w = self.frame_viewer.width() / 2
             new_h = self.frame_viewer.height() / 2
             self.view_L.resizeSlice(new_w, new_h)
             self.view_R.resizeSlice(new_w, new_h)
-            self.view_R.setVisible(True)
         else:
             self.view_R.setVisible(False)
+
+    def resizeEvent(self, event):
+        # TODO: oba labely at maji stejnou velikost
+        pass
+         # if self.two_views:
+         #    new_w = self.frame_viewer.width() / 2
+         #    new_h = self.frame_viewer.height() / 2
+         #    # new_w1 = self.width() / 2
+         #    # new_h1 = self.height() / 2
+         #    self.view_L.resizeSlice(new_w, new_h)
+         #    self.view_R.resizeSlice(new_w, new_h)
 
 
 class SliceBox(QLabel):

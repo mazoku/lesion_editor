@@ -24,6 +24,8 @@ class Data:
         self.n_cols = None
         self.n_slices = None
 
+        self.data_vis = self.data  # visualized data, can be image data (data) or labels
+
         self.filename = filename
         self.loaded = False
 
@@ -58,9 +60,20 @@ class Data:
             self.data = self.data[slice_idx, :, :]
             self.mask = self.mask[slice_idx, :, :]
 
+        self.data_vis = self.data
+
         self.orig_shape = self.data.shape
         self.shape = self.data.shape
         self.n_slices, self.n_rows, self.n_cols = self.orig_shape
         self.labels = np.zeros(self.orig_shape)
 
         self.loaded = True
+
+    def display_im(self):
+        self.data_vis = self.data
+
+    def display_labels(self):
+        self.data_vis = self.labels
+
+    def display_contours(self):
+        self.data_vis = self.data

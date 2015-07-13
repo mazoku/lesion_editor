@@ -1582,7 +1582,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QComboBox" name="figure_1_CB">
+             <widget class="QComboBox" name="figure_L_CB">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1613,7 +1613,7 @@
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_12">
                <item>
-                <widget class="QPushButton" name="view_1_BTN">
+                <widget class="QPushButton" name="view_L_BTN">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1648,7 +1648,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_im_1_BTN">
+                <widget class="QPushButton" name="show_im_L_BTN">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1683,7 +1683,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_labels_1_BTN">
+                <widget class="QPushButton" name="show_labels_L_BTN">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1718,7 +1718,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_contours_1_BTN">
+                <widget class="QPushButton" name="show_contours_L_BTN">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1767,7 +1767,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
-             <widget class="QComboBox" name="figure_2_CB">
+             <widget class="QComboBox" name="figure_R_CB">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1798,7 +1798,7 @@
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
                <item>
-                <widget class="QPushButton" name="view_2_BTN">
+                <widget class="QPushButton" name="view_R_BTN">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1833,7 +1833,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_im_2_BTN">
+                <widget class="QPushButton" name="show_im_R_BTN">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -1871,7 +1871,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_labels_2_BTN">
+                <widget class="QPushButton" name="show_labels_R_BTN">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -1909,7 +1909,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="show_contours_2_BTN">
+                <widget class="QPushButton" name="show_contours_R_BTN">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>

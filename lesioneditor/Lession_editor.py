@@ -62,8 +62,8 @@ class Lession_editor(QtGui.QMainWindow):
 
         # self.im = im
         # self.labels = labels
-        self.show_view_1 = True
-        self.show_view_2 = False
+        self.show_view_L = True
+        self.show_view_R = False
         # self.healthy_label = healthy_label
         # self.hypo_label = hypo_label
         # self.hyper_label = hyper_label
@@ -92,14 +92,18 @@ class Lession_editor(QtGui.QMainWindow):
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
         if self.cc.data_1.loaded:
             self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_1_CB.addItem(self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_2_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            self.ui.figure_L_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.cc.data_1.filename.split('/')[-1])
             self.data_L = self.cc.data_1
+            if not self.cc.data_2.loaded:
+                self.data_R = self.cc.data_1
         if self.cc.data_2.loaded:
             self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_1_CB.addItem(self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_2_CB.addItem(self.cc.data_2.filename.split('/')[-1])
+            self.ui.figure_L_CB.addItem(self.cc.data_2.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.cc.data_2.filename.split('/')[-1])
             self.data_R = self.cc.data_2
+            if not self.cc.data_1.loaded:
+                self.data_L = self.cc.data_2
 
         # radio buttons
         self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
@@ -131,43 +135,27 @@ class Lession_editor(QtGui.QMainWindow):
             self.ui.slice_R_SB.setMaximum(self.cc.data_2.n_slices - 1)
 
         # combo boxes - for figure views
-        self.ui.figure_1_CB.currentIndexChanged.connect(self.figure_1_CB_callback)
-        self.ui.figure_2_CB.currentIndexChanged.connect(self.figure_2_CB_callback)
+        self.ui.figure_L_CB.currentIndexChanged.connect(self.figure_L_CB_callback)
+        self.ui.figure_R_CB.currentIndexChanged.connect(self.figure_R_CB_callback)
 
         # adding widget for displaying image data
-        # self.form_widget = Form_widget.Form_widget(self, self.cc)
-        if self.cc.actual_data.loaded:
-            shape = self.cc.actual_data.shape
-        else:
-            shape = (0,0)
-        # height = 200
-        vscale = self.voxel_size / float(np.min(self.voxel_size))
-        grid = self.view_widget_width / float(shape[0] * vscale[0])
-        mgrid = (grid * vscale[0], grid * vscale[1])
-        # self.view_L = data_view_widget.SliceBox(shape[1:], mgrid)
-        self.view_L = data_view_widget.SliceBox(shape[1:])
+        self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:])
         self.view_L.setCW(self.win_l, 'c')
         self.view_L.setCW(self.win_w, 'w')
-        # self.view_L.setSlice(self.cc.actual_data.data[0,:,:])
-        if self.cc.data_1.loaded:
-            self.view_L.setSlice(self.cc.data_1.data[0,:,:])
-        elif self.cc.data_2.loaded:
-            self.view_L.setSlice(self.cc.data_2.data[0,:,:])
-
-        # self.view_R = data_view_widget.SliceBox(shape[1:], mgrid)
-        self.view_R = data_view_widget.SliceBox(shape[1:])
+        self.view_L.setSlice(self.data_L.data[0,:,:])
+        self.view_R = data_view_widget.SliceBox(self.data_R.shape[1:])
         self.view_R.setCW(self.win_l, 'c')
         self.view_R.setCW(self.win_w, 'w')
-        if self.cc.data_2.loaded:
-            self.view_R.setSlice(self.cc.data_2.data[0,:,:])
-        elif self.cc.data_1.loaded:
-            self.view_R.setSlice(self.cc.data_1.data[0,:,:])
-
+        self.view_R.setSlice(self.data_R.data[0,:,:])
+        if not self.show_view_L:
+            self.view_L.setVisible(False)
+        if not self.show_view_R:
+            self.view_R.setVisible(False)
 
         data_viewer_layout = QtGui.QHBoxLayout()
         # data_viewer_layout.addWidget(self.form_widget)
         data_viewer_layout.addWidget(self.view_L)
-        # data_viewer_layout.addWidget(self.view_R)
+        data_viewer_layout.addWidget(self.view_R)
         self.ui.viewer_F.setLayout(data_viewer_layout)
 
         # adding widget for displaying data histograms
@@ -177,20 +165,20 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.histogram_F.setLayout(hist_viewer_layout)
 
         # connecting callbacks ----------------------------------
-        self.ui.view_1_BTN.clicked.connect(self.view_1_callback)
-        self.ui.view_2_BTN.clicked.connect(self.view_2_callback)
+        self.ui.view_L_BTN.clicked.connect(self.view_L_callback)
+        self.ui.view_R_BTN.clicked.connect(self.view_R_callback)
 
         # show image data
-        self.ui.show_im_1_BTN.clicked.connect(self.show_im_1_callback)
-        self.ui.show_im_2_BTN.clicked.connect(self.show_im_2_callback)
+        self.ui.show_im_L_BTN.clicked.connect(self.show_im_L_callback)
+        self.ui.show_im_R_BTN.clicked.connect(self.show_im_R_callback)
 
         # show label data
-        self.ui.show_labels_1_BTN.clicked.connect(self.show_labels_1_callback)
-        self.ui.show_labels_2_BTN.clicked.connect(self.show_labels_2_callback)
+        self.ui.show_labels_L_BTN.clicked.connect(self.show_labels_L_callback)
+        self.ui.show_labels_R_BTN.clicked.connect(self.show_labels_R_callback)
 
         # show contours data
-        self.ui.show_contours_1_BTN.clicked.connect(self.show_contours_1_callback)
-        self.ui.show_contours_2_BTN.clicked.connect(self.show_contours_2_callback)
+        self.ui.show_contours_L_BTN.clicked.connect(self.show_contours_L_callback)
+        self.ui.show_contours_R_BTN.clicked.connect(self.show_contours_R_callback)
 
         # main buttons
         self.ui.calculate_models_BTN.clicked.connect(self.calculate_models_callback)
@@ -212,7 +200,6 @@ class Lession_editor(QtGui.QMainWindow):
         # connecting sliders with their line edit
         self.connect_SL_and_LE()
 
-
     def test_callback(self):
         self.two_views = not self.two_views
         if self.two_views:
@@ -222,16 +209,13 @@ class Lession_editor(QtGui.QMainWindow):
             # self.view_L.setFixedSize(self.view_L.size() * 2)
             self.view_L.resize(self.view_L.pixmap().size() * 2)
 
-
     def serie_1_RB_callback(self):
         self.cc.active_serie = 1
         self.cc.actual_data = self.cc.data_1
 
-
     def serie_2_RB_callback(self):
         self.cc.active_serie = 2
         self.cc.actual_data = self.cc.data_2
-
 
     def connect_SL_and_LE(self):
         # win width
@@ -333,12 +317,10 @@ class Lession_editor(QtGui.QMainWindow):
         # tableview selection changed
         # self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
 
-
     def selection_changed(self):
         indexes = self.ui.objects_TV.selectionModel().selectedRows()
         for index in indexes:
             print index.row()
-
 
     def comp_fact_SB_changed(self, value):
         self.ui.comp_fact_LE.setText(str(value))
@@ -530,7 +512,6 @@ class Lession_editor(QtGui.QMainWindow):
         except:
             pass
 
-
     def load_parameters(self, config_path='config.xml'):
         config = ConfigParser.ConfigParser()
         config.read('config.ini')
@@ -553,7 +534,6 @@ class Lession_editor(QtGui.QMainWindow):
                             params[option] = config.get(section, option)
 
         return params
-
 
     def fill_parameters(self):
         # general parameters
@@ -608,15 +588,12 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.comp_fact_SB.setValue(self.params['comp_fact'])
         self.ui.comp_fact_LE.setText(str(self.params['comp_fact']))
 
-
-
     def hypo_mean_SB_callback(self, value):
         self.statusBar().showMessage('Hypodense model updated thru spin box.')
         rv = scista.norm(value, self.cc.models['rv_hypo'].std())
         self.cc.models['rv_hypo'] = rv
         self.hist_widget.update_hypo_rv(rv)
         self.hist_widget.update_figures()
-
 
     def hypo_std_SB_callback(self, value):
         self.statusBar().showMessage('Hypodense model updated thru spin box.')
@@ -625,14 +602,12 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_hypo_rv(rv)
         self.hist_widget.update_figures()
 
-
     def hyper_mean_SB_callback(self, value):
         self.statusBar().showMessage('Hyperdense model updated thru spin box.')
         rv = scista.norm(value, self.cc.models['rv_hyper'].std())
         self.cc.models['rv_hyper'] = rv
         self.hist_widget.update_hyper_rv(rv)
         self.hist_widget.update_figures()
-
 
     def hyper_std_SB_callback(self, value):
         self.statusBar().showMessage('Hyperdense model updated thru spin box.')
@@ -641,7 +616,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_hyper_rv(rv)
         self.hist_widget.update_figures()
 
-
     def heal_mean_SB_callback(self, value):
         self.statusBar().showMessage('Healthy model updated thru spin box.')
         rv = scista.norm(value, self.cc.models['rv_heal'].std())
@@ -649,14 +623,12 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_heal_rv(rv)
         self.hist_widget.update_figures()
 
-
     def heal_std_SB_callback(self, value):
         self.statusBar().showMessage('Healthy model updated thru spin box.')
         rv = scista.norm(self.cc.models['rv_heal'].mean(), value)
         self.cc.models['rv_heal'] = rv
         self.hist_widget.update_heal_rv(rv)
         self.hist_widget.update_figures()
-
 
     def scroll_event(self, value, who):
         if who == 0:  # left viewer
@@ -667,7 +639,6 @@ class Lession_editor(QtGui.QMainWindow):
             new = self.actual_slice_R + value
             if (new < 0) or (new >= self.data_R.n_slices):
                 return
-
 
     def slider_C_changed(self, val):
         self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (val + 1, self.data_L.n_slices))
@@ -692,9 +663,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.setValue(self.actual_slice_L)
         self.ui.slice_R_SB.setValue(self.actual_slice_R)
 
-        self.view_L.setSlice(self.data_L.data[self.actual_slice_L, :, :])
-        self.view_R.setSlice(self.data_R.data[self.actual_slice_R, :, :])
-
+        self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
+        self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
+        pass
 
     def slider_L_changed(self, val):
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
@@ -709,8 +680,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_C_SB.setValue(self.actual_slice_L)
 
-        self.view_L.setSlice(self.data_L.data[self.actual_slice_L, :, :])
-
+        self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
 
     def slider_R_changed(self, val):
         if (val >= 0) and (val < self.data_R.n_slices):
@@ -720,15 +690,13 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_number_R_LBL.setText('%i/%i' % (self.actual_slice_R + 1, self.data_R.n_slices))
 
-        self.view_R.setSlice(self.data_L.data[self.actual_slice_R, :, :])
-
+        self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
 
     def calculate_models_callback(self):
         self.statusBar().showMessage('Calculating intensity models...')
         self.cc.calculate_intensity_models()
         self.statusBar().showMessage('Intensity models calculated.')
         self.update_models()
-
 
     def update_models(self):
         self.hist_widget.update_heal_rv(self.cc.models['rv_heal'])
@@ -746,7 +714,6 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.hist_widget.update_figures()
 
-
     def run_callback(self):
         # Viewer_3D.run(self.data)
         # viewer = Viewer_3D.Viewer_3D(self.data)
@@ -757,7 +724,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.cc.run()
         self.update_models()
 
-        self.form_widget.update_figures()
+        # self.form_widget.update_figures()
         # self.hist_widget.update_figures()
         self.labels = self.cc.actual_data.labels
         # self.labels = self.cc.labels
@@ -772,7 +739,6 @@ class Lession_editor(QtGui.QMainWindow):
         # self.cc.n_objects = len(np.unique(self.cc.objects)) - 1
         # self.fill_table(self.cc.labels, self.cc.areas, self.cc.comps)
 
-
     def fill_table(self, labels, areas, comps):
         # idxs = np.arange(1, len(areas)+1)
         features = np.vstack((labels, areas, comps)).T
@@ -781,111 +747,96 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
         # self.tableview.verticalHeader().setVisible(True)
 
-
     # def update_table_model(self):
     #     self.ui.objects_TV
 
-
-    def view_1_callback(self):
-        self.show_view_1 = not self.show_view_1
+    def view_L_callback(self):
+        self.show_view_L = not self.show_view_L
+        self.view_L.setVisible(self.show_view_L)
 
         # enabling and disabling other toolbar icons
-        self.ui.show_im_1_BTN.setEnabled(not self.ui.show_im_1_BTN.isEnabled())
-        self.ui.show_labels_1_BTN.setEnabled(not self.ui.show_labels_1_BTN.isEnabled())
-        self.ui.show_contours_1_BTN.setEnabled(not self.ui.show_contours_1_BTN.isEnabled())
+        self.ui.show_im_L_BTN.setEnabled(not self.ui.show_im_L_BTN.isEnabled())
+        self.ui.show_labels_L_BTN.setEnabled(not self.ui.show_labels_L_BTN.isEnabled())
+        self.ui.show_contours_L_BTN.setEnabled(not self.ui.show_contours_L_BTN.isEnabled())
 
-        self.statusBar().showMessage('view_1 set to %s' % self.show_view_1)
+        self.statusBar().showMessage('Left view set to %s' % self.show_view_L)
         # print 'view_1 set to', self.show_view_1
 
-        self.form_widget.update_figures()
+        # self.form_widget.update_figures()
+        self.view_L.update()
 
-
-    def view_2_callback(self):
-        self.show_view_2 = not self.show_view_2
+    def view_R_callback(self):
+        self.show_view_R = not self.show_view_R
+        self.view_R.setVisible(self.show_view_R)
 
         # enabling and disabling other toolbar icons
-        self.ui.show_im_2_BTN.setEnabled(not self.ui.show_im_2_BTN.isEnabled())
-        self.ui.show_labels_2_BTN.setEnabled(not self.ui.show_labels_2_BTN.isEnabled())
-        self.ui.show_contours_2_BTN.setEnabled(not self.ui.show_contours_2_BTN.isEnabled())
+        self.ui.show_im_R_BTN.setEnabled(not self.ui.show_im_R_BTN.isEnabled())
+        self.ui.show_labels_R_BTN.setEnabled(not self.ui.show_labels_R_BTN.isEnabled())
+        self.ui.show_contours_R_BTN.setEnabled(not self.ui.show_contours_R_BTN.isEnabled())
 
-        self.statusBar().showMessage('view_2 set to %s' % self.show_view_2)
+        self.statusBar().showMessage('Right view set to %s' % self.show_view_R)
         # print 'view_2 set to', self.show_view_2
 
-        self.form_widget.update_figures()
+        # self.form_widget.update_figures()
+        self.view_R.update()
 
+    def show_im_L_callback(self):
+        self.data_L.display_im()
+        self.view_L.show_contours = False
+        self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
+        self.statusBar().showMessage('data_L set to im')
 
-    def show_im_1_callback(self):
-        # print 'data_1 set to im'
-        self.statusBar().showMessage('data_1 set to im')
-        # self.form_widget.data_1 = self.data
-        self.form_widget.data_L_str = 'im'
-        self.form_widget.update_figures()
+    def show_im_R_callback(self):
+        self.data_R.display_im()
+        self.view_R.show_contours = False
+        self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
+        self.statusBar().showMessage('data_R set to im')
 
+    def show_labels_L_callback(self):
+        self.data_L.display_labels()
+        self.view_L.show_contours = False
+        self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
+        self.statusBar().showMessage('data_L set to labels')
 
-    def show_im_2_callback(self):
-        # print 'data_2 set to im'
-        self.statusBar().showMessage('data_2 set to im')
-        # if self.disp_smoothed:
-        #     self.form_widget.data_2 = self.labels
-        # else:
-        #     self.form_widget.data_2 = self.data
-        self.form_widget.data_R_str = 'im'
-        self.form_widget.update_figures()
+    def show_labels_R_callback(self):
+        self.data_R.display_labels()
+        self.view_R.show_contours = False
+        self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
+        self.statusBar().showMessage('data_R set to labels')
 
+    def show_contours_L_callback(self):
+        self.data_L.display_im()
+        self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
+        self.view_L.show_contours = True
+        self.statusBar().showMessage('data_L set to contours')
 
-    def show_labels_1_callback(self):
-        # print 'data_1 set to labels'
-        self.statusBar().showMessage('data_1 set to labels')
-        # self.form_widget.data_1 = self.labels
-        self.form_widget.data_L_str = 'labels'
-        self.form_widget.update_figures()
+    def show_contours_R_callback(self):
+        self.data_R.display_im()
+        self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
+        self.view_R.show_contours = True
+        self.statusBar().showMessage('data_R set to contours')
 
-
-    def show_labels_2_callback(self):
-        # print 'data_2 set to labels'
-        self.statusBar().showMessage('data_2 set to labels')
-        # self.form_widget.data_1 = self.labels
-        self.form_widget.data_R_str = 'labels'
-        self.form_widget.update_figures()
-
-
-    def show_contours_1_callback(self):
-        # print 'data_2 set to contours'
-        self.statusBar().showMessage('data_1 set to contours')
-        # self.form_widget.data_1 = self.data
-        self.form_widget.data_L_str = 'contours'
-        self.form_widget.update_figures()
-
-
-    def show_contours_2_callback(self):
-        # print 'data_2 set to contours'
-        self.statusBar().showMessage('data_2 set to contours')
-        # self.form_widget.data_2 = self.data
-        self.form_widget.data_R_str = 'contours'
-        self.form_widget.update_figures()
-
-
-    def figure_1_CB_callback(self):
-        if self.ui.figure_1_CB.currentIndex() == 0:
+    def figure_L_CB_callback(self):
+        if self.ui.figure_L_CB.currentIndex() == 0:
             self.data_L = self.cc.data_1
             # self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices)
-        elif self.ui.figure_1_CB.currentIndex() == 1:
+        elif self.ui.figure_L_CB.currentIndex() == 1:
             self.data_L = self.cc.data_2
 
         if self.actual_slice_L >= self.data_L.n_slices:
             self.actual_slice_L = self.data_L.n_slices - 1
             self.slice_change(self.actual_slice_L)
 
-        self.ui.slice_1_SB.setMaximum(self.data_L.n_slices - 1)
-        self.ui.slice_scrollB.setMaximum(self.data_L.n_slices - 1)
+        self.ui.slice_L_SB.setMaximum(self.data_L.n_slices - 1)
+        self.ui.slice_C_SB.setMaximum(self.data_L.n_slices - 1)
 
         self.form_widget.update_figures()
 
-    def figure_2_CB_callback(self):
-        if self.ui.figure_2_CB.currentIndex() == 0:
+    def figure_R_CB_callback(self):
+        if self.ui.figure_R_CB.currentIndex() == 0:
             self.data_R = self.cc.data_1
             # self.ui.slice_2_SB.setMaximum(self.cc.data_1.n_slices)
-        elif self.ui.figure_2_CB.currentIndex() == 1:
+        elif self.ui.figure_R_CB.currentIndex() == 1:
             self.data_R = self.cc.data_2
             # self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices)
 
@@ -893,17 +844,15 @@ class Lession_editor(QtGui.QMainWindow):
             self.actual_slice_R = self.data_R.n_slices - 1
             self.slice_change(self.actual_slice_R)
 
-        self.ui.slice_2_SB.setMaximum(self.data_R.n_slices - 1)
+        self.ui.slice_R_SB.setMaximum(self.data_R.n_slices - 1)
         # self.ui.slice_scrollB.setMaximum(self.data_R.n_slices - 1)
 
         self.form_widget.update_figures()
-
 
     def action_Load_serie_callback(self, serie_number):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir'])
         print 'Does not work yet.'
         print fname
-
 
     def run(self, im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):
         if slice_axis == 0:
@@ -913,7 +862,6 @@ class Lession_editor(QtGui.QMainWindow):
         le = Lession_editor(im, labels, healthy_label, hypo_label, hyper_label, disp_smoothed)
         le.show()
         sys.exit(app.exec_())
-
 
 ################################################################################
 ################################################################################
@@ -958,10 +906,3 @@ if __name__ == '__main__':
     le = Lession_editor(fnames)
     le.show()
     sys.exit(app.exec_())
-
-    # app = QtGui.QApplication(sys.argv)
-    # myapp = Lession_editor(im, labels, healthy_label, hypo_label, hyper_label)
-    #
-    # # zviditelneni aplikace
-    # myapp.show()
-    # sys.exit(app.exec_())

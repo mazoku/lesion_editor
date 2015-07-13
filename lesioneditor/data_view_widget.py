@@ -2,6 +2,8 @@ __author__ = 'tomas'
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 from PyQt4.QtCore import Qt, QSize, QString, SIGNAL
 from PyQt4.QtGui import QImage, QDialog,\
     QApplication, QSlider, QPushButton,\
@@ -88,6 +90,7 @@ class SliceBox(QLabel):
         self.contours_old = None
         self.mask_points = None
         self.contour_mode = 'fill'
+        self.show_contours = False
         # self.actual_slice = 0
         # self.n_slices = 0
         self.scroll_fun = None
@@ -115,7 +118,6 @@ class SliceBox(QLabel):
         painter.drawImage(event.rect(), self.image)
         painter.end()
 
-
     def get_contours(self, img, sl):
         idxs = sl.nonzero()[0]
         keys = np.unique(sl[idxs])
@@ -129,7 +131,6 @@ class SliceBox(QLabel):
 
             self.composeRgba(img, cnt,
                              CONTOURLINES_COLORTABLE[ii - 1,...])
-
 
     def gen_contours(self, sl):
         sls = sl.reshape(self.slice_size, order='F')
@@ -158,7 +159,6 @@ class SliceBox(QLabel):
 
         return cnt.ravel(order='F')
 
-
     def composeRgba(self, bg, fg, cmap):
         idxs = fg.nonzero()[0]
 
@@ -172,11 +172,9 @@ class SliceBox(QLabel):
             rgbx = ((rgbf.T * af).T + (rgbb.T * (255 - af)).T) / 255
             bg[idxs,:3] = rgbx.astype(np.uint8)
 
-
     def overRgba(self, bg, fg, cmap):
         idxs = fg.nonzero()[0]
         bg[idxs] = cmap[fg[idxs] - 1]
-
 
     def window_slice(self, ctslice):
         if self.win_w > 0:
@@ -191,7 +189,6 @@ class SliceBox(QLabel):
 
         return aux.astype(np.uint8)
 
-
     def updateSlice(self):
         if self.ctslice_rgba is None:
             return
@@ -205,7 +202,6 @@ class SliceBox(QLabel):
                                      self.seeds_colortable)
                 elif self.contour_mode == 'contours':
                     self.get_contours(img, self.seeds)
-
             else:
                 self.overRgba(img, self.seeds,
                               self.seeds_colortable)
@@ -227,7 +223,6 @@ class SliceBox(QLabel):
 
         self.update()
 
-
     def getSliceRGBA(self, ctslice):
         if self.cw['w'] > 0:
             mul = 255.0 / float(self.cw['w'])
@@ -244,13 +239,11 @@ class SliceBox(QLabel):
 
         return aux.astype(np.uint8)
 
-
     def updateSliceCW(self, ctslice=None):
         if ctslice is not None:
             self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
 
         self.updateSlice()
-
 
     def setSlice(self, ctslice=None, seeds=None, contours=None):
         ctslice = np.transpose(ctslice)
@@ -269,12 +262,10 @@ class SliceBox(QLabel):
 
         self.updateSlice()
 
-
     def gridPosition(self, pos):
         # return (int(pos.x() / self.grid[0]),
         #         int(pos.y() / self.grid[1]))
         return (int(pos.x()), int(pos.y()))
-
 
     def resizeSlice(self, new_slice_size=None, new_grid=None, new_image_size=None):
 
@@ -294,7 +285,6 @@ class SliceBox(QLabel):
         # self.setPixmap(QPixmap.fromImage(self.image))
         # self.setPixmap(self._pixmap.scaled(QPixmap.fromImage(self.image), Qt.KeepAspectRatio)
 
-
     def resizeEvent(self, event):
         # new_height = self.height()
         # new_grid = new_height / float(self.slice_size[1])
@@ -304,7 +294,6 @@ class SliceBox(QLabel):
         self.resizeSlice()
         self.updateSlice()
 
-
     def set_width(self, new_width):
         # new_grid = new_width / float(self.slice_size[0])
         # mul = new_grid / self.grid[0]
@@ -313,18 +302,14 @@ class SliceBox(QLabel):
         self.resizeSlice()
         self.updateSlice()
 
-
     def getCW(self):
         return self.cw
-
 
     def setCW(self, val, key):
         self.cw[key] = val
 
-
     def setScrollFun(self, fun):
         self.scroll_fun = fun
-
 
     def wheelEvent(self, event):
         d = event.delta()

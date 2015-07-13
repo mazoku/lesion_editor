@@ -19,6 +19,10 @@ GRAY_COLORTABLE = np.array([[ii, ii, ii, 255] for ii in range(256)],
 SEEDS_COLORTABLE = np.array([[0, 255, 0, 255],
                              [0, 0, 255, 255]], dtype=np.uint8)
 
+LABELS_COLORTABLE = np.array([[255, 0, 0, 255],
+                              [0, 255, 0, 255],
+                              [0, 0, 255, 255]], dtype=np.uint8)
+
 CONTOURS_COLORS = {
     1: [255, 0, 0],
     2: [0, 0, 255],
@@ -79,6 +83,10 @@ class SliceBox(QLabel):
         # self.imagesize = QSize(int(sliceSize[0] * grid[0]),
         #                        int(sliceSize[1] * grid[1]))
 
+        self.SHOW_IM = 0  # flag for showing density data
+        self.SHOW_LABELS = 1  # flag for showing labels
+        self.SHOW_CONTOURS = 2  # flag for showing contours
+
         self.imagesize = QSize(sliceSize[0], sliceSize[1])
         # self.grid = grid
         self.slice_size = sliceSize
@@ -90,7 +98,9 @@ class SliceBox(QLabel):
         self.contours_old = None
         self.mask_points = None
         self.contour_mode = 'fill'
-        self.show_contours = False
+
+        self.show_mode = self.SHOW_IM
+
         # self.actual_slice = 0
         # self.n_slices = 0
         self.scroll_fun = None
@@ -248,7 +258,12 @@ class SliceBox(QLabel):
     def setSlice(self, ctslice=None, seeds=None, contours=None):
         ctslice = np.transpose(ctslice)
         if ctslice is not None:
-            self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
+            if self.show_mode in (self.SHOW_IM, self.SHOW_CONTOURS):
+                # tmp = self.getSliceRGBA(ctslice)
+                self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
+            elif self.show_mode == self.SHOW_LABELS:
+                # TODO: zprovoznit spravne vykresleni
+                self.ctslice_rgba = LABELS_COLORTABLE[ctslice.ravel(order='F')]
 
         if seeds is not None:
             self.seeds = seeds.ravel(order='F')

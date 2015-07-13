@@ -782,38 +782,38 @@ class Lession_editor(QtGui.QMainWindow):
 
     def show_im_L_callback(self):
         self.data_L.display_im()
-        self.view_L.show_contours = False
+        self.view_L.show_mode = self.view_L.SHOW_IM
         self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
         self.statusBar().showMessage('data_L set to im')
 
     def show_im_R_callback(self):
         self.data_R.display_im()
-        self.view_R.show_contours = False
+        self.view_R.show_mode = self.view_R.SHOW_IM
         self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
         self.statusBar().showMessage('data_R set to im')
 
     def show_labels_L_callback(self):
         self.data_L.display_labels()
-        self.view_L.show_contours = False
+        self.view_L.show_mode = self.view_L.SHOW_LABELS
         self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
         self.statusBar().showMessage('data_L set to labels')
 
     def show_labels_R_callback(self):
         self.data_R.display_labels()
-        self.view_R.show_contours = False
+        self.view_R.show_mode = self.view_R.SHOW_LABELS
         self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
         self.statusBar().showMessage('data_R set to labels')
 
     def show_contours_L_callback(self):
         self.data_L.display_im()
+        self.view_L.show_mode = self.view_L.SHOW_CONTOURS
         self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-        self.view_L.show_contours = True
         self.statusBar().showMessage('data_L set to contours')
 
     def show_contours_R_callback(self):
         self.data_R.display_im()
+        self.view_R.show_mode = self.view_R.SHOW_CONTOURS
         self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
-        self.view_R.show_contours = True
         self.statusBar().showMessage('data_R set to contours')
 
     def figure_L_CB_callback(self):

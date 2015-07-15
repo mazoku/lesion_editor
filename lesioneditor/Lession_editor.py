@@ -664,6 +664,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_R_SB.setValue(self.actual_slice_R)
 
         self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
+        # self.view_L.setSlice(self.cc.actual_data.labels2[self.actual_slice_L, :, :])
         self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
         pass
 
@@ -906,3 +907,8 @@ if __name__ == '__main__':
     le = Lession_editor(fnames)
     le.show()
     sys.exit(app.exec_())
+
+
+# TODO: figure_L_CB, figure_R_CB
+#           - inicializovat R CB podle dat (ted ukazuje venous, ale nactena jsou arterial)
+#           - upravit callbacky

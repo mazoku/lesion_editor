@@ -430,7 +430,7 @@ def eroding3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
     return data
 
 
-def resize3D(data, scale, sliceId=2, method='cv2'):
+def resize3D(data, scale=None, shape=None,sliceId=2, method='cv2'):
     if sliceId == 2:
         n_slices = data.shape[2]
         # new_shape = cv2.resize(data[:,:,0], None, fx=scale, fy=scale).shape
@@ -447,13 +447,22 @@ def resize3D(data, scale, sliceId=2, method='cv2'):
         n_slices = data.shape[0]
         # new_shape = cv2.resize(data[0,:,:], None, fx=scale, fy=scale).shape
         # new_shape = skitra.rescale(data[0,:,:], scale).shape
-        new_shape =  scindiint.zoom(data[0,:,:], scale).shape
-        new_data = np.zeros(np.hstack((n_slices, new_shape)), dtype=np.int)
+        if scale is not None:
+            # new_shape = scindiint.zoom(data[0,:,:], scale).shape
+            new_shape = np.hstack((n_slices, scindiint.zoom(data[0,:,:], scale).shape))
+            # new_data = np.zeros(new_shape, dtype=np.int)
+        else:
+            new_shape = shape
+        new_data = np.zeros(new_shape, dtype=np.int)
+
         for i in range(n_slices):
             # new_data[i,:,:] = cv2.resize(data[i,:,:], None, fx=scale, fy=scale)
             # new_data[i,:,:] = (255 * skitra.rescale(data[i,:,:], scale)).astype(np.int)
             if method == 'cv2':
-                new_data[i,:,:] = cv2.resize(data[i,:,:], (0,0),  fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+                if scale is not None:
+                    new_data[i,:,:] = cv2.resize(data[i,:,:], (0,0),  fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+                elif shape is not None:
+                    new_data[i,:,:] = cv2.resize(data[i,:,:], new_shape[1:][::-1], interpolation=cv2.INTER_NEAREST)
             else:
                 new_data[i,:,:] = scindiint.zoom(data[i,:,:], scale)
     return new_data

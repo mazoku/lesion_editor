@@ -32,6 +32,8 @@ import pickle
 
 import Viewer_3D
 
+import cv2
+
 import Data
 
 import logging
@@ -55,6 +57,8 @@ class Computational_core():
         self.data_2 = Data.Data()
         self.actual_data = self.data_1
         self.active_serie = 1
+
+        self.objects = list()  # list of segmented lesions
 
         # loading data - both series if provided
         if len(self.fname) > 0:
@@ -95,23 +99,19 @@ class Computational_core():
         #     self.orig_shape_2 = self.data_2.shape
         #     self.res_2 = np.zeros(self.orig_shape_2)
 
-
         # smooth data if allowed
         self.data_1.data = self.smooth_data(self.data_1.data)
         self.data_2.data = self.smooth_data(self.data_2.data)
-
 
     def data_zoom(self, data, voxelsize_mm, working_voxelsize_mm):
         zoom = voxelsize_mm / (1.0 * working_voxelsize_mm)
         data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
         return data_res
 
-
     def zoom_to_shape(self, data, shape):
         zoom = np.array(shape, dtype=np.float) / np.array(data.shape, dtype=np.float)
         data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
         return data_res
-
 
     # def load_pickle_data(self, fname, slice_idx=-1):
     #     fcontent = None
@@ -141,7 +141,6 @@ class Computational_core():
     #         mask = mask[slice_idx, :, :]
     #
     #     return data, mask, voxel_size
-
 
     def estimate_healthy_pdf(self, data, mask, params):
         perc = params['perc']
@@ -201,7 +200,6 @@ class Computational_core():
             # plt.show()
 
         return rv
-
 
     def estimate_outlier_pdf(self, data, mask, rv_healthy, outlier_type, params):
         prob_w = params['prob_w']
@@ -277,7 +275,6 @@ class Computational_core():
 
         return rv
 
-
     def get_unaries(self, data, mask, models, params):
         rv_heal = models['rv_heal']
         rv_hyper = models['rv_hyper']
@@ -338,7 +335,6 @@ class Computational_core():
 
         return unaries
 
-
     # def mayavi_visualization(self, res):
     #     ### Read the data in a numpy 3D array ##########################################
     #     #parenchym = np.logical_or(liver, vessels)
@@ -374,7 +370,6 @@ class Computational_core():
     #
     #     mlab.show()
 
-
     def get_compactness(self, labels):
         nlabels = labels.max() + 1
         # nlabels = len(np.unique(labels)) - 1
@@ -403,7 +398,6 @@ class Computational_core():
 
         return eccs
 
-
     def get_areas(self, labels):
         nlabels = labels.max() + 1
         areas = np.zeros(nlabels)
@@ -412,7 +406,6 @@ class Computational_core():
             areas[i] = obj.sum()
 
         return areas
-
 
     # def filter_objects(self, feature_v, features, params):
     #     min_area = params['min_area']
@@ -438,7 +431,6 @@ class Computational_core():
     #
     #     return obj_ok
 
-
     def smooth_data(self, data):
         if data is not None:
             # smoothing data
@@ -453,7 +445,6 @@ class Computational_core():
                 print '\tcurrently switched off'
 
         return data
-
 
     def calculate_intensity_models(self, data, mask):
         print 'calculating intensity models...'
@@ -474,7 +465,6 @@ class Computational_core():
 
         return models
 
-
     def objects_filtration(self):
         min_area = self.params['min_area']
         max_area = self.params['max_area']
@@ -486,8 +476,6 @@ class Computational_core():
             # TODO: test the compactness
             if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
                 self.filtered_idxs[i] = False
-
-
 
     def run(self):
         # slice_idx = self.params['slice_idx']
@@ -503,7 +491,6 @@ class Computational_core():
         # self.data = self.data.astype(np.uint8)
 
         # TumorVisualiser.run(data, mask, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
-
 
         print 'estimating number of clusters...'
         print '\tcurrently switched off'
@@ -536,7 +523,6 @@ class Computational_core():
             data = tools.resize3D(self.actual_data.data, self.params['scale'], sliceId=0)
             mask = tools.resize3D(self.actual_data.mask, self.params['scale'], sliceId=0)
         # data = data.astype(np.uint8)
-
 
         # calculating intensity models if necesarry
         if not self.models:
@@ -598,7 +584,9 @@ class Computational_core():
         if self.params['zoom']:
             self.actual_data.labels = self.zoom_to_shape(labels, self.actual_data.orig_shape)
         else:
-            self.actual_data.labels = tools.resize3D(labels, 1. / self.params['scale'], sliceId=0)
+            # self.actual_data.labels = tools.resize3D(labels, scale=1. / self.params['scale'], sliceId=0)
+            # self.actual_data.labels2 = skitra.resize(labels, self.actual_data.orig_shape, mode='nearest', preserve_range=True).astype(np.int64)
+            self.actual_data.labels = tools.resize3D(labels, shape=self.actual_data.orig_shape, sliceId=0)#.astype(np.int64)
 
         print '\t...done'
         self.status_bar.showMessage('Done')
@@ -606,7 +594,6 @@ class Computational_core():
         # debug visualization
         # self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
         # self.viewer.show()
-
 
         self.status_bar.showMessage('Extracting objects...')
         labels_hypo, n_hypo = scindimea.label(self.actual_data.labels == hypo_lab)
@@ -667,7 +654,6 @@ class Computational_core():
         #     hyper_ok = self.filter_objects(features_hyper_v, features, self.params).sum(axis=1) == len(features)
         #     print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
         #     print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
-
 
         #     TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 

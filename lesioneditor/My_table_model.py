@@ -9,21 +9,18 @@ class MyTableModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent, *args)
 
         if headerdata is None:
-            headerdata = ['idx', 'area', 'compactness']
+            headerdata = ['label', 'area', 'compactness']
 
         self.data = datain
         self.headerdata = headerdata
-
 
     def rowCount(self, parent):
         # Number of rows corresponds to the number of objects
         return self.data.shape[0]
 
-
     def columnCount(self, parent):
         # Number of columns corresponds to the number of features
         return self.data.shape[1]
-
 
     def data(self, index, role):
         if not index.isValid():
@@ -31,7 +28,6 @@ class MyTableModel(QAbstractTableModel):
         elif role != Qt.DisplayRole:
             return QVariant()
         return QVariant('%.3f'%self.data[index.row(), index.column()])
-
 
     def headerData(self, idx, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
@@ -51,7 +47,6 @@ class MyWindow(QWidget):
         self.tableview = QTableView()
         self.tableview.setModel(self.tablemodel)
         self.tableview.setSelectionBehavior(QAbstractItemView.SelectRows)
-
         self.tableview.selectionModel().selectionChanged.connect(self.selection_changed)
 
         add_BTN = QPushButton('add')
@@ -73,13 +68,11 @@ class MyWindow(QWidget):
         layoutV.addWidget(btn_frame)
         self.setLayout(layoutV)
 
-
     def selection_changed(self, selected, deselected):
         indexes = self.tableview.selectionModel().selectedRows()
         for index in indexes:
             print index.row()
             # self.tableview.selectRow(index.row())
-
 
     def add_row(self):
         try:
@@ -90,7 +83,6 @@ class MyWindow(QWidget):
         self.tablemodel.data = self.data
         self.tableview.model().layoutChanged.emit()
         print 'row added'
-
 
     def del_row(self):
         self.data = self.data[:-1, :]

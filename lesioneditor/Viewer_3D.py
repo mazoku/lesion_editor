@@ -130,7 +130,9 @@ if __name__ == '__main__':
     data = Data.Data()
     data.load_data(fname)
 
+    data.data = np.load('/home/tomas/Data/labels.npy')
+
     app = QtGui.QApplication(sys.argv)
-    viewer = Viewer_3D(data.data)
+    viewer = Viewer_3D(data.data, range=True)
     viewer.show()
     sys.exit(app.exec_())

@@ -35,6 +35,7 @@ import Viewer_3D
 import cv2
 
 import Data
+import Lesion
 
 import logging
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class Computational_core():
         self.models = None
         self.status_bar = status_bar
 
-        self.labels = None
+        self.labels = None  # list of unique labels
         self.filtered_idxs = None
 
         ext_list = ('pklz', 'pickle')
@@ -465,17 +466,31 @@ class Computational_core():
 
         return models
 
-    def objects_filtration(self):
-        min_area = self.params['min_area']
-        max_area = self.params['max_area']
-        min_compactness = self.params['min_compactness']
+    def objects_filtration(self, selected_labels=None, min_area=0, max_area=np.Infinity):
+        # min_area = self.params['min_area']
+        # max_area = self.params['max_area']
+        # min_compactness = self.params['min_compactness']
+        self.filtered_idxs = [x.label for x in self.actual_data.lesions
+                              if min_area <= x.area <= max_area]
 
-        self.filtered_idxs = np.ones(self.n_objects, dtype=np.bool)
+        if selected_labels is not None:
+            self.filtered_idxs = np.intersect1d(self.filtered_idxs, selected_labels)
+        # areas = [x.area for x in self.actual_data.lesions if x.label in self.filtered_idxs]
+        # print max(areas)
+        # self.actual_data.labels_filt = self.params['healthy_label'] * (self.actual_data.labels > self.params['bgd_label'])
+        self.actual_data.labels_filt = np.where(self.actual_data.labels > self.params['bgd_label'], self.params['healthy_label'], self.params['bgd_label'])
+        is_in = np.in1d(self.actual_data.objects, self.filtered_idxs).reshape(self.actual_data.labels.shape)
+        self.actual_data.labels_filt = np.where(is_in, self.actual_data.labels, self.actual_data.labels_filt)
+        pass
+        # self.actual_data.labels_filt = self.actual_data.labels * np.in1d(self.actual_data.objects, self.filtered_idxs).reshape(self.actual_data.labels.shape)
+        # self.actual_data.labels_filt[self.actual_data.labels == self.params['bgd_label']] = self.params['bgd_label']
 
-        for i in range(self.n_objects):
-            # TODO: test the compactness
-            if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
-                self.filtered_idxs[i] = False
+        # self.filtered_idxs = np.ones(self.n_objects, dtype=np.bool)
+        #
+        # for i in range(self.n_objects):
+        #     # TODO: test the compactness
+        #     if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
+        #         self.filtered_idxs[i] = False
 
     def run(self):
         # slice_idx = self.params['slice_idx']
@@ -492,8 +507,8 @@ class Computational_core():
 
         # TumorVisualiser.run(data, mask, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
 
-        print 'estimating number of clusters...'
-        print '\tcurrently switched off'
+        # print 'estimating number of clusters ...',
+        # print '\tcurrently switched off'
         # d = scindiint.zoom(data_o, 0.5)
         # m = skitra.resize(mask, np.array(mask.shape) * 0.5).astype(np.bool)
         # ints = d[np.nonzero(m)]
@@ -515,20 +530,25 @@ class Computational_core():
         # data_d = np.where(data_d < 0, 0, data_d)
 
         # zooming the data
+        print 'rescaling data ...',
         if self.params['zoom']:
-            print 'zooming data...'
             self.actual_data.data = self.data_zoom(self.actual_data.data, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
             self.actual_data.mask = self.data_zoom(self.actual_data.mask, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
         else:
             data = tools.resize3D(self.actual_data.data, self.params['scale'], sliceId=0)
             mask = tools.resize3D(self.actual_data.mask, self.params['scale'], sliceId=0)
+        print 'ok'
         # data = data.astype(np.uint8)
 
         # calculating intensity models if necesarry
+        print 'estimating color models ...'
         if not self.models:
             self.models = self.calculate_intensity_models(data, mask)
+            print 'ok'
+        else:
+            print 'already done'
 
-        print 'calculating unary potentials...'
+        print 'calculating unary potentials ...',
         self.status_bar.showMessage('Calculating unary potentials...')
         # create unaries
         # unaries = data_d
@@ -536,13 +556,15 @@ class Computational_core():
         # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
         self.unaries = beta * self.get_unaries(data, mask, self.models, self.params)
         n_labels = self.unaries.shape[2]
+        print 'ok'
 
-        print 'calculating pairwise potentials...'
+        print 'calculating pairwise potentials ...',
         self.status_bar.showMessage('Calculating pairwise potentials...')
         # create potts pairwise
         self.pairwise = -alpha * np.eye(n_labels, dtype=np.int32)
+        print 'ok'
 
-        print 'deriving graph edges...'
+        print 'deriving graph edges ...',
         self.status_bar.showMessage('Deriving graph edges...')
         # use the gerneral graph algorithm
         # first, we construct the grid graph
@@ -562,6 +584,7 @@ class Computational_core():
         nodes_in = np.ravel_multi_index(np.nonzero(mask), data.shape)
         rows_inds = np.in1d(self.edges, nodes_in).reshape(self.edges.shape).sum(axis=1) == 2
         self.edges = self.edges[rows_inds, :]
+        print 'ok'
 
         # plt.show()
 
@@ -570,15 +593,15 @@ class Computational_core():
         # un = unaries[:, :, 2].reshape(data_o.shape)
         # py3DSeedEditor.py3DSeedEditor(un).show()
 
-        print 'calculating graph cut...'
+        print 'calculating graph cut ...',
         self.status_bar.showMessage('Calculating graph cut...')
         # we flatten the unaries
         # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
         # print 'tu: ', unaries.reshape(-1, n_labels).shape
         result_graph = pygco.cut_from_graph(self.edges, self.unaries.reshape(-1, n_labels), self.pairwise)
-        labels = result_graph.reshape(data.shape)
+        labels = result_graph.reshape(data.shape) + 1  # +1 to shift the first class to label number 1
 
-        labels = np.where(mask, labels, -1)
+        labels = np.where(mask, labels, self.params['bgd_label'])
 
         # zooming to the original size
         if self.params['zoom']:
@@ -588,76 +611,30 @@ class Computational_core():
             # self.actual_data.labels2 = skitra.resize(labels, self.actual_data.orig_shape, mode='nearest', preserve_range=True).astype(np.int64)
             self.actual_data.labels = tools.resize3D(labels, shape=self.actual_data.orig_shape, sliceId=0)#.astype(np.int64)
 
-        print '\t...done'
+        print 'ok'
         self.status_bar.showMessage('Done')
 
         # debug visualization
         # self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
         # self.viewer.show()
 
-        self.status_bar.showMessage('Extracting objects...')
-        labels_hypo, n_hypo = scindimea.label(self.actual_data.labels == hypo_lab)
-        labels_hypo -= 1  # shifts background to -1
-        labels_hyper, n_hyper = scindimea.label(self.actual_data.labels == hyper_lab)
-        labels_hyper -= 1  # shifts background to -1
-        self.n_objects = n_hypo + n_hyper
-        # self.objects = labels_hypo + (labels_hyper + n_hypo)
-        self.objects = labels_hypo
-        self.objects = np.where(labels_hyper >= 0, labels_hyper + n_hypo, self.objects)
+        print 'extracting objects ...',
+        self.status_bar.showMessage('Extracting objects ...'),
+        labels_tmp = np.where(self.actual_data.labels == self.params['healthy_label'], self.params['bgd_label'], self.actual_data.labels)  # because we can set only one label as bgd
+        self.actual_data.objects = skimea.label(labels_tmp, background=self.params['bgd_label'])
+        self.actual_data.lesions = Lesion.extract_lesions(self.actual_data.objects, self.actual_data.data)
+        # areas = [x.area for x in self.actual_data.lesions]
         self.status_bar.showMessage('Done')
+        print 'ok'
 
-        self.status_bar.showMessage('Calculating object features...')
-        print 'Calculating object features...'
-        self.areas = self.get_areas(self.objects)
-        # self.comps = self.get_compactness(self.objects)
-        self.comps = np.zeros(self.n_objects)
-        self.labels = np.unique(self.objects)[1:]  # from 1 because the first idex is background (-1)
-        # self.features = np.hstack((self.areas, self.comps))
-
-        print 'Initial filtration...'
+        print 'initial filtration ...',
         self.objects_filtration()
-
-        # self.fill_table(self.areas, self.comps)
-        print 'Done'
+        print 'ok'
         self.status_bar.showMessage('Done')
 
-        # if self.params['filtration']:
-        #     print 'calculating features of hypodense tumors...'
-        #     labels_hypo, n_labels = scindimea.label(self.res == hypo_lab)
-        #     labels_hypo -= 1  # shifts background to -1
-        #     areas_hypo = np.zeros(n_labels)
-        #     comps_hypo = self.get_compactness(labels_hypo)
-        #     for i in range(n_labels):
-        #         lab = labels_hypo == (i + 1)
-        #         areas_hypo[i] = lab.sum()
-        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
-        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-        #     print '\t...done'
-        #
-        #     print 'calculating features of hyperdense tumors...'
-        #     labels_hyper, n_labels = scindimea.label(self.res == hyper_lab)
-        #     labels_hyper -= 1  # shifts background to -1
-        #     areas_hyper = np.zeros(n_labels)
-        #     comps_hyper = self.get_compactness(labels_hyper)
-        #     for i in range(n_labels):
-        #         lab = labels_hyper == (i + 1)
-        #         areas_hyper[i] = lab.sum()
-        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
-        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-        #     print '\t...done'
-        #
-        #     print 'filtering false objects...'
-        #     features = ('area', 'compactness')
-        #     features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
-        #     features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
-        #     hypo_ok = self.filter_objects(features_hypo_v, features, self.params).sum(axis=1) == len(features)
-        #     hyper_ok = self.filter_objects(features_hyper_v, features, self.params).sum(axis=1) == len(features)
-        #     print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
-        #     print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
+        # TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 
-        #     TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
-
-            # mayavi_visualization(res)
+        # mayavi_visualization(res)
 
 #-------------------------------------------------------------
 if __name__ == '__main__':

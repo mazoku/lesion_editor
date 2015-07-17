@@ -32,7 +32,6 @@ class Hist_widget(QtGui.QWidget):
         super(Hist_widget, self).__init__()
         self.init_UI_form()
 
-
     def init_UI_form(self):
         self.figure = plt.figure()
         self.axes = self.figure.add_axes([0, 0, 1, 1])
@@ -52,18 +51,14 @@ class Hist_widget(QtGui.QWidget):
 
         self.update_figures()
 
-
     def update_heal_rv(self, new_rv):
         self.rv_healthy = new_rv
-
 
     def update_hypo_rv(self, new_rv):
         self.rv_hypo = new_rv
 
-
     def update_hyper_rv(self, new_rv):
         self.rv_hyper = new_rv
-
 
     def update_figures(self):
         plt.figure(self.figure.number)

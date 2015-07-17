@@ -19,7 +19,8 @@ GRAY_COLORTABLE = np.array([[ii, ii, ii, 255] for ii in range(256)],
 SEEDS_COLORTABLE = np.array([[0, 255, 0, 255],
                              [0, 0, 255, 255]], dtype=np.uint8)
 
-LABELS_COLORTABLE = np.array([[255, 0, 0, 255],
+LABELS_COLORTABLE = np.array([[0, 0, 0, 255],
+                              [255, 0, 0, 255],
                               [0, 255, 0, 255],
                               [0, 0, 255, 255]], dtype=np.uint8)
 
@@ -98,6 +99,7 @@ class SliceBox(QLabel):
         self.contours_old = None
         self.mask_points = None
         self.contour_mode = 'fill'
+        # self.contour_mode = 'contours'
 
         self.show_mode = self.SHOW_IM
 
@@ -113,6 +115,19 @@ class SliceBox(QLabel):
         # self.act_transposition = VIEW_TABLE[self.actual_view]
         self.act_transposition = (1,0)
 
+    def reinit(self, sliceSize):
+        self.imagesize = QSize(sliceSize[0], sliceSize[1])
+        self.slice_size = sliceSize
+        self.ctslice_rgba = None
+
+        self.seeds = None
+        self.contours = None
+        self.contours_old = None
+        self.mask_points = None
+
+        self.image = QImage(self.imagesize, QImage.Format_RGB32)
+        self.setPixmap(QPixmap.fromImage(self.image))
+        self.setScaledContents(True)
 
     # def set_data(self, data, type):
     #     self.data = data
@@ -122,6 +137,23 @@ class SliceBox(QLabel):
     #     self.imagesize = QSize(int(self.n_rows * self.grid[0]),
     #                            int(self.n_cols * self.grid[1]))
     #     self.slice_size = (self.n_rows, self.n_cols)
+
+    # def set_slice_size(self, sliceSize):
+    #     self.imagesize = QSize(sliceSize[0], sliceSize[1])
+    #     self.slice_size = sliceSize
+    #
+    #     self.seeds = None
+    #     self.contours = None
+    #     self.contours_old = None
+    #     self.mask_points = None
+    #
+    #     self.image = QImage(self.imagesize, QImage.Format_RGB32)
+    #     self.setPixmap(QPixmap.fromImage(self.image))
+    #     self.setScaledContents(True)
+
+    def setContours(self, contours):
+        self.contours = contours
+        self.contours_aview = self.contours.transpose(self.act_transposition)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -205,16 +237,16 @@ class SliceBox(QLabel):
 
         img = self.ctslice_rgba.copy()
 
-        if self.seeds is not None:
-            if self.mode_draw:
-                if self.contour_mode == 'fill':
-                    self.composeRgba(img, self.seeds,
-                                     self.seeds_colortable)
-                elif self.contour_mode == 'contours':
-                    self.get_contours(img, self.seeds)
-            else:
-                self.overRgba(img, self.seeds,
-                              self.seeds_colortable)
+        # if self.seeds is not None:
+        #     if self.mode_draw:
+        #         if self.contour_mode == 'fill':
+        #             self.composeRgba(img, self.seeds,
+        #                              self.seeds_colortable)
+        #         elif self.contour_mode == 'contours':
+        #             self.get_contours(img, self.seeds)
+        #     else:
+        #         self.overRgba(img, self.seeds,
+        #                       self.seeds_colortable)
 
         if self.contours is not None:
             if self.contour_mode == 'fill':
@@ -262,7 +294,6 @@ class SliceBox(QLabel):
                 # tmp = self.getSliceRGBA(ctslice)
                 self.ctslice_rgba = GRAY_COLORTABLE[self.getSliceRGBA(ctslice)]
             elif self.show_mode == self.SHOW_LABELS:
-                # TODO: zprovoznit spravne vykresleni
                 self.ctslice_rgba = LABELS_COLORTABLE[ctslice.ravel(order='F')]
 
         if seeds is not None:
@@ -270,8 +301,9 @@ class SliceBox(QLabel):
         else:
             self.seeds = None
 
-        if contours is not None:
-            self.contours = contours.ravel(order='F')
+        if contours is not None and self.show_mode == self.SHOW_CONTOURS:
+            self.contours = contours.transpose(self.act_transposition).ravel(order='F')
+            # self.contours = contours.transpose(self.act_transposition)
         else:
             self.contours = None
 

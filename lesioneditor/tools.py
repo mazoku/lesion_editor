@@ -449,7 +449,8 @@ def resize3D(data, scale=None, shape=None,sliceId=2, method='cv2'):
         # new_shape = skitra.rescale(data[0,:,:], scale).shape
         if scale is not None:
             # new_shape = scindiint.zoom(data[0,:,:], scale).shape
-            new_shape = np.hstack((n_slices, scindiint.zoom(data[0,:,:], scale).shape))
+            # new_shape = np.hstack((n_slices, scindiint.zoom(data[0,:,:], scale).shape))
+            new_shape = np.hstack((n_slices, cv2.resize(data[0,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST).shape))
             # new_data = np.zeros(new_shape, dtype=np.int)
         else:
             new_shape = shape
@@ -460,7 +461,7 @@ def resize3D(data, scale=None, shape=None,sliceId=2, method='cv2'):
             # new_data[i,:,:] = (255 * skitra.rescale(data[i,:,:], scale)).astype(np.int)
             if method == 'cv2':
                 if scale is not None:
-                    new_data[i,:,:] = cv2.resize(data[i,:,:], (0,0),  fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+                    new_data[i,:,:] = cv2.resize(data[i,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
                 elif shape is not None:
                     new_data[i,:,:] = cv2.resize(data[i,:,:], new_shape[1:][::-1], interpolation=cv2.INTER_NEAREST)
             else:

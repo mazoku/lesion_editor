@@ -18,13 +18,19 @@ class Data:
         self.voxel_size = None
         self.shape = None
         self.orig_shape = None
-        self.labels = None
+        self.labels = None  # array of labeled results
+        self.labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
+        self.objects = None  # array where each object has unique label
         self.labels_v = None
         self.n_rows = None
         self.n_cols = None
         self.n_slices = None
 
+        self.lesions = None  # list of lesions, set it with Lesions.extract_lesions(self.labels)
+
         self.data_vis = self.data  # visualized data, can be image data (data) or labels
+        self.data_vis_L = self.data  # visualized data, can be image data (data) or labels
+        self.data_vis_R = self.data
 
         self.filename = filename
         self.loaded = False
@@ -73,7 +79,28 @@ class Data:
         self.data_vis = self.data
 
     def display_labels(self):
-        self.data_vis = self.labels
+        # self.data_vis = self.labels
+        self.data_vis = self.labels_filt
 
     def display_contours(self):
         self.data_vis = self.data
+
+    def display_im_L(self):
+        self.data_vis_L = self.data
+
+    def display_labels_L(self):
+        # self.data_vis = self.labels
+        self.data_vis_L = self.labels_filt
+
+    def display_contours_L(self):
+        self.data_vis_L = self.data
+
+    def display_im_R(self):
+        self.data_vis_R = self.data
+
+    def display_labels_R(self):
+        # self.data_vis = self.labels
+        self.data_vis_R = self.labels_filt
+
+    def display_contours_R(self):
+        self.data_vis_R = self.data

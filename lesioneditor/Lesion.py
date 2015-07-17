@@ -40,7 +40,7 @@ class Lesion(object):
         # getting unique labels that are greater than 0 (0 = background, -1 = out of mask)
         self.area = mask.sum()
 
-        r, c, s = np.nonzero(mask)
+        s, r, c = np.nonzero(mask)
 
         self.center = (s.mean(), r.mean(), c.mean())
 

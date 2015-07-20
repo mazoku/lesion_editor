@@ -9,7 +9,7 @@ class MyTableModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent, *args)
 
         if headerdata is None:
-            headerdata = ['label', 'area', 'compactness']
+            headerdata = ['label', 'area', 'mean density', 'compactness']
 
         self.objects = objects  # lesion list
         self.headerdata = headerdata
@@ -28,7 +28,7 @@ class MyTableModel(QAbstractTableModel):
             return QVariant()
         elif role != Qt.DisplayRole:
             return QVariant()
-        data = (self.objects[index.row()].label, self.objects[index.row()].area, self.objects[index.row()].compactness )
+        data = (self.objects[index.row()].label, self.objects[index.row()].area, self.objects[index.row()].mean_density, self.objects[index.row()].compactness )
         if data[index.column()] is not None:
             if isinstance(data[index.column()], int):
                 out = QVariant('%i' % data[index.column()])

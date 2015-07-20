@@ -684,7 +684,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.cc.models['rv_heal'] = rv
         self.hist_widget.update_heal_rv(rv)
         self.hist_widget.update_figures()
-l
+
     def scroll_event(self, value, who):
         if who == 0:  # left viewer
             new = self.actual_slice_L + value
@@ -721,7 +721,7 @@ l
         if self.cc.actual_data.labels_filt is not None:
             # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
             # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
-l            self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
+            self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
             self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
         else:
             # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
@@ -1021,8 +1021,9 @@ if __name__ == '__main__':
     # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
     # venous 5mm - ok, but wrong approach
     # TODO: study ID 29 - 3/3, pouze 2 velke spoji v jeden
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz')
+    # slice = 17
+    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
+    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz')
 
     # hypo in venous -----------------------
     # arterial - bad
@@ -1057,8 +1058,9 @@ if __name__ == '__main__':
     # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_185_48441644_arterial_5.0_B30f-.pklz')
 
     # TODO: study ID 21 - 0/2, nenasel ani jeden pekny hypo
-    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_5.0_B30f-.pklz')
-    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_5.0_B30f-.pklz')
+    # slice = 6
+    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_5.0_B30f-.pklz')
+    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_5.0_B30f-.pklz')
 
     # runing application -------------------------
     app = QtGui.QApplication(sys.argv)

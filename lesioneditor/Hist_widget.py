@@ -70,8 +70,12 @@ class Hist_widget(QtGui.QWidget):
         plt.hold(True)
         if self.rv_healthy and self.rv_hypo and self.rv_hyper:
             healthy_y = self.rv_healthy.pdf(x)
-            hypo_y = self.rv_hypo.pdf(x)
-            hyper_y = self.rv_hyper.pdf(x)
+            if self.win.params['unaries_as_cdf']:
+                hypo_y = (1 - self.rv_hypo.cdf(x)) * self.rv_healthy.pdf(self.rv_healthy.mean())
+                hyper_y = self.rv_hyper.cdf(x) * self.rv_healthy.pdf(self.rv_healthy.mean())
+            else:
+                hypo_y = self.rv_hypo.pdf(x)
+                hyper_y = self.rv_hyper.pdf(x)
             y_max = max(healthy_y.max(), hypo_y.max(), hyper_y.max())
             fac = self.hist.max() / y_max
 

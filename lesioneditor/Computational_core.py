@@ -306,6 +306,25 @@ class Computational_core():
         unaries = np.dstack((unaries_hypo.reshape(-1, 1), unaries_healthy.reshape(-1, 1), unaries_hyper.reshape(-1, 1)))
         unaries = unaries.astype(np.int32)
 
+        # slice = 17
+        # # slice = 6
+        # plt.figure()
+        # plt.imshow(unaries_hypo.reshape(data.shape)[slice,:,:], 'gray')
+        # while True:
+        #     pt = plt.ginput(1)
+        #     print pt[0][1], pt[0][0], ' - ',
+        #     print 'hypo = ', unaries_hypo.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print 'heal = ', unaries_healthy.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print 'hyper = ', unaries_hyper.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print ', int = ', data[slice, int(pt[0][1]), int(pt[0][0])]
+        #
+        # plt.figure()
+        # plt.subplot(221), plt.imshow(unaries_hypo.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.subplot(222), plt.imshow(unaries_hyper.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.subplot(223), plt.imshow(unaries_healthy.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.show()
+
+        # self.params['show_unaries'] = True
         if self.params['show_unaries']:
             ints = data[np.nonzero(mask)]
             hist, bins = skiexp.histogram(ints, nbins=256)
@@ -326,13 +345,14 @@ class Computational_core():
             plt.title('histogram of input data')
             plt.subplot(212)
             plt.plot(x, hypo, 'm')
+            plt.hold(True)
             plt.plot(x, healthy, 'g')
             plt.plot(x, hyper, 'r')
             ax = plt.axis()
             plt.axis([0, 256, ax[2], ax[3]])
             plt.title('histogram of input data')
             plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
-            # plt.show()
+            plt.show()
 
         return unaries
 

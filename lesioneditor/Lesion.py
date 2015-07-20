@@ -1,6 +1,7 @@
 __author__ = 'tomas'
 
 import numpy as np
+import tools
 
 class Lesion(object):
     """ This class represents lesions. """
@@ -41,6 +42,8 @@ class Lesion(object):
         self.area = mask.sum()
 
         s, r, c = np.nonzero(mask)
+
+        self.compactness = tools.get_zunics_compatness(mask)
 
         self.center = (s.mean(), r.mean(), c.mean())
 

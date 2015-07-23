@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI.ui'
 #
-# Created: Tue Jul 14 00:00:52 2015
+# Created: Tue Jul 21 10:46:54 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -933,6 +933,7 @@ class Ui_MainWindow(object):
         self.show_im_L_BTN.setObjectName(_fromUtf8("show_im_L_BTN"))
         self.horizontalLayout_12.addWidget(self.show_im_L_BTN)
         self.show_labels_L_BTN = QtGui.QPushButton(self.left_view_btns_F)
+        self.show_labels_L_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -948,6 +949,7 @@ class Ui_MainWindow(object):
         self.show_labels_L_BTN.setObjectName(_fromUtf8("show_labels_L_BTN"))
         self.horizontalLayout_12.addWidget(self.show_labels_L_BTN)
         self.show_contours_L_BTN = QtGui.QPushButton(self.left_view_btns_F)
+        self.show_contours_L_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

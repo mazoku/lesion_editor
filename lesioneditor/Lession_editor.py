@@ -49,6 +49,11 @@ import Computational_core
 
 import data_view_widget
 
+# constants definition
+SHOW_IM = 0
+SHOW_LABELS = 1
+SHOW_CONTOURS = 2
+
 class Lession_editor(QtGui.QMainWindow):
     """Main class of the programm."""
 
@@ -70,6 +75,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.disp_smoothed = disp_smoothed
         # self.view_L_curr_idx = 0
         # self.view_R_curr_idx = 0
+
+        self.show_mode_L = SHOW_IM
+        self.show_mode_R = SHOW_IM
 
         # load parameters
         self.params = self.load_parameters()
@@ -696,8 +704,6 @@ class Lession_editor(QtGui.QMainWindow):
                 return
 
     def slider_C_changed(self, val):
-        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (val + 1, self.data_L.n_slices))
-
         if val == self.actual_slice_L:
             return
 
@@ -718,24 +724,24 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.setValue(self.actual_slice_L)
         self.ui.slice_R_SB.setValue(self.actual_slice_R)
 
-        if self.cc.actual_data.labels_filt is not None:
-            # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
-            # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
-            self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
-            self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
+        im_L = self.get_image('L')
+        im_R = self.get_image('R')
+        if self.show_mode_L == SHOW_CONTOURS:
+            labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
         else:
-            # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-            # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
-            self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :])
-            self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :])
-            pass
+            labels_L = None
+        if self.show_mode_R == SHOW_CONTOURS:
+            labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
+        else:
+            labels_R = None
 
-        # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-        # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
+        self.view_L.setSlice(im_L, contours=labels_L)
+        self.view_R.setSlice(im_R, contours=labels_R)
+
+        self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
+        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
 
     def slider_L_changed(self, val):
-        self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
-
         if val == self.actual_slice_L:
             return
 
@@ -746,8 +752,16 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_C_SB.setValue(self.actual_slice_L)
 
-        # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-        self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :])
+        im_L = self.get_image('L')
+        if self.show_mode_L == SHOW_CONTOURS:
+            labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
+        else:
+            labels_L = None
+
+        self.view_L.setSlice(im_L, contours=labels_L)
+
+        self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
+        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
 
     def slider_R_changed(self, val):
         if (val >= 0) and (val < self.data_R.n_slices):
@@ -757,8 +771,13 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_number_R_LBL.setText('%i/%i' % (self.actual_slice_R + 1, self.data_R.n_slices))
 
-        # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
-        self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :])
+        im_R = self.get_image('R')
+        if self.show_mode_R == SHOW_CONTOURS:
+            labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
+        else:
+            labels_R = None
+
+        self.view_R.setSlice(im_R, contours=labels_R)
 
     def calculate_models_callback(self):
         self.statusBar().showMessage('Calculating intensity models...')
@@ -815,6 +834,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.max_area_SL.setMinimum(min(areas))
         self.ui.max_area_SL.setValue(max(areas))
 
+        self.ui.show_labels_L_BTN.setEnabled(True)
+        self.ui.show_contours_L_BTN.setEnabled(True)
+
         # self.cc.areas = np.array([10, 20, 30, 8])
         # self.cc.comps = np.array([51, 60, 70, 80])
         # self.cc.objects = np.array([[0,0,-1,3,3],[0,-1,-1,3,3],[-1,-1,-1,-1,-1],[1,1,-1,-1,2],[1,-1,-1,2,2]])
@@ -847,9 +869,15 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_L.setVisible(self.show_view_L)
 
         # enabling and disabling other toolbar icons
-        self.ui.show_im_L_BTN.setEnabled(not self.ui.show_im_L_BTN.isEnabled())
-        self.ui.show_labels_L_BTN.setEnabled(not self.ui.show_labels_L_BTN.isEnabled())
-        self.ui.show_contours_L_BTN.setEnabled(not self.ui.show_contours_L_BTN.isEnabled())
+        self.ui.show_im_L_BTN.setEnabled(self.show_view_L)
+
+        if self.show_view_L and self.data_L.labels is not None:
+            self.ui.show_labels_L_BTN.setEnabled(True)
+            self.ui.show_contours_L_BTN.setEnabled(True)
+        else:
+            self.ui.show_labels_L_BTN.setEnabled(False)
+            self.ui.show_contours_L_BTN.setEnabled(False)
+
 
         self.statusBar().showMessage('Left view set to %s' % self.show_view_L)
         # print 'view_1 set to', self.show_view_1
@@ -873,98 +901,103 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_R.update()
 
     def show_im_L_callback(self):
-        self.data_L.display_im()
-        self.data_L.display_im_L()
+        self.show_mode_L = SHOW_IM
         self.view_L.show_mode = self.view_L.SHOW_IM
-        # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-        self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :])
+
+        im = self.get_image('L')
+        self.view_L.setSlice(im)
+
         self.statusBar().showMessage('data_L set to im')
 
     def show_im_R_callback(self):
-        self.data_R.display_im()
-        self.data_R.display_im_R()
+        self.show_mode_R = SHOW_IM
         self.view_R.show_mode = self.view_R.SHOW_IM
-        # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
-        self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :])
+
+        im = self.get_image('R')
+        self.view_R.setSlice(im)
+
         self.statusBar().showMessage('data_R set to im')
 
     def show_labels_L_callback(self):
-        self.data_L.display_labels()
-        self.data_L.display_labels_L()
+        self.show_mode_L = SHOW_LABELS
         self.view_L.show_mode = self.view_L.SHOW_LABELS
-        # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :])
-        self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :])
+
+        im = self.get_image('L')
+        self.view_L.setSlice(im)
+
         self.statusBar().showMessage('data_L set to labels')
 
     def show_labels_R_callback(self):
-        self.data_R.display_labels()
-        self.data_R.display_labels_R()
+        self.show_mode_R = SHOW_LABELS
         self.view_R.show_mode = self.view_R.SHOW_LABELS
-        # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :])
-        self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :])
+
+        im = self.get_image('R')
+        self.view_R.setSlice(im)
+
         self.statusBar().showMessage('data_R set to labels')
 
     def show_contours_L_callback(self):
-        self.data_L.display_im()
-        self.data_L.display_im_L()
+        self.show_mode_L = SHOW_CONTOURS
         self.view_L.show_mode = self.view_L.SHOW_CONTOURS
-        # self.view_L.setSlice(self.data_L.data_vis[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
-        self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_L, :, :])
+
+        im = self.get_image('L')
+        labels = self.data_L.labels_filt[self.actual_slice_L, :, :]
+        self.view_L.setSlice(im, contours=labels)
+
         self.statusBar().showMessage('data_L set to contours')
 
     def show_contours_R_callback(self):
-        self.data_R.display_im()
-        self.data_R.display_im_R()
+        self.show_mode_R = SHOW_CONTOURS
         self.view_R.show_mode = self.view_R.SHOW_CONTOURS
-        # self.view_R.setSlice(self.data_R.data_vis[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
-        self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R, :, :], contours=self.cc.actual_data.labels_filt[self.actual_slice_R, :, :])
+
+        im = self.get_image('R')
+        labels = self.data_R.labels_filt[self.actual_slice_R, :, :]
+        self.view_R.setSlice(im, contours=labels)
+
         self.statusBar().showMessage('data_R set to contours')
 
     def figure_L_CB_callback(self):
         if self.ui.figure_L_CB.currentIndex() == 0:
             self.data_L = self.cc.data_1
-            # self.ui.slice_1_SB.setMaximum(self.cc.data_1.n_slices)
         elif self.ui.figure_L_CB.currentIndex() == 1:
             self.data_L = self.cc.data_2
 
         if self.actual_slice_L >= self.data_L.n_slices:
             self.actual_slice_L = self.data_L.n_slices - 1
-            # self.slice_change(self.actual_slice_L)
 
         self.ui.slice_L_SB.setMaximum(self.data_L.n_slices - 1)
         self.ui.slice_C_SB.setMaximum(self.data_L.n_slices - 1)
 
+        if self.data_L.labels is None:
+            self.ui.show_labels_L_BTN.setEnabled(False)
+            self.ui.show_contours_L_BTN.setEnabled(False)
+        else:
+            self.ui.show_labels_L_BTN.setEnabled(True)
+            self.ui.show_contours_L_BTN.setEnabled(True)
+
         self.view_L.reinit(self.data_L.shape[1:])
-        # self.view_L.setSlice(self.data_L.data[self.actual_slice_L,:,:])
-        # self.show_im_L_callback()
-        self.data_L.display_im_L()
-        self.data_L.display_im_R()
-        self.view_L.setSlice(self.data_L.data_vis_L[self.actual_slice_L,:,:])
+        self.show_im_L_callback()
 
     def figure_R_CB_callback(self):
         if self.ui.figure_R_CB.currentIndex() == 0:
             self.data_R = self.cc.data_1
-            # self.ui.slice_2_SB.setMaximum(self.cc.data_1.n_slices)
         elif self.ui.figure_R_CB.currentIndex() == 1:
             self.data_R = self.cc.data_2
-            # self.ui.slice_1_SB.setMaximum(self.cc.data_2.n_slices)
 
         if self.actual_slice_R >= self.data_R.n_slices:
             self.actual_slice_R = self.data_R.n_slices - 1
-            # self.slice_change(self.actual_slice_R)
 
         self.ui.slice_R_SB.setMaximum(self.data_R.n_slices - 1)
-        # self.ui.slice_scrollB.setMaximum(self.data_R.n_slices - 1)
 
-        # self.form_widget.update_figures()
-        # self.view_R.updateSlice()
-        # self.create_view_R()
+        if self.data_R.labels is None:
+            self.ui.show_labels_R_BTN.setEnabled(False)
+            self.ui.show_contours_R_BTN.setEnabled(False)
+        else:
+            self.ui.show_labels_R_BTN.setEnabled(True)
+            self.ui.show_contours_R_BTN.setEnabled(True)
+
         self.view_R.reinit(self.data_R.shape[1:])
-        # self.view_R.setSlice(self.data_R.data[self.actual_slice_R,:,:])
-        # self.show_im_R_callback()
-        self.data_R.display_im_R()
-        self.data_R.display_im_L()
-        self.view_R.setSlice(self.data_R.data_vis_R[self.actual_slice_R,:,:])
+        self.show_im_R_callback()
 
     def action_Load_serie_callback(self, serie_number):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir'])
@@ -998,6 +1031,20 @@ class Lession_editor(QtGui.QMainWindow):
         self.cc.actual_data.lesions.remove(obj)
         print 'removed label', lbl
 
+    def get_image(self, site):
+        im = None
+        if site == 'L':
+            if self.show_mode_L == SHOW_IM or self.show_mode_L == SHOW_CONTOURS:
+                im = self.data_L.data[self.actual_slice_L, :, :]
+            elif self.show_mode_L == SHOW_LABELS:
+                im = self.data_L.labels[self.actual_slice_L, :, :]
+        elif site == 'R':
+            if self.show_mode_R == SHOW_IM or self.show_mode_R == SHOW_CONTOURS:
+                im = self.data_R.data[self.actual_slice_R, :, :]
+            elif self.show_mode_R == SHOW_LABELS:
+                im = self.data_R.labels[self.actual_slice_R, :, :]
+        return im
+
     def run(self, im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):
         if slice_axis == 0:
             im = np.transpose(im, (1, 2, 0))
@@ -1020,7 +1067,7 @@ if __name__ == '__main__':
     # venous 0.6mm - good
     # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
     # venous 5mm - ok, but wrong approach
-    # TODO: study ID 29 - 3/3, pouze 2 velke spoji v jeden
+    # TODO: study ID 29 - 3/3, 2 velke spoji v jeden
     # slice = 17
     fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
     fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz')

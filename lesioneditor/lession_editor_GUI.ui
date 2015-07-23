@@ -1684,6 +1684,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="show_labels_L_BTN">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1719,6 +1722,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="show_contours_L_BTN">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>

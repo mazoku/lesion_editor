@@ -28,9 +28,9 @@ class Data:
 
         self.lesions = None  # list of lesions, set it with Lesions.extract_lesions(self.labels)
 
-        self.data_vis = self.data  # visualized data, can be image data (data) or labels
-        self.data_vis_L = self.data  # visualized data, can be image data (data) or labels
-        self.data_vis_R = self.data
+        # self.data_vis = self.data  # visualized data, can be image data (data) or labels
+        # self.data_vis_L = self.data  # visualized data, can be image data (data) or labels
+        # self.data_vis_R = self.data
 
         self.filename = filename
         self.loaded = False
@@ -71,36 +71,36 @@ class Data:
         self.orig_shape = self.data.shape
         self.shape = self.data.shape
         self.n_slices, self.n_rows, self.n_cols = self.orig_shape
-        self.labels = np.zeros(self.orig_shape)
+        # self.labels = np.zeros(self.orig_shape)
 
         self.loaded = True
 
-    def display_im(self):
-        self.data_vis = self.data
-
-    def display_labels(self):
-        # self.data_vis = self.labels
-        self.data_vis = self.labels_filt
-
-    def display_contours(self):
-        self.data_vis = self.data
-
-    def display_im_L(self):
-        self.data_vis_L = self.data
-
-    def display_labels_L(self):
-        # self.data_vis = self.labels
-        self.data_vis_L = self.labels_filt
-
-    def display_contours_L(self):
-        self.data_vis_L = self.data
-
-    def display_im_R(self):
-        self.data_vis_R = self.data
-
-    def display_labels_R(self):
-        # self.data_vis = self.labels
-        self.data_vis_R = self.labels_filt
-
-    def display_contours_R(self):
-        self.data_vis_R = self.data
+    # def display_im(self):
+    #     self.data_vis = self.data
+    #
+    # def display_labels(self):
+    #     # self.data_vis = self.labels
+    #     self.data_vis = self.labels_filt
+    #
+    # def display_contours(self):
+    #     self.data_vis = self.data
+    #
+    # def display_im_L(self):
+    #     self.data_vis_L = self.data
+    #
+    # def display_labels_L(self):
+    #     # self.data_vis = self.labels
+    #     self.data_vis_L = self.labels_filt
+    #
+    # def display_contours_L(self):
+    #     self.data_vis_L = self.data
+    #
+    # def display_im_R(self):
+    #     self.data_vis_R = self.data
+    #
+    # def display_labels_R(self):
+    #     # self.data_vis = self.labels
+    #     self.data_vis_R = self.labels_filt
+    #
+    # def display_contours_R(self):
+    #     self.data_vis_R = self.data

@@ -15,7 +15,6 @@
 - Table
     - filtrace se spousti 2x, jednou po updatu uzivatelem a jednou jak je zretezen slider s line editem
     - callback remove - odstraneni objektu
-    - pri kliknuti na objekt zobrazit ve figure (zmenit self.actual_slice)
     - pri kliknuti do figure zobrazit v tabulce
 
 - mel bych si ukladat rescalovana data, aby se mi pri opakovanem spousteni vypoctu dale nezmensovala
@@ -27,12 +26,6 @@
 
 
 duben  -------------------------
-- predelat Form_widget ala QTSeedEditor
-
 - pocitat z eroze, ale pote dorustat do neerodovane
 - ppst
     - tlacitko a nejaky chooser pro tridu (health, hypo, hyper)
-- scrollbary
-    - upravit callback na central SB (dve serie = ruzny pocet rezu)
-    - horni hranice slideru jsou nejake divne
-        - zkontrolovat scroll - zrejme jde jen kazde druhe otoceni kolecka

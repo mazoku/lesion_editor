@@ -1375,7 +1375,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>min. area [cm^2] =</string>
+                  <string>min. area [ml] =</string>
                  </property>
                 </widget>
                </item>
@@ -1426,7 +1426,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>max. area [cm^2] =</string>
+                  <string>max. area [ml] =</string>
                  </property>
                 </widget>
                </item>

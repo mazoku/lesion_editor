@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI.ui'
 #
-# Created: Tue Jul 21 10:46:54 2015
+# Created: Mon Jul 27 10:23:22 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -1180,8 +1180,8 @@ class Ui_MainWindow(object):
         self.label_17.setText(_translate("MainWindow", "min. compactness [%] =", None))
         self.max_area_LE.setText(_translate("MainWindow", "0", None))
         self.min_area_LE.setText(_translate("MainWindow", "0", None))
-        self.label_15.setText(_translate("MainWindow", "min. area [cm^2] =", None))
-        self.label_16.setText(_translate("MainWindow", "max. area [cm^2] =", None))
+        self.label_15.setText(_translate("MainWindow", "min. area [ml] =", None))
+        self.label_16.setText(_translate("MainWindow", "max. area [ml] =", None))
         self.min_comp_LE.setText(_translate("MainWindow", "0", None))
         self.label_18.setText(_translate("MainWindow", "Compact factor =", None))
         self.comp_fact_LE.setText(_translate("MainWindow", "0", None))

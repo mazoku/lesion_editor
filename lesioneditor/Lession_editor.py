@@ -891,8 +891,13 @@ class Lession_editor(QtGui.QMainWindow):
 
         # enabling and disabling other toolbar icons
         self.ui.show_im_R_BTN.setEnabled(not self.ui.show_im_R_BTN.isEnabled())
-        self.ui.show_labels_R_BTN.setEnabled(not self.ui.show_labels_R_BTN.isEnabled())
-        self.ui.show_contours_R_BTN.setEnabled(not self.ui.show_contours_R_BTN.isEnabled())
+
+        if self.show_view_R and self.data_R.labels is not None:
+            self.ui.show_labels_R_BTN.setEnabled(True)
+            self.ui.show_contours_R_BTN.setEnabled(True)
+        else:
+            self.ui.show_labels_R_BTN.setEnabled(False)
+            self.ui.show_contours_R_BTN.setEnabled(False)
 
         self.statusBar().showMessage('Right view set to %s' % self.show_view_R)
         # print 'view_2 set to', self.show_view_2
@@ -968,12 +973,12 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.setMaximum(self.data_L.n_slices - 1)
         self.ui.slice_C_SB.setMaximum(self.data_L.n_slices - 1)
 
-        if self.data_L.labels is None:
-            self.ui.show_labels_L_BTN.setEnabled(False)
-            self.ui.show_contours_L_BTN.setEnabled(False)
-        else:
+        if (self.data_L.labels is not None) and self.show_view_L:
             self.ui.show_labels_L_BTN.setEnabled(True)
             self.ui.show_contours_L_BTN.setEnabled(True)
+        else:
+            self.ui.show_labels_L_BTN.setEnabled(False)
+            self.ui.show_contours_L_BTN.setEnabled(False)
 
         self.view_L.reinit(self.data_L.shape[1:])
         self.show_im_L_callback()
@@ -989,12 +994,12 @@ class Lession_editor(QtGui.QMainWindow):
 
         self.ui.slice_R_SB.setMaximum(self.data_R.n_slices - 1)
 
-        if self.data_R.labels is None:
-            self.ui.show_labels_R_BTN.setEnabled(False)
-            self.ui.show_contours_R_BTN.setEnabled(False)
-        else:
+        if (self.data_R.labels is not None) and self.show_view_R:
             self.ui.show_labels_R_BTN.setEnabled(True)
             self.ui.show_contours_R_BTN.setEnabled(True)
+        else:
+            self.ui.show_labels_R_BTN.setEnabled(False)
+            self.ui.show_contours_R_BTN.setEnabled(False)
 
         self.view_R.reinit(self.data_R.shape[1:])
         self.show_im_R_callback()
@@ -1116,10 +1121,6 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
 
-# TODO: figure_L_CB, figure_R_CB
-#           - inicializovat R CB podle dat (ted ukazuje venous, ale nactena jsou arterial)
-#           - upravit callbacky
 # TODO: vizualizace kontur
 # TODO: min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
-# TODO: kdyz zapnu na obou view stejna data a chci zobrazit vlevo img a vpravo labely, tak to krachne
 # TODO: kontury 'contours' (obrysy) nefunguji

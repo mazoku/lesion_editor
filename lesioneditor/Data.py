@@ -10,6 +10,11 @@ import pickle
 
 import tools
 
+# definition of different views
+VIEW_TABLE = {'axial': (2,1,0),
+              'sagittal': (1,0,2),
+              'coronal': (2,0,1)}
+
 class Data:
 
     def __init__(self, data=None, mask=None, filename=None):
@@ -38,6 +43,14 @@ class Data:
         self.win_level = 50
         self.win_width = 300
 
+        # seting up views
+        self.actual_view = 'axial'
+        self.act_transposition = VIEW_TABLE[self.actual_view]
+        if self.data is not None:
+            self.data_aview = self.data.transpose(self.act_transposition)
+        else:
+            self.data_aview = None
+
 
     def load_data(self, filename, slice_idx=-1):
         self.filename = filename
@@ -63,13 +76,19 @@ class Data:
         # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
 
         if slice_idx != -1:
-            self.data = self.data[slice_idx, :, :]
-            self.mask = self.mask[slice_idx, :, :]
+            self.data = self.data[:, :, slice_idx]
+            self.mask = self.mask[:, :, slice_idx]
+
+        # data_s = 200 * np.triu(np.ones((100,120), dtype=np.int))
+        # data = np.dstack((data_s, data_s))
+        # self.data = np.rollaxis(data, 2, 0)
+        # self.mask = np.ones_like(self.data)
 
         self.data_vis = self.data
+        self.data_aview = self.data.transpose(self.act_transposition)
 
         self.orig_shape = self.data.shape
-        self.shape = self.data.shape
+        # self.shape = self.data.shape
         self.n_slices, self.n_rows, self.n_cols = self.orig_shape
         # self.labels = np.zeros(self.orig_shape)
 

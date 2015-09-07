@@ -4,12 +4,17 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from PyQt4.QtCore import Qt, QSize, QString, SIGNAL
+from PyQt4.QtCore import Qt, QSize, QString, SIGNAL, QPoint
 from PyQt4.QtGui import QImage, QDialog,\
     QApplication, QSlider, QPushButton,\
     QLabel, QPixmap, QPainter, qRgba,\
     QComboBox, QIcon, QStatusBar,\
-    QHBoxLayout, QVBoxLayout, QFrame, QSizePolicy
+    QHBoxLayout, QVBoxLayout, QFrame, QSizePolicy,\
+    QPen
+
+import skimage.morphology as skimor
+
+import area_hist_widget as ahw
 
 
 # BGRA order
@@ -33,10 +38,6 @@ CONTOURS_COLORS = {
     # 12: [0, 255, 255],
     # 13: [0, 0, 255],
 }
-
-# VIEW_TABLE = {'axial': (2,1,0),
-#               'sagittal': (1,0,2),
-#               'coronal': (2,0,1)}
 
 # VIEW_TABLE = {'axial': (1,0),
 #               'sagittal': (1,0,2),
@@ -73,23 +74,36 @@ def erase_reg(arr, p, val=0):
 
 class SliceBox(QLabel):
 
+    def __init__(self, sliceSize, voxel_size, mode='seeds'):
     # def __init__(self, sliceSize, grid, mode='seeds'):
-    def __init__(self, sliceSize, mode='seeds'):
+    # def __init__(self, sliceSize, mode='seeds'):
 
         QLabel.__init__(self)
+
+        height = 600
+        vscale = voxel_size / float(np.min(voxel_size))
+        grid = height / float(sliceSize[1] * vscale[1])
+        grid = (grid * vscale[0], grid * vscale[1])
 
         # self.drawing = False
         # self.modified = False
         # self.last_position = None
-        # self.imagesize = QSize(int(sliceSize[0] * grid[0]),
-        #                        int(sliceSize[1] * grid[1]))
+        self.imagesize = QSize(int(sliceSize[0] * grid[0]),
+                               int(sliceSize[1] * grid[1]))
+
+        # self.setMouseTracking(True)
+        self.mouse_cursor = [0, 0]
+        self.mouse_glob = [0, 0]
+        self.circle_r = 1
+        self.circle_strel = np.nonzero(skimor.disk(self.circle_r))
+        self.circle_m = self.circle_strel
 
         self.SHOW_IM = 0  # flag for showing density data
         self.SHOW_LABELS = 1  # flag for showing labels
         self.SHOW_CONTOURS = 2  # flag for showing contours
 
-        self.imagesize = QSize(sliceSize[0], sliceSize[1])
-        # self.grid = grid
+        # self.imagesize = QSize(sliceSize[0], sliceSize[1])
+        self.grid = grid
         self.slice_size = sliceSize
         self.ctslice_rgba = None
         self.cw = {'c': 1.0, 'w': 1.0}
@@ -113,10 +127,16 @@ class SliceBox(QLabel):
 
         self.actual_view = 'axial'
         # self.act_transposition = VIEW_TABLE[self.actual_view]
-        self.act_transposition = (1,0)
+
+        self.circle_active = False
+        self.ruler_active = False
+
+        # self.area_hist_widget = ahw.AreaHistWidget()
+        # self.area_hist_widget.setEnabled(False)
+        # self.area_hist_widget.show()
 
     def reinit(self, sliceSize):
-        self.imagesize = QSize(sliceSize[0], sliceSize[1])
+        self.imagesize = QSize(sliceSize[1], sliceSize[0])
         self.slice_size = sliceSize
         self.ctslice_rgba = None
 
@@ -149,7 +169,7 @@ class SliceBox(QLabel):
     #
     #     self.image = QImage(self.imagesize, QImage.Format_RGB32)
     #     self.setPixmap(QPixmap.fromImage(self.image))
-    #     self.setScaledContents(True)
+        self.setScaledContents(True)
 
     def setContours(self, contours):
         self.contours = contours
@@ -256,11 +276,23 @@ class SliceBox(QLabel):
             elif self.contour_mode == 'contours':
                 self.get_contours(img, self.contours)
 
+        # masking out pixels under circle
+        # for i in self.circle_m:
+        #     img[i, :] = [0, 0, 255, 255]
+
         image = QImage(img.flatten(),
-                     self.slice_size[1], self.slice_size[0],
+                     self.slice_size[0], self.slice_size[1],
                      QImage.Format_ARGB32).scaled(self.imagesize)
         painter = QPainter(self.image)
         painter.drawImage(0, 0, image)
+
+        if self.circle_active:
+            pen = QPen(Qt.red, 3)
+            painter.setPen(pen)
+            center_offset = 0 #0.5
+            radius_offset = 0 #0.5
+            painter.drawEllipse(QPoint((self.mouse_cursor[0] + center_offset) * self.grid[0], (self.mouse_cursor[1] + center_offset) * self.grid[1]),
+                                (self.circle_r + radius_offset) * self.grid[0], (self.circle_r + radius_offset) * self.grid[1])
         painter.end()
 
         self.update()
@@ -288,7 +320,9 @@ class SliceBox(QLabel):
         self.updateSlice()
 
     def setSlice(self, ctslice=None, seeds=None, contours=None):
-        ctslice = np.transpose(ctslice)
+        # ctslice = 200 * np.triu(np.ones(ctslice.shape, dtype=int))
+        self.ctslice = ctslice
+        # ctslice = np.transpose(ctslice)
         if ctslice is not None:
             if self.show_mode in (self.SHOW_IM, self.SHOW_CONTOURS):
                 # tmp = self.getSliceRGBA(ctslice)
@@ -310,9 +344,9 @@ class SliceBox(QLabel):
         self.updateSlice()
 
     def gridPosition(self, pos):
-        # return (int(pos.x() / self.grid[0]),
-        #         int(pos.y() / self.grid[1]))
-        return (int(pos.x()), int(pos.y()))
+        return (int(pos.x() / self.grid[0]),
+                int(pos.y() / self.grid[1]))
+        # return (int(pos.x()), int(pos.y()))
 
     def resizeSlice(self, new_slice_size=None, new_grid=None, new_image_size=None):
 
@@ -325,27 +359,35 @@ class SliceBox(QLabel):
         if new_image_size is not None:
             self.imagesize = new_image_size
         else:
-            # self.imagesize = QSize(int(self.slice_size[0] * self.grid[0]),
-            #                        int(self.slice_size[1] * self.grid[1]))
-            self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
+            self.imagesize = QSize(int(self.slice_size[0] * self.grid[0]),
+                                   int(self.slice_size[1] * self.grid[1]))
+            # self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
         self.image = QImage(self.imagesize, QImage.Format_RGB32)
-        # self.setPixmap(QPixmap.fromImage(self.image))
-        # self.setPixmap(self._pixmap.scaled(QPixmap.fromImage(self.image), Qt.KeepAspectRatio)
+        self.setPixmap(QPixmap.fromImage(self.image))
 
     def resizeEvent(self, event):
-        # new_height = self.height()
-        # new_grid = new_height / float(self.slice_size[1])
-        # mul = new_grid / self.grid[1]
-        #
-        # self.grid = np.array(self.grid) * mul
+        new_height = self.height()
+        new_grid_height = new_height / float(self.slice_size[1])
+        mul_height = new_grid_height / self.grid[1]
+
+        new_width = self.width()
+        new_grid_width = new_width / float(self.slice_size[0])
+        mul_width = new_grid_width / self.grid[0]
+
+
+        # self.grid = np.array(self.grid) * mul_height
+        self.grid =  np.array(self.grid)
+        self.grid[0] *= mul_width
+        self.grid[1] *= mul_height
+
         self.resizeSlice()
         self.updateSlice()
 
     def set_width(self, new_width):
-        # new_grid = new_width / float(self.slice_size[0])
-        # mul = new_grid / self.grid[0]
+        new_grid = new_width / float(self.slice_size[0])
+        mul = new_grid / self.grid[0]
 
-        # self.grid = np.array(self.grid) * mul
+        self.grid = np.array(self.grid) * mul
         self.resizeSlice()
         self.updateSlice()
 
@@ -359,12 +401,48 @@ class SliceBox(QLabel):
         self.scroll_fun = fun
 
     def wheelEvent(self, event):
+        step = 4
         d = event.delta()
         nd = d / abs(d)
-        if self.scroll_fun is not None:
-            self.scroll_fun(-nd)
+        self.circle_r += step * nd
+        self.circle_r = max(self.circle_r, 1)
+        self.circle_strel = np.nonzero(skimor.disk(self.circle_r))
+        self.updateSlice()
+        # if self.scroll_fun is not None:
+        #     self.scroll_fun(-nd)
 
+    def mouseMoveEvent(self, QMouseEvent):
+        center = list(self.gridPosition(QMouseEvent.pos()))
+        self.mouse_cursor = center
+        # print self.mouse_cursor, QMouseEvent.x()/self.grid[0], QMouseEvent.y()/self.grid[1]
 
+        circle_x = (self.circle_strel[1] + center[0] - self.circle_r).astype(np.int)
+        circle_y = (self.circle_strel[0] + center[1] - self.circle_r).astype(np.int)
+
+        idx_x = (circle_x >= 0) * (circle_x < self.slice_size[0])
+        idx_y = (circle_y >= 0) * (circle_y < self.slice_size[1])
+        idx = idx_x * idx_y
+        circle_x = circle_x[np.nonzero(idx)]
+        circle_y = circle_y[np.nonzero(idx)]
+
+        print self.mouse_cursor
+        # print circle_x
+        # print circle_y
+
+        self.circle_m = np.ravel_multi_index((circle_y, circle_x), self.slice_size[::-1])
+
+        self.circle_area_data = self.ctslice[(circle_x, circle_y)]
+        self.area_hist_widget.set_data(self.circle_area_data)
+
+        # print 'data: ', self.circle_area_data
+
+        # print self.ctslice[np.unravel_index(self.circle_m, self.slice_size)]
+        # for i in range(len(circle_x)):
+        #     print self.ctslice[circle_y[i], circle_x[i]],
+        # print ''
+        # print self.ctslice[np.unravel_index(circle_y, circle_x]
+
+        self.updateSlice()
     # def selectSlice(self, value, force=False):
     #     if (value < 0) or (value >= self.n_slices):
     #         return

@@ -28,7 +28,11 @@ class AreaHistWidget(QFrame):
         self.init_UI_form()
 
     def set_data(self, data):
+        if data is None:
+            return
+
         self.data = data
+
         self.hist, self.bins = skiexp.histogram(self.data, nbins=256)
         self.update_figures()
 

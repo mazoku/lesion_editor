@@ -90,6 +90,7 @@ class Data:
         self.orig_shape = self.data.shape
         # self.shape = self.data.shape
         self.n_slices, self.n_rows, self.n_cols = self.orig_shape
+        self.shape = self.data.shape
         # self.labels = np.zeros(self.orig_shape)
 
         self.loaded = True

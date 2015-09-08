@@ -1,8 +1,9 @@
 __author__ = 'tomas'
 
 import numpy as np
-
 import matplotlib.pyplot as plt
+
+import sys
 
 from PyQt4.QtCore import Qt, QSize, QString, SIGNAL, QPoint
 from PyQt4.QtGui import QImage, QDialog,\
@@ -10,9 +11,10 @@ from PyQt4.QtGui import QImage, QDialog,\
     QLabel, QPixmap, QPainter, qRgba,\
     QComboBox, QIcon, QStatusBar,\
     QHBoxLayout, QVBoxLayout, QFrame, QSizePolicy,\
-    QPen
+    QPen, QMainWindow, QWidget
 
 import skimage.morphology as skimor
+import skimage.io as skiio
 
 import area_hist_widget as ahw
 
@@ -104,6 +106,7 @@ class SliceBox(QLabel):
 
         # self.imagesize = QSize(sliceSize[0], sliceSize[1])
         self.grid = grid
+        self.grid_res = np.copy(grid)
         self.slice_size = sliceSize
         self.ctslice_rgba = None
         self.cw = {'c': 1.0, 'w': 1.0}
@@ -131,12 +134,17 @@ class SliceBox(QLabel):
         self.circle_active = False
         self.ruler_active = False
 
+        self.area_hist_widget = None
+
+        self.setScaledContents(True)
+
         # self.area_hist_widget = ahw.AreaHistWidget()
         # self.area_hist_widget.setEnabled(False)
         # self.area_hist_widget.show()
 
     def reinit(self, sliceSize):
-        self.imagesize = QSize(sliceSize[1], sliceSize[0])
+        self.imagesize = QSize(int(sliceSize[0] * self.grid[0]),
+                               int(sliceSize[1] * self.grid[1]))
         self.slice_size = sliceSize
         self.ctslice_rgba = None
 
@@ -344,8 +352,10 @@ class SliceBox(QLabel):
         self.updateSlice()
 
     def gridPosition(self, pos):
-        return (int(pos.x() / self.grid[0]),
-                int(pos.y() / self.grid[1]))
+        # return (int(pos.x() / self.grid[0]),
+        #         int(pos.y() / self.grid[1]))
+        return (int(pos.x() / self.grid_res[0]),
+                int(pos.y() / self.grid_res[1]))
         # return (int(pos.x()), int(pos.y()))
 
     def resizeSlice(self, new_slice_size=None, new_grid=None, new_image_size=None):
@@ -362,23 +372,28 @@ class SliceBox(QLabel):
             self.imagesize = QSize(int(self.slice_size[0] * self.grid[0]),
                                    int(self.slice_size[1] * self.grid[1]))
             # self.imagesize = QSize(self.slice_size[0], self.slice_size[1])
-        self.image = QImage(self.imagesize, QImage.Format_RGB32)
+        # self.image = QImage(self.imagesize, QImage.Format_RGB32)
+        # pixmap = QPixmap.fromImage(self.image).scaled(self.size(), Qt.KeepAspectRatio)
+        # self.setPixmap(pixmap)
         self.setPixmap(QPixmap.fromImage(self.image))
 
     def resizeEvent(self, event):
         new_height = self.height()
         new_grid_height = new_height / float(self.slice_size[1])
         mul_height = new_grid_height / self.grid[1]
+        # mul_width = mul_height
 
         new_width = self.width()
         new_grid_width = new_width / float(self.slice_size[0])
         mul_width = new_grid_width / self.grid[0]
 
-
         # self.grid = np.array(self.grid) * mul_height
-        self.grid =  np.array(self.grid)
-        self.grid[0] *= mul_width
-        self.grid[1] *= mul_height
+        # self.grid =  np.array(self.grid)
+        # self.grid[0] *= mul_width
+        # self.grid[1] *= mul_height
+        self.grid_res[0] = self.grid[0] * mul_width
+        self.grid_res[1] = self.grid[1] * mul_height
+        # print self.grid, self.grid_res
 
         self.resizeSlice()
         self.updateSlice()
@@ -425,14 +440,14 @@ class SliceBox(QLabel):
         circle_x = circle_x[np.nonzero(idx)]
         circle_y = circle_y[np.nonzero(idx)]
 
-        print self.mouse_cursor
         # print circle_x
         # print circle_y
 
         self.circle_m = np.ravel_multi_index((circle_y, circle_x), self.slice_size[::-1])
 
-        self.circle_area_data = self.ctslice[(circle_x, circle_y)]
-        self.area_hist_widget.set_data(self.circle_area_data)
+        if self.area_hist_widget is not None:
+            self.circle_area_data = self.ctslice[(circle_x, circle_y)]
+            self.area_hist_widget.set_data(self.circle_area_data)
 
         # print 'data: ', self.circle_area_data
 
@@ -470,3 +485,35 @@ class SliceBox(QLabel):
     #                             self.seeds_aview[...,value],
     #                             contours)
     #     self.actual_slice = value
+
+if __name__ == '__main__':
+    from lession_editor_GUI_slim2 import Ui_MainWindow
+
+    class Window(QMainWindow):
+        def __init__(self, img, parent=None):
+            QWidget.__init__(self, parent)
+
+            v_size = np.array([1, 1, 1])
+
+            viewer = SliceBox(img.shape, v_size)
+            viewer.setCW(0, 'c')
+            viewer.setCW(1, 'w')
+            viewer.setSlice(img)
+            viewer.circle_active = True
+            viewer.setMouseTracking(True)
+
+            layout = QHBoxLayout()
+            layout.addWidget(viewer)
+
+            ui = Ui_MainWindow()
+            ui.setupUi(self)
+            ui.viewer_F.setLayout(layout)
+
+    app = QApplication(sys.argv)
+
+    img = skiio.imread('/home/tomas/Dropbox/images/puma.png', as_grey=True)
+    img = img.transpose()
+    win = Window(img)
+    win.show()
+
+    sys.exit(app.exec_())

@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig()
 
 
-from lession_editor_GUI import Ui_MainWindow
+from lession_editor_GUI_slim import Ui_MainWindow
 import Form_widget
 import hist_widget_old
 import My_table_model as mtm
@@ -104,53 +104,56 @@ class Lession_editor(QtGui.QMainWindow):
         # computational core
         self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
         if self.cc.data_1.loaded:
-            self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            # self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
+            # self.ui.figure_L_CB.addItem(self.cc.data_1.filename.split('/')[-1])
+            # self.ui.figure_R_CB.addItem(self.cc.data_1.filename.split('/')[-1])
             self.data_L = self.cc.data_1
             if not self.cc.data_2.loaded:
                 self.data_R = self.cc.data_1
         if self.cc.data_2.loaded:
-            self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.cc.data_2.filename.split('/')[-1])
+            # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
+            # self.ui.figure_L_CB.addItem(self.cc.data_2.filename.split('/')[-1])
+            # self.ui.figure_R_CB.addItem(self.cc.data_2.filename.split('/')[-1])
             self.data_R = self.cc.data_2
-            self.ui.figure_R_CB.setCurrentIndex(1)
+            # self.ui.figure_R_CB.setCurrentIndex(1)
             if not self.cc.data_1.loaded:
                 self.data_L = self.cc.data_2
 
         # radio buttons
-        self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
-        self.ui.serie_2_RB.clicked.connect(self.serie_2_RB_callback)
-        if self.ui.serie_1_RB.isChecked():
-            self.cc.active_serie = 1
-        else:
-            self.cc.active_serie = 2
+        # self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
+        # self.ui.serie_2_RB.clicked.connect(self.serie_2_RB_callback)
+        # if self.ui.serie_1_RB.isChecked():
+        #     self.cc.active_serie = 1
+        # else:
+        #     self.cc.active_serie = 2
+        self.cc.active_serie = 1
 
         self.ui.action_Load_serie_1.triggered.connect(lambda: self.action_Load_serie_callback(1))
         self.ui.action_Load_serie_2.triggered.connect(lambda: self.action_Load_serie_callback(2))
+
+        self.ui.actionCircle.triggered.connect(self.actionCircle_callback)
 
         # self.n_slices = self.data.shape[0]
         # self.n_slices = self.cc.data_1.n_slices
 
         # seting up the callback for the test button --------------------------------------
-        self.ui.test_BTN.clicked.connect(self.test_callback)
+        # self.ui.test_BTN.clicked.connect(self.test_callback)
         #----------------------------------------------------------------------------------
 
         # seting up the range of the scrollbar to cope with the number of slices
-        if self.cc.active_serie == 1:
-            self.ui.slice_C_SB.setMaximum(self.cc.data_1.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.cc.data_1.n_slices - 1)
-        else:
-            self.ui.slice_C_SB.setMaximum(self.cc.data_2.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.cc.data_2.n_slices - 1)
-
-        if self.cc.data_2.loaded:
-            self.ui.slice_R_SB.setMaximum(self.cc.data_2.n_slices - 1)
+        # if self.cc.active_serie == 1:
+        #     self.ui.slice_C_SB.setMaximum(self.cc.data_1.n_slices - 1)
+        #     self.ui.slice_L_SB.setMaximum(self.cc.data_1.n_slices - 1)
+        # else:
+        #     self.ui.slice_C_SB.setMaximum(self.cc.data_2.n_slices - 1)
+        #     self.ui.slice_L_SB.setMaximum(self.cc.data_2.n_slices - 1)
+        #
+        # if self.cc.data_2.loaded:
+        #     self.ui.slice_R_SB.setMaximum(self.cc.data_2.n_slices - 1)
 
         # combo boxes - for figure views
-        self.ui.figure_L_CB.currentIndexChanged.connect(self.figure_L_CB_callback)
-        self.ui.figure_R_CB.currentIndexChanged.connect(self.figure_R_CB_callback)
+        # self.ui.figure_L_CB.currentIndexChanged.connect(self.figure_L_CB_callback)
+        # self.ui.figure_R_CB.currentIndexChanged.connect(self.figure_R_CB_callback)
 
         # self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:], self.voxel_size)
         self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size)
@@ -158,12 +161,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_L.setCW(self.win_w, 'w')
         # self.view_L.setSlice(self.data_L.data[0,:,:])
         self.view_L.setSlice(self.data_L.data_aview[...,0])
-
-        # # TODO: hack
-        # self.view_L.circle_active = True
-        # self.view_L.setMouseTracking(True)
-        # self.view_L.area_hist_widget = ahw.AreaHistWidget()
-        # self.view_L.area_hist_widget.show()
 
         self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size)
         self.view_R.setCW(self.win_l, 'c')
@@ -189,46 +186,58 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget = hist_widget_old.Hist_widget(self, self.cc)
         hist_viewer_layout = QtGui.QHBoxLayout()
         hist_viewer_layout.addWidget(self.hist_widget)
-        self.ui.histogram_F.setLayout(hist_viewer_layout)
+        # self.ui.histogram_F.setLayout(hist_viewer_layout)
 
         # connecting callbacks ----------------------------------
-        self.ui.view_L_BTN.clicked.connect(self.view_L_callback)
-        self.ui.view_R_BTN.clicked.connect(self.view_R_callback)
-
-        # show image data
-        self.ui.show_im_L_BTN.clicked.connect(self.show_im_L_callback)
-        self.ui.show_im_R_BTN.clicked.connect(self.show_im_R_callback)
-
-        # show label data
-        self.ui.show_labels_L_BTN.clicked.connect(self.show_labels_L_callback)
-        self.ui.show_labels_R_BTN.clicked.connect(self.show_labels_R_callback)
-
-        # show contours data
-        self.ui.show_contours_L_BTN.clicked.connect(self.show_contours_L_callback)
-        self.ui.show_contours_R_BTN.clicked.connect(self.show_contours_R_callback)
+        # self.ui.view_L_BTN.clicked.connect(self.view_L_callback)
+        # self.ui.view_R_BTN.clicked.connect(self.view_R_callback)
+        #
+        # # show image data
+        # self.ui.show_im_L_BTN.clicked.connect(self.show_im_L_callback)
+        # self.ui.show_im_R_BTN.clicked.connect(self.show_im_R_callback)
+        #
+        # # show label data
+        # self.ui.show_labels_L_BTN.clicked.connect(self.show_labels_L_callback)
+        # self.ui.show_labels_R_BTN.clicked.connect(self.show_labels_R_callback)
+        #
+        # # show contours data
+        # self.ui.show_contours_L_BTN.clicked.connect(self.show_contours_L_callback)
+        # self.ui.show_contours_R_BTN.clicked.connect(self.show_contours_R_callback)
 
         # main buttons
-        self.ui.calculate_models_BTN.clicked.connect(self.calculate_models_callback)
-        self.ui.run_BTN.clicked.connect(self.run_callback)
+        # self.ui.calculate_models_BTN.clicked.connect(self.calculate_models_callback)
+        # self.ui.run_BTN.clicked.connect(self.run_callback)
 
         # connecting spin boxes
-        self.ui.hypo_mean_SB.valueChanged.connect(self.hypo_mean_SB_callback)
-        self.ui.hypo_std_SB.valueChanged.connect(self.hypo_std_SB_callback)
-        self.ui.hyper_mean_SB.valueChanged.connect(self.hyper_mean_SB_callback)
-        self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
-        self.ui.heal_mean_SB.valueChanged.connect(self.heal_mean_SB_callback)
-        self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
+        # self.ui.hypo_mean_SB.valueChanged.connect(self.hypo_mean_SB_callback)
+        # self.ui.hypo_std_SB.valueChanged.connect(self.hypo_std_SB_callback)
+        # self.ui.hyper_mean_SB.valueChanged.connect(self.hyper_mean_SB_callback)
+        # self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
+        # self.ui.heal_mean_SB.valueChanged.connect(self.heal_mean_SB_callback)
+        # self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
 
         # connecting scrollbars
-        self.ui.slice_C_SB.valueChanged.connect(self.slider_C_changed)
-        self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
-        self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
+        # self.ui.slice_C_SB.valueChanged.connect(self.slider_C_changed)
+        # self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
+        # self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
 
         # connecting sliders with their line edit
         self.connect_SL_and_LE()
 
+
+        self.actionCircle_callback()
+
         # remove btn
-        self.ui.remove_obj_BTN.clicked.connect(self.remove_obj_BTN_callback)
+        # self.ui.remove_obj_BTN.clicked.connect(self.remove_obj_BTN_callback)
+
+    def keyPressEvent(self, QKeyEvent):
+        print 'key event: ',
+        if QKeyEvent.key() == QtCore.Qt.Key_Escape:
+            print 'Escape'
+            self.view_L.circle_active = False
+            self.view_L.area_hist_widget.close()
+            self.view_L.setMouseTracking(False)
+            self.view_L.updateSlice()
 
     def test_callback(self):
         self.two_views = not self.two_views
@@ -253,6 +262,13 @@ class Lession_editor(QtGui.QMainWindow):
     #     if not self.show_view_R:
     #         self.view_R.setVisible(False)
 
+    def actionCircle_callback(self):
+        self.view_L.circle_active = True
+        self.view_L.setMouseTracking(True)
+        self.view_L.area_hist_widget = ahw.AreaHistWidget()
+        self.view_L.area_hist_widget.show()
+        # self.view_R.circle_active = True
+
     def serie_1_RB_callback(self):
         self.cc.active_serie = 1
         self.cc.actual_data = self.cc.data_1
@@ -262,101 +278,102 @@ class Lession_editor(QtGui.QMainWindow):
         self.cc.actual_data = self.cc.data_2
 
     def connect_SL_and_LE(self):
-        # win width
-        self.ui.win_wdth_SL.valueChanged.connect(self.win_wdth_SL_changed)
-        ww_val = QtGui.QIntValidator(self.ui.win_wdth_SL.minimum(), self.ui.win_wdth_SL.maximum())
-        self.ui.win_width_LE.setValidator(ww_val)
-        self.ui.win_width_LE.textChanged.connect(self.win_width_LE_changed)
-
-        # win level
-        self.ui.win_lvl_SL.valueChanged.connect(self.win_lvl_SL_changed)
-        wl_val = QtGui.QIntValidator(self.ui.win_lvl_SL.minimum(), self.ui.win_lvl_SL.maximum())
-        self.ui.win_level_LE.setValidator(wl_val)
-        self.ui.win_level_LE.textChanged.connect(self.win_level_LE_changed)
-
-        # voxel size
-        self.ui.voxel_size_SB.valueChanged.connect(self.voxel_size_SB_changed)
-        vs_val = QtGui.QIntValidator(self.ui.voxel_size_SB.minimum(), self.ui.voxel_size_SB.maximum())
-        self.ui.voxel_size_LE.setValidator(vs_val)
-        self.ui.voxel_size_LE.textChanged.connect(self.voxel_size_LE_changed)
-
-        # smoothing - sigma
-        self.ui.sigma_SL.valueChanged.connect(self.sigma_SL_changed)
-        ss_val = QtGui.QIntValidator(self.ui.sigma_SL.minimum(), self.ui.sigma_SL.maximum())
-        self.ui.gaussian_sigma_LE.setValidator(ss_val)
-        self.ui.gaussian_sigma_LE.textChanged.connect(self.gaussian_sigma_LE_changed)
-
-        # smoothing - sigma_range
-        self.ui.sigma_range_SL.valueChanged.connect(self.sigma_range_SL_changed)
-        sr_val = QtGui.QIntValidator(self.ui.sigma_range_SL.minimum(), self.ui.sigma_range_SL.maximum())
-        self.ui.bilateral_range_LE.setValidator(sr_val)
-        self.ui.bilateral_range_LE.textChanged.connect(self.bilateral_range_LE_changed)
-
-        # smoothing - sigma_spatial
-        self.ui.sigma_spatial_SL.valueChanged.connect(self.sigma_spatial_SL_changed)
-        sigs_val = QtGui.QIntValidator(self.ui.sigma_spatial_SL.minimum(), self.ui.sigma_spatial_SL.maximum())
-        self.ui.bilateral_spatial_LE.setValidator(sigs_val)
-        self.ui.bilateral_spatial_LE.textChanged.connect(self.bilateral_spatial_LE_changed)
-
-        # smoothing - tv_weight
-        self.ui.tv_weight_SL.valueChanged.connect(self.tv_weight_SL_changed)
-        tvw_val = QtGui.QIntValidator(self.ui.tv_weight_SL.minimum(), self.ui.tv_weight_SL.maximum())
-        self.ui.tv_weight_LE.setValidator(tvw_val)
-        self.ui.tv_weight_LE.textChanged.connect(self.tv_weight_LE_changed)
-
-        # alpha
-        self.ui.alpha_SL.valueChanged.connect(self.alpha_SL_changed)
-        alpha_val = QtGui.QIntValidator(self.ui.alpha_SL.minimum(), self.ui.alpha_SL.maximum())
-        self.ui.alpha_LE.setValidator(alpha_val)
-        self.ui.alpha_LE.textChanged.connect(self.alpha_LE_changed)
-
-        # beta
-        self.ui.beta_SL.valueChanged.connect(self.beta_SL_changed)
-        beta_val = QtGui.QIntValidator(self.ui.beta_SL.minimum(), self.ui.beta_SL.maximum())
-        self.ui.beta_LE.setValidator(beta_val)
-        self.ui.beta_LE.textChanged.connect(self.beta_LE_changed)
-
-        # frac
-        self.ui.frac_SL.valueChanged.connect(self.frac_SL_changed)
-        frac_val = QtGui.QIntValidator(self.ui.frac_SL.minimum(), self.ui.frac_SL.maximum())
-        self.ui.perc_LE.setValidator(frac_val)
-        self.ui.perc_LE.textChanged.connect(self.perc_LE_changed)
-
-        # heal_std_k
-        self.ui.heal_std_k_SL.valueChanged.connect(self.heal_std_k_SL_changed)
-        stdh_val = QtGui.QIntValidator(self.ui.heal_std_k_SL.minimum(), self.ui.heal_std_k_SL.maximum())
-        self.ui.k_std_h_LE.setValidator(stdh_val)
-        self.ui.k_std_h_LE.textChanged.connect(self.k_std_h_LE_changed)
-
-        # tum_std_k
-        self.ui.tum_std_k_SL.valueChanged.connect(self.tum_std_k_SL_changed)
-        stdt_val = QtGui.QIntValidator(self.ui.tum_std_k_SL.minimum(), self.ui.tum_std_k_SL.maximum())
-        self.ui.k_std_t_LE.setValidator(stdt_val)
-        self.ui.k_std_t_LE.textChanged.connect(self.k_std_t_LE_changed)
-
-        # min_area
-        self.ui.min_area_SL.valueChanged.connect(self.min_area_SL_changed)
-        minarea_val = QtGui.QIntValidator(self.ui.min_area_SL.minimum(), self.ui.min_area_SL.maximum())
-        self.ui.min_area_LE.setValidator(minarea_val)
-        self.ui.min_area_LE.textChanged.connect(self.min_area_LE_changed)
-
-        # max_area
-        self.ui.max_area_SL.valueChanged.connect(self.max_area_SL_changed)
-        maxarea_val = QtGui.QIntValidator(self.ui.max_area_SL.maximum(), self.ui.max_area_SL.maximum())
-        self.ui.max_area_LE.setValidator(maxarea_val)
-        self.ui.max_area_LE.textChanged.connect(self.max_area_LE_changed)
-
-        # min_comp
-        self.ui.min_comp_SL.valueChanged.connect(self.min_comp_SL_changed)
-        mincomp_val = QtGui.QIntValidator(self.ui.min_comp_SL.maximum(), self.ui.min_comp_SL.maximum())
-        self.ui.min_comp_LE.setValidator(mincomp_val)
-        self.ui.min_comp_LE.textChanged.connect(self.min_comp_LE_changed)
-
-        # comp_fact
-        self.ui.comp_fact_SB.valueChanged.connect(self.comp_fact_SB_changed)
-        compf_val = QtGui.QIntValidator(self.ui.comp_fact_SB.maximum(), self.ui.comp_fact_SB.maximum())
-        self.ui.comp_fact_LE.setValidator(compf_val)
-        self.ui.comp_fact_LE.textChanged.connect(self.comp_fact_LE_changed)
+        pass
+        # # win width
+        # self.ui.win_wdth_SL.valueChanged.connect(self.win_wdth_SL_changed)
+        # ww_val = QtGui.QIntValidator(self.ui.win_wdth_SL.minimum(), self.ui.win_wdth_SL.maximum())
+        # self.ui.win_width_LE.setValidator(ww_val)
+        # self.ui.win_width_LE.textChanged.connect(self.win_width_LE_changed)
+        #
+        # # win level
+        # self.ui.win_lvl_SL.valueChanged.connect(self.win_lvl_SL_changed)
+        # wl_val = QtGui.QIntValidator(self.ui.win_lvl_SL.minimum(), self.ui.win_lvl_SL.maximum())
+        # self.ui.win_level_LE.setValidator(wl_val)
+        # self.ui.win_level_LE.textChanged.connect(self.win_level_LE_changed)
+        #
+        # # voxel size
+        # self.ui.voxel_size_SB.valueChanged.connect(self.voxel_size_SB_changed)
+        # vs_val = QtGui.QIntValidator(self.ui.voxel_size_SB.minimum(), self.ui.voxel_size_SB.maximum())
+        # self.ui.voxel_size_LE.setValidator(vs_val)
+        # self.ui.voxel_size_LE.textChanged.connect(self.voxel_size_LE_changed)
+        #
+        # # smoothing - sigma
+        # self.ui.sigma_SL.valueChanged.connect(self.sigma_SL_changed)
+        # ss_val = QtGui.QIntValidator(self.ui.sigma_SL.minimum(), self.ui.sigma_SL.maximum())
+        # self.ui.gaussian_sigma_LE.setValidator(ss_val)
+        # self.ui.gaussian_sigma_LE.textChanged.connect(self.gaussian_sigma_LE_changed)
+        #
+        # # smoothing - sigma_range
+        # self.ui.sigma_range_SL.valueChanged.connect(self.sigma_range_SL_changed)
+        # sr_val = QtGui.QIntValidator(self.ui.sigma_range_SL.minimum(), self.ui.sigma_range_SL.maximum())
+        # self.ui.bilateral_range_LE.setValidator(sr_val)
+        # self.ui.bilateral_range_LE.textChanged.connect(self.bilateral_range_LE_changed)
+        #
+        # # smoothing - sigma_spatial
+        # self.ui.sigma_spatial_SL.valueChanged.connect(self.sigma_spatial_SL_changed)
+        # sigs_val = QtGui.QIntValidator(self.ui.sigma_spatial_SL.minimum(), self.ui.sigma_spatial_SL.maximum())
+        # self.ui.bilateral_spatial_LE.setValidator(sigs_val)
+        # self.ui.bilateral_spatial_LE.textChanged.connect(self.bilateral_spatial_LE_changed)
+        #
+        # # smoothing - tv_weight
+        # self.ui.tv_weight_SL.valueChanged.connect(self.tv_weight_SL_changed)
+        # tvw_val = QtGui.QIntValidator(self.ui.tv_weight_SL.minimum(), self.ui.tv_weight_SL.maximum())
+        # self.ui.tv_weight_LE.setValidator(tvw_val)
+        # self.ui.tv_weight_LE.textChanged.connect(self.tv_weight_LE_changed)
+        #
+        # # alpha
+        # self.ui.alpha_SL.valueChanged.connect(self.alpha_SL_changed)
+        # alpha_val = QtGui.QIntValidator(self.ui.alpha_SL.minimum(), self.ui.alpha_SL.maximum())
+        # self.ui.alpha_LE.setValidator(alpha_val)
+        # self.ui.alpha_LE.textChanged.connect(self.alpha_LE_changed)
+        #
+        # # beta
+        # self.ui.beta_SL.valueChanged.connect(self.beta_SL_changed)
+        # beta_val = QtGui.QIntValidator(self.ui.beta_SL.minimum(), self.ui.beta_SL.maximum())
+        # self.ui.beta_LE.setValidator(beta_val)
+        # self.ui.beta_LE.textChanged.connect(self.beta_LE_changed)
+        #
+        # # frac
+        # self.ui.frac_SL.valueChanged.connect(self.frac_SL_changed)
+        # frac_val = QtGui.QIntValidator(self.ui.frac_SL.minimum(), self.ui.frac_SL.maximum())
+        # self.ui.perc_LE.setValidator(frac_val)
+        # self.ui.perc_LE.textChanged.connect(self.perc_LE_changed)
+        #
+        # # heal_std_k
+        # self.ui.heal_std_k_SL.valueChanged.connect(self.heal_std_k_SL_changed)
+        # stdh_val = QtGui.QIntValidator(self.ui.heal_std_k_SL.minimum(), self.ui.heal_std_k_SL.maximum())
+        # self.ui.k_std_h_LE.setValidator(stdh_val)
+        # self.ui.k_std_h_LE.textChanged.connect(self.k_std_h_LE_changed)
+        #
+        # # tum_std_k
+        # self.ui.tum_std_k_SL.valueChanged.connect(self.tum_std_k_SL_changed)
+        # stdt_val = QtGui.QIntValidator(self.ui.tum_std_k_SL.minimum(), self.ui.tum_std_k_SL.maximum())
+        # self.ui.k_std_t_LE.setValidator(stdt_val)
+        # self.ui.k_std_t_LE.textChanged.connect(self.k_std_t_LE_changed)
+        #
+        # # min_area
+        # self.ui.min_area_SL.valueChanged.connect(self.min_area_SL_changed)
+        # minarea_val = QtGui.QIntValidator(self.ui.min_area_SL.minimum(), self.ui.min_area_SL.maximum())
+        # self.ui.min_area_LE.setValidator(minarea_val)
+        # self.ui.min_area_LE.textChanged.connect(self.min_area_LE_changed)
+        #
+        # # max_area
+        # self.ui.max_area_SL.valueChanged.connect(self.max_area_SL_changed)
+        # maxarea_val = QtGui.QIntValidator(self.ui.max_area_SL.maximum(), self.ui.max_area_SL.maximum())
+        # self.ui.max_area_LE.setValidator(maxarea_val)
+        # self.ui.max_area_LE.textChanged.connect(self.max_area_LE_changed)
+        #
+        # # min_comp
+        # self.ui.min_comp_SL.valueChanged.connect(self.min_comp_SL_changed)
+        # mincomp_val = QtGui.QIntValidator(self.ui.min_comp_SL.maximum(), self.ui.min_comp_SL.maximum())
+        # self.ui.min_comp_LE.setValidator(mincomp_val)
+        # self.ui.min_comp_LE.textChanged.connect(self.min_comp_LE_changed)
+        #
+        # # comp_fact
+        # self.ui.comp_fact_SB.valueChanged.connect(self.comp_fact_SB_changed)
+        # compf_val = QtGui.QIntValidator(self.ui.comp_fact_SB.maximum(), self.ui.comp_fact_SB.maximum())
+        # self.ui.comp_fact_LE.setValidator(compf_val)
+        # self.ui.comp_fact_LE.textChanged.connect(self.comp_fact_LE_changed)
 
     def selection_changed(self, selected, deselected):
         #TODO: povolit oznaceni pouze jednoho objektu?
@@ -606,62 +623,63 @@ class Lession_editor(QtGui.QMainWindow):
         return params
 
     def fill_parameters(self):
-        # general parameters
-        self.ui.win_wdth_SL.setValue(self.params['win_width'])
-        self.ui.win_width_LE.setText(str(self.params['win_width']))
-
-        self.ui.win_lvl_SL.setValue(self.params['win_level'])
-        self.ui.win_level_LE.setText(str(self.params['win_level']))
-
-        self.ui.voxel_size_SB.setValue(self.params['working_voxel_size_mm'])
-        self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size_mm']))
-
-        # smoothing parameters
-        self.ui.sigma_SL.setValue(self.params['sigma'])
-        self.ui.gaussian_sigma_LE.setText(str(self.params['sigma']))
-
-        self.ui.sigma_range_SL.setValue(self.params['sigma_range'])
-        self.ui.bilateral_range_LE.setText(str(self.params['sigma_range']))
-
-        self.ui.sigma_spatial_SL.setValue(self.params['sigma_spatial'])
-        self.ui.bilateral_spatial_LE.setText(str(self.params['sigma_spatial']))
-
-        self.ui.tv_weight_SL.setValue(self.params['tv_weight'])
-        self.ui.tv_weight_LE.setText(str(self.params['tv_weight']))
-
-        # color model parameters
-        self.ui.frac_SL.setValue(self.params['perc'])
-        self.ui.perc_LE.setText(str(self.params['perc']))
-
-        self.ui.heal_std_k_SL.setValue(self.params['k_std_h'])
-        self.ui.k_std_h_LE.setText(str(self.params['k_std_h']))
-
-        self.ui.tum_std_k_SL.setValue(self.params['k_std_t'])
-        self.ui.k_std_t_LE.setText(str(self.params['k_std_t']))
-
-        # localization parameters
-        self.ui.alpha_SL.setValue(self.params['alpha'])
-        self.ui.alpha_LE.setText(str(self.params['alpha']))
-
-        self.ui.beta_SL.setValue(self.params['beta'])
-        self.ui.beta_LE.setText(str(self.params['beta']))
-
-        # self.ui.min_area_SL.setValue(self.params['min_area'])
-        # self.ui.min_area_LE.setText(str(self.params['min_area']))
-        self.ui.min_area_SL.setValue(0)
-        self.ui.min_area_LE.setText('0')
-
-        # self.ui.max_area_SL.setValue(self.params['max_area'])
-        # self.ui.max_area_LE.setText(str(self.params['max_area']))
-
-        self.ui.max_area_SL.setValue(0)
-        self.ui.max_area_LE.setText('0')
-
-        self.ui.min_comp_SL.setValue(self.params['min_compactness'])
-        self.ui.min_comp_LE.setText(str(self.params['min_compactness']))
-
-        self.ui.comp_fact_SB.setValue(self.params['comp_fact'])
-        self.ui.comp_fact_LE.setText(str(self.params['comp_fact']))
+        pass
+        # # general parameters
+        # self.ui.win_wdth_SL.setValue(self.params['win_width'])
+        # self.ui.win_width_LE.setText(str(self.params['win_width']))
+        #
+        # self.ui.win_lvl_SL.setValue(self.params['win_level'])
+        # self.ui.win_level_LE.setText(str(self.params['win_level']))
+        #
+        # self.ui.voxel_size_SB.setValue(self.params['working_voxel_size_mm'])
+        # self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size_mm']))
+        #
+        # # smoothing parameters
+        # self.ui.sigma_SL.setValue(self.params['sigma'])
+        # self.ui.gaussian_sigma_LE.setText(str(self.params['sigma']))
+        #
+        # self.ui.sigma_range_SL.setValue(self.params['sigma_range'])
+        # self.ui.bilateral_range_LE.setText(str(self.params['sigma_range']))
+        #
+        # self.ui.sigma_spatial_SL.setValue(self.params['sigma_spatial'])
+        # self.ui.bilateral_spatial_LE.setText(str(self.params['sigma_spatial']))
+        #
+        # self.ui.tv_weight_SL.setValue(self.params['tv_weight'])
+        # self.ui.tv_weight_LE.setText(str(self.params['tv_weight']))
+        #
+        # # color model parameters
+        # self.ui.frac_SL.setValue(self.params['perc'])
+        # self.ui.perc_LE.setText(str(self.params['perc']))
+        #
+        # self.ui.heal_std_k_SL.setValue(self.params['k_std_h'])
+        # self.ui.k_std_h_LE.setText(str(self.params['k_std_h']))
+        #
+        # self.ui.tum_std_k_SL.setValue(self.params['k_std_t'])
+        # self.ui.k_std_t_LE.setText(str(self.params['k_std_t']))
+        #
+        # # localization parameters
+        # self.ui.alpha_SL.setValue(self.params['alpha'])
+        # self.ui.alpha_LE.setText(str(self.params['alpha']))
+        #
+        # self.ui.beta_SL.setValue(self.params['beta'])
+        # self.ui.beta_LE.setText(str(self.params['beta']))
+        #
+        # # self.ui.min_area_SL.setValue(self.params['min_area'])
+        # # self.ui.min_area_LE.setText(str(self.params['min_area']))
+        # self.ui.min_area_SL.setValue(0)
+        # self.ui.min_area_LE.setText('0')
+        #
+        # # self.ui.max_area_SL.setValue(self.params['max_area'])
+        # # self.ui.max_area_LE.setText(str(self.params['max_area']))
+        #
+        # self.ui.max_area_SL.setValue(0)
+        # self.ui.max_area_LE.setText('0')
+        #
+        # self.ui.min_comp_SL.setValue(self.params['min_compactness'])
+        # self.ui.min_comp_LE.setText(str(self.params['min_compactness']))
+        #
+        # self.ui.comp_fact_SB.setValue(self.params['comp_fact'])
+        # self.ui.comp_fact_LE.setText(str(self.params['comp_fact']))
 
     def hypo_mean_SB_callback(self, value):
         self.statusBar().showMessage('Hypodense model updated thru spin box.')
@@ -1141,3 +1159,5 @@ if __name__ == '__main__':
 # TODO: vizualizace kontur
 # TODO: min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
 # TODO: kontury 'contours' (obrysy) nefunguji
+# TODO: Okno nejde zmensit, jen zvetsit. Asi kvuli velikosti obrazku, kdyz se da visible(False), vse funguje.
+# TODO: Menit velikost tak, aby bylo mozne okno horizontalne menit (kvuli zapinani a vypinani pohledu)

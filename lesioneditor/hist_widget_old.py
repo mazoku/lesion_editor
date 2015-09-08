@@ -46,9 +46,6 @@ class Hist_widget(QtGui.QWidget):
         ints = self.data[np.nonzero(self.mask)]
         self.hist, self.bins = skiexp.histogram(ints, nbins=256)
 
-        # conenction to wheel events
-        # self.canvas.mpl_connect('scroll_event', self.on_scroll)
-
         self.update_figures()
 
     def update_heal_rv(self, new_rv):
@@ -87,45 +84,4 @@ class Hist_widget(QtGui.QWidget):
         plt.axis([0, 256, ax[2], ax[3]])
         plt.hold(False)
 
-        # plt.subplot(412)
-        # plt.plot(self.bins, self.hist, 'k')
-        # plt.hold(True)
-        # if self.rv_healthy:
-        #     plt.plot(x, fac * self.rv_healthy.pdf(x), 'g', linewidth=2)
-        # plt.title('healthy PDF')
-        # ax = plt.axis()
-        # plt.axis([0, 256, ax[2], ax[3]])
-        # plt.hold(False)
-        #
-        # plt.subplot(413)
-        # plt.plot(self.bins, self.hist, 'k')
-        # plt.hold(True)
-        # if self.rv_hypo:
-        #     plt.plot(x, fac * self.rv_hypo.pdf(x), 'b', linewidth=2)
-        # plt.title('hypodense PDF')
-        # ax = plt.axis()
-        # plt.axis([0, 256, ax[2], ax[3]])
-        # plt.hold(False)
-        #
-        # plt.subplot(414)
-        # plt.plot(self.bins, self.hist, 'k')
-        # plt.hold(True)
-        # if self.rv_hyper:
-        #     plt.plot(x, fac * self.rv_hyper.pdf(x), 'r', linewidth=2)
-        # plt.title('hyperdense PDF')
-        # ax = plt.axis()
-        # plt.axis([0, 256, ax[2], ax[3]])
-        # plt.hold(False)
-
         self.canvas.draw()
-
-    # def on_scroll(self, event):
-    #     '''mouse wheel is used for setting slider value'''
-    #     if event.button == 'up':
-    #         self.next_slice()
-    #     if event.button == 'down':
-    #         self.prev_slice()
-    #     # self.slider.setValue(self.actual_slice)
-    #     # self.slider_change(self.actual_slice)
-    #     self.update_figures()
-    #     self.win.slice_change(self.actual_slice)

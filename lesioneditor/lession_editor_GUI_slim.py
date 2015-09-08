@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_slim.ui'
 #
-# Created: Thu Aug 27 13:32:30 2015
+# Created: Tue Sep  8 10:16:16 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -283,7 +283,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuSerie = QtGui.QMenu(self.menubar)
         self.menuSerie.setObjectName(_fromUtf8("menuSerie"))

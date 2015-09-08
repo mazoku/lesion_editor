@@ -13,12 +13,10 @@ from hist_widget_GUI import Ui_Form
 # Main widget containing figures etc
 class Hist_widget(QtGui.QWidget):
 
-    def __init__(self, models, hist=None, bins=None, data=None, parent=None, unaries_as_cdf=False, params=None):
+    def __init__(self, data, models=None, hist=None, bins=None, parent=None, unaries_as_cdf=False, params=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
-
-        self.models = models  # color models
 
         self.hist = hist
         self.bins = bins
@@ -29,15 +27,23 @@ class Hist_widget(QtGui.QWidget):
                 return
             self.hist, self.bins = skiexp.histogram(self.data, nbins=256)
 
-        self.rv_heal = models['heal']
-        self.rv_hypo = models['hypo']
-        self.rv_hyper = models['hyper']
+        self.models = models  # color models
+
+        if self.models is not None:
+            self.rv_heal = models['heal']
+            self.rv_hypo = models['hypo']
+            self.rv_hyper = models['hyper']
+            self.setup_ui()
+        else:
+            self.rv_heal = None
+            self.rv_hypo = None
+            self.rv_hyper = None
 
         self.unaries_as_cdf = unaries_as_cdf
         self.params = params
 
         self.figure = plt.figure()
-        self.axes = self.figure.add_axes([0, 0, 1, 1])
+        self.axes = self.figure.add_axes([0.08, 0.05, 0.91, 0.9])
         self.canvas = FigureCanvas(self.figure)
 
         layout = QtGui.QVBoxLayout()
@@ -45,14 +51,15 @@ class Hist_widget(QtGui.QWidget):
         self.ui.histogram_F.setLayout(layout)
 
         # seting up min and max values
-        if self.params.has_key('data_min'):
+
+        if self.params and self.params.has_key('data_min'):
             self.data_min = self.params['data_min']
         else:
-            self.data_min = 0
-        if self.params.has_key('datam_max'):
+            self.data_min = self.data.min()
+        if self.params and self.params.has_key('datam_max'):
             self.data_max = self.params['data_max']
         else:
-            self.data_max = 255
+            self.data_max = self.data.max()
 
         self.ui.hypo_mean_SL.setMinimum(self.data_min)
         self.ui.heal_mean_SL.setMinimum(self.data_min)
@@ -62,6 +69,9 @@ class Hist_widget(QtGui.QWidget):
         self.ui.heal_mean_SL.setMaximum(self.data_max)
         self.ui.hyper_mean_SL.setMaximum(self.data_max)
 
+        self.update_figures()
+
+    def setup_ui(self):
         # filling line edits and spinboxes
         self.ui.hypo_mean_LE.setText('%i'%int(self.rv_hypo.mean()))
         self.ui.hypo_mean_SL.setValue(int(self.rv_hypo.mean()))
@@ -97,6 +107,15 @@ class Hist_widget(QtGui.QWidget):
         self.ui.hypo_std_SB.valueChanged.connect(self.hypo_std_SB_callback)
         self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
         self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
+
+    def set_models(self, models):
+        self.models = models
+
+        self.rv_heal = models['heal']
+        self.rv_hypo = models['hypo']
+        self.rv_hyper = models['hyper']
+
+        self.setup_ui()
 
         self.update_figures()
 
@@ -194,10 +213,10 @@ class Hist_widget(QtGui.QWidget):
             plt.plot(x, fac * healthy_y, 'g', linewidth=2)
             plt.plot(x, fac * hypo_y, 'b', linewidth=2)
             plt.plot(x, fac * hyper_y, 'r', linewidth=2)
-            plt.title('all PDFs')
         ax = plt.axis()
         plt.axis([0, 256, ax[2], ax[3]])
         plt.hold(False)
+        # plt.grid(True)
 
         self.canvas.draw()
 
@@ -221,7 +240,8 @@ if __name__ == '__main__':
     models['heal'] = rv_heal
     models['hyper'] = rv_hyper
     params = {'data_min': img.min(), 'data_max':img.max()}
-    hist_w = Hist_widget(models, data=img, params=params, unaries_as_cdf=True)
+    hist_w = Hist_widget(data=img, params=params, unaries_as_cdf=True)
+    hist_w.set_models(models)
     hist_w.show()
 
     sys.exit(app.exec_())

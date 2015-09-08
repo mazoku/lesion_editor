@@ -557,8 +557,8 @@
     <property name="title">
      <string>Data</string>
     </property>
-    <addaction name="action_Load_serie_1"/>
-    <addaction name="action_Load_serie_2"/>
+    <addaction name="action_load_serie_1"/>
+    <addaction name="action_load_serie_2"/>
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
@@ -572,14 +572,14 @@
     <property name="title">
      <string>Show</string>
     </property>
-    <addaction name="actionColor_Model"/>
-    <addaction name="actionObject_List"/>
+    <addaction name="action_color_model"/>
+    <addaction name="action_object_list"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionCircle"/>
+    <addaction name="action_circle"/>
     <addaction name="actionRuler"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -597,12 +597,12 @@
    <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_Load_serie_1">
+  <action name="action_load_serie_1">
    <property name="text">
     <string>Load serie #1...</string>
    </property>
   </action>
-  <action name="action_Load_serie_2">
+  <action name="action_load_serie_2">
    <property name="text">
     <string>Load serie #2...</string>
    </property>
@@ -622,17 +622,17 @@
     <string>Restart</string>
    </property>
   </action>
-  <action name="actionColor_Model">
+  <action name="action_color_model">
    <property name="text">
     <string>Color Model</string>
    </property>
   </action>
-  <action name="actionObject_List">
+  <action name="action_object_list">
    <property name="text">
     <string>Object List</string>
    </property>
   </action>
-  <action name="actionCircle">
+  <action name="action_circle">
    <property name="text">
     <string>Circle</string>
    </property>

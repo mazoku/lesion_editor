@@ -99,6 +99,8 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_widget_width = 50
         self.two_views = False
 
+        self.hist_widget = None
+
         # self.area_hist_widget = ahw.AreaHistWidget()
 
         # computational core
@@ -128,10 +130,11 @@ class Lession_editor(QtGui.QMainWindow):
         #     self.cc.active_serie = 2
         self.cc.active_serie = 1
 
-        self.ui.action_Load_serie_1.triggered.connect(lambda: self.action_Load_serie_callback(1))
-        self.ui.action_Load_serie_2.triggered.connect(lambda: self.action_Load_serie_callback(2))
+        self.ui.action_load_serie_1.triggered.connect(lambda: self.action_load_serie_callback(1))
+        self.ui.action_load_serie_2.triggered.connect(lambda: self.action_load_serie_callback(2))
 
-        self.ui.actionCircle.triggered.connect(self.actionCircle_callback)
+        self.ui.action_circle.triggered.connect(self.action_circle_callback)
+        self.ui.action_color_model.triggered.connect(self.action_color_model_callback)
 
         # self.n_slices = self.data.shape[0]
         # self.n_slices = self.cc.data_1.n_slices
@@ -262,12 +265,17 @@ class Lession_editor(QtGui.QMainWindow):
     #     if not self.show_view_R:
     #         self.view_R.setVisible(False)
 
-    def actionCircle_callback(self):
+    def action_circle_callback(self):
         self.view_L.circle_active = True
         self.view_L.setMouseTracking(True)
         self.view_L.area_hist_widget = ahw.AreaHistWidget()
         self.view_L.area_hist_widget.show()
         # self.view_R.circle_active = True
+
+    def action_color_model_callback(self):
+        if self.hist_widget is None:
+            self.hist_widget = hist_widget.Hist_widget(data=self.data_L.data)
+        self.hist_widget.show()
 
     def serie_1_RB_callback(self):
         self.cc.active_serie = 1
@@ -943,7 +951,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_R.reinit((self.data_R.shape[2], self.data_R.shape[1]))
         self.show_im_R_callback()
 
-    def action_Load_serie_callback(self, serie_number):
+    def action_load_serie_callback(self, serie_number):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir'])
         print 'Does not work yet.'
         print fname

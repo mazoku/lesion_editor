@@ -215,6 +215,7 @@ class Hist_widget(QtGui.QWidget):
             plt.plot(x, fac * hyper_y, 'r', linewidth=2)
         ax = plt.axis()
         plt.axis([0, 256, ax[2], ax[3]])
+        plt.gca().tick_params(direction='in', pad=-50)
         plt.hold(False)
         # plt.grid(True)
 

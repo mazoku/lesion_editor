@@ -171,7 +171,7 @@ class Hist_widget(QtGui.QWidget):
         self.update_figures()
 
     def update_heal_rv(self, new_rv):
-        self.rv_healthy = new_rv
+        self.rv_heal = new_rv
         if int(self.ui.heal_mean_LE.text()) != self.rv_heal.mean():
             self.ui.heal_mean_LE.setText('%i'%int(self.rv_heal.mean()))
         if self.ui.heal_std_SB.value() != self.rv_heal.std():
@@ -220,6 +220,12 @@ class Hist_widget(QtGui.QWidget):
         # plt.grid(True)
 
         self.canvas.draw()
+
+    def keyPressEvent(self, QKeyEvent):
+        print 'hist widget key event: ',
+        if QKeyEvent.key() == QtCore.Qt.Key_Escape:
+            print 'Escape'
+            self.close()
 
 if __name__ == '__main__':
 

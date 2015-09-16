@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'hist_widget_GUI.ui'
 #
-# Created: Tue Sep  8 15:26:39 2015
+# Created: Wed Sep 16 07:24:34 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,7 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(528, 574)
+        Form.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.verticalLayout = QtGui.QVBoxLayout(Form)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.histogram_F = QtGui.QFrame(Form)

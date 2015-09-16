@@ -42,7 +42,8 @@ logging.basicConfig()
 
 from lession_editor_GUI_slim import Ui_MainWindow
 import Form_widget
-import hist_widget
+from hist_widget import Hist_widget
+from objects_widget import Objects_widget
 import My_table_model as mtm
 import area_hist_widget as ahw
 
@@ -100,6 +101,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.two_views = False
 
         self.hist_widget = None
+        self.objects_widget = None
 
         # self.area_hist_widget = ahw.AreaHistWidget()
 
@@ -134,7 +136,9 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.action_load_serie_2.triggered.connect(lambda: self.action_load_serie_callback(2))
 
         self.ui.action_circle.triggered.connect(self.action_circle_callback)
-        self.ui.action_color_model.triggered.connect(self.action_color_model_callback)
+        self.ui.action_show_color_model.triggered.connect(self.action_show_color_model_callback)
+        self.ui.action_show_object_list.triggered.connect(self.action_show_object_list_callback)
+        self.ui.action_run.triggered.connect(self.run_callback)
 
         # self.n_slices = self.data.shape[0]
         # self.n_slices = self.cc.data_1.n_slices
@@ -224,46 +228,38 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
         self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
 
+        # to be able to capture key press events immediately
+        self.setFocus()
+
         # connecting sliders with their line edit
         # self.connect_SL_and_LE()
-
-
-        # self.actionCircle_callback()
 
         # remove btn
         # self.ui.remove_obj_BTN.clicked.connect(self.remove_obj_BTN_callback)
 
     def keyPressEvent(self, QKeyEvent):
         print 'key event: ',
-        if QKeyEvent.key() == QtCore.Qt.Key_Escape:
+        key = QKeyEvent.key()
+        if key == QtCore.Qt.Key_Escape:
             print 'Escape'
-            self.view_L.circle_active = False
-            self.view_L.area_hist_widget.close()
-            self.view_L.setMouseTracking(False)
-            self.view_L.updateSlice()
-
-    def test_callback(self):
-        self.two_views = not self.two_views
-        if self.two_views:
-            # self.view_L.setFixedSize(self.view_L.size() / 2)
-            self.view_L.resize(self.view_L.pixmap().size() / 2)
+            if self.view_L.area_hist_widget is not None:
+                self.view_L.circle_active = False
+                self.view_L.area_hist_widget.close()
+                self.view_L.setMouseTracking(False)
+                self.view_L.updateSlice()
+            else:
+                self.close()
+        elif key == QtCore.Qt.Key_H:
+            print 'H'
+            self.action_show_color_model_callback()
+        elif key == QtCore.Qt.Key_O:
+            print 'O'
+            self.action_show_object_list_callback()
+        elif key == QtCore.Qt.Key_L:
+            print 'R'
+            self.run_callback()
         else:
-            # self.view_L.setFixedSize(self.view_L.size() * 2)
-            self.view_L.resize(self.view_L.pixmap().size() * 2)
-
-    # def update_view_L(self):
-    #
-    #     self.view_L.setSlice(self.data_L.data[0,:,:])
-    #     if not self.show_view_L:
-    #         self.view_L.setVisible(False)
-
-    # def update_view_R(self):
-    #     # self.view_R = data_view_widget.SliceBox(self.data_R.shape[1:])
-    #     self.view_R.setCW(self.win_l, 'c')
-    #     self.view_R.setCW(self.win_w, 'w')
-    #     self.view_R.setSlice(self.data_R.data[0,:,:])
-    #     if not self.show_view_R:
-    #         self.view_R.setVisible(False)
+            print key, ' - unrecognized hot key.'
 
     def action_circle_callback(self):
         self.view_L.circle_active = True
@@ -272,10 +268,17 @@ class Lession_editor(QtGui.QMainWindow):
         self.view_L.area_hist_widget.show()
         # self.view_R.circle_active = True
 
-    def action_color_model_callback(self):
+    def action_show_color_model_callback(self):
         if self.hist_widget is None:
-            self.hist_widget = hist_widget.Hist_widget(data=self.data_L.data)
+            self.hist_widget = Hist_widget(data=self.data_L.data)
         self.hist_widget.show()
+        self.hist_widget.setFocus()
+
+    def action_show_object_list_callback(self):
+        if self.objects_widget is None:
+            self.objects_widget = Objects_widget()
+        self.objects_widget.show()
+        self.objects_widget.setFocus()
 
     def serie_1_RB_callback(self):
         self.cc.active_serie = 1
@@ -732,6 +735,8 @@ class Lession_editor(QtGui.QMainWindow):
         self.update_models()
 
     def update_models(self):
+        if self.hist_widget is None:
+            self.hist_widget = Hist_widget(data=self.data_L.data)
         self.hist_widget.update_heal_rv(self.cc.models['rv_heal'])
         self.hist_widget.update_hypo_rv(self.cc.models['rv_hypo'])
         self.hist_widget.update_hyper_rv(self.cc.models['rv_hyper'])
@@ -768,11 +773,7 @@ class Lession_editor(QtGui.QMainWindow):
         self.selected_objects_labels = [x.label for x in self.table_model.objects]
         # seting up range of area slider
         areas = [x.area for x in self.cc.actual_data.lesions]
-        self.ui.min_area_SL.setMaximum(max(areas))
-        self.ui.min_area_SL.setMinimum(min(areas))
-        self.ui.max_area_SL.setMaximum(max(areas))
-        self.ui.max_area_SL.setMinimum(min(areas))
-        self.ui.max_area_SL.setValue(max(areas))
+        self.objects_widget.set_area_range(areas)
 
         self.ui.show_labels_L_BTN.setEnabled(True)
         self.ui.show_contours_L_BTN.setEnabled(True)
@@ -785,14 +786,16 @@ class Lession_editor(QtGui.QMainWindow):
         # self.fill_table(self.cc.labels, self.cc.areas, self.cc.comps)
 
     def fill_table(self, lesions, labels, idxs):
+        if self.objects_widget is None:
+            self.objects_widget = Objects_widget()
         lesions_filtered = [x for x in lesions if x.label in idxs]
         # labels_filtered = np.where(labels in idxs, labels, 0)
         labels_filtered = labels * np.in1d(labels, idxs).reshape(labels.shape)
         self.table_model = mtm.MyTableModel(lesions_filtered, labels_filtered)
-        self.ui.objects_TV.setModel(self.table_model)
+        self.objects_widget.ui.objects_TV.setModel(self.table_model)
 
         # tableview selection changed
-        self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
+        self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
 
         # self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
 
@@ -1011,6 +1014,18 @@ class Lession_editor(QtGui.QMainWindow):
         sys.exit(app.exec_())
 
 
+# class MyApplication(QtGui.QApplication):
+#
+#     def __init__(self, args):
+#       super(MyApplication, self).__init__(args)
+#
+#
+#     def notify(self, receiver, event):
+#         if(event.type() == QtCore.QEvent.KeyPress):
+#             QtGui.QMessageBox.information(None,"Received Key Press Event!!", "You Pressed: "+ event.text())
+#       #Call Base Class Method to Continue Normal Event Processing
+#         return super(MyApplication, self).notify(receiver, event)
+
 ################################################################################
 ################################################################################
 if __name__ == '__main__':
@@ -1067,6 +1082,7 @@ if __name__ == '__main__':
 
     # runing application -------------------------
     app = QtGui.QApplication(sys.argv)
+    # app = MyApplication(sys.argv)
     le = Lession_editor(fnames)
     le.show()
     sys.exit(app.exec_())
@@ -1076,3 +1092,7 @@ if __name__ == '__main__':
 # TODO: vizualizace kontur
 # TODO: min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
 # TODO: kontury 'contours' (obrysy) nefunguji
+# TODO: area_hist_widget nefunguje (hodnoty jsou asi spravne, ale histogram je mimo)
+# TODO: nahradit slidery pro min a max hodnotu jedinym range sliderem
+#       http://blog.enthought.com/enthought-tool-suite/traits/new-double-slider-editor/#.VfkBEN-oGkA
+#       https://github.com/rsgalloway/QRangeSlider

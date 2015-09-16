@@ -16,6 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -562,18 +565,20 @@
    </widget>
    <widget class="QMenu" name="menuAction">
     <property name="title">
-     <string>Localization</string>
+     <string>Action</string>
     </property>
-    <addaction name="actionRun"/>
-    <addaction name="actionDelete"/>
-    <addaction name="actionRestart"/>
+    <addaction name="action_calculate_color_model"/>
+    <addaction name="separator"/>
+    <addaction name="action_run"/>
+    <addaction name="action_delete"/>
+    <addaction name="action_restart"/>
    </widget>
    <widget class="QMenu" name="menuShow">
     <property name="title">
      <string>Show</string>
     </property>
-    <addaction name="action_color_model"/>
-    <addaction name="action_object_list"/>
+    <addaction name="action_show_color_model"/>
+    <addaction name="action_show_object_list"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -607,27 +612,27 @@
     <string>Load serie #2...</string>
    </property>
   </action>
-  <action name="actionRun">
+  <action name="action_run">
    <property name="text">
-    <string>Run</string>
+    <string>Run localization</string>
    </property>
   </action>
-  <action name="actionDelete">
+  <action name="action_delete">
    <property name="text">
-    <string>Delete</string>
+    <string>Delete localization</string>
    </property>
   </action>
-  <action name="actionRestart">
+  <action name="action_restart">
    <property name="text">
-    <string>Restart</string>
+    <string>Restart localization</string>
    </property>
   </action>
-  <action name="action_color_model">
+  <action name="action_show_color_model">
    <property name="text">
     <string>Color Model</string>
    </property>
   </action>
-  <action name="action_object_list">
+  <action name="action_show_object_list">
    <property name="text">
     <string>Object List</string>
    </property>
@@ -655,6 +660,11 @@
   <action name="actionSagital">
    <property name="text">
     <string>Sagital</string>
+   </property>
+  </action>
+  <action name="action_calculate_color_model">
+   <property name="text">
+    <string>Calculate color model</string>
    </property>
   </action>
  </widget>

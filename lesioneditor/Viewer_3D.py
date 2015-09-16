@@ -40,7 +40,7 @@ class Viewer_3D(QtGui.QWidget):
 
         self.update_figures()
 
-        self.data = data
+        # self.data = data
         # adding widget for displaying image data
         # self.form_widget = Form_widget.Form_widget(self)
         data_viewer_layout = QtGui.QHBoxLayout()
@@ -130,7 +130,8 @@ if __name__ == '__main__':
     data = Data.Data()
     data.load_data(fname)
 
-    data.data = np.load('/home/tomas/Data/labels.npy')
+    # data.data = np.load('/home/tomas/Data/labels.npy')
+    data.data = np.load('labels_filt.npy')
 
     app = QtGui.QApplication(sys.argv)
     viewer = Viewer_3D(data.data, range=True)

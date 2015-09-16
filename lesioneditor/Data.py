@@ -15,7 +15,7 @@ VIEW_TABLE = {'axial': (2,1,0),
               'sagittal': (1,0,2),
               'coronal': (2,0,1)}
 
-class Data:
+class Data(object):
 
     def __init__(self, data=None, mask=None, filename=None):
         self.data = data
@@ -23,8 +23,9 @@ class Data:
         self.voxel_size = None
         self.shape = None
         self.orig_shape = None
-        self.labels = None  # array of labeled results
-        self.labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
+        self.__labels = None  # array of labeled results
+        self.__labels_aview = None
+        self.__labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
         self.objects = None  # array where each object has unique label
         self.labels_v = None
         self.n_rows = None
@@ -36,6 +37,15 @@ class Data:
         # self.data_vis = self.data  # visualized data, can be image data (data) or labels
         # self.data_vis_L = self.data  # visualized data, can be image data (data) or labels
         # self.data_vis_R = self.data
+
+        # @labels.setter
+        # def labels(self, data):
+        #     self._labels_aview = self._labels.transpose(self.act_transposition)
+
+        # @labels.deleter
+        # def labels(self):
+        #     del self._labels
+        #     del self._labels_aview
 
         self.filename = filename
         self.loaded = False
@@ -51,6 +61,43 @@ class Data:
         else:
             self.data_aview = None
 
+    @property
+    def labels(self):
+        return self.__labels
+
+    @labels.setter
+    def labels(self, data):
+        self.__labels = data
+        self.__labels_aview = self.__labels.transpose(self.act_transposition)
+
+    @labels.deleter
+    def labels(self):
+        del self.__labels
+        del self.__labels_aview
+
+    @property
+    def labels_aview(self):
+        return self.__labels_aview
+
+    @labels_aview.setter
+    def labels_aview(self, data):
+        self.__labels_aview = data
+
+    def set_labels(self, labels):
+        self.__labels = labels
+        self.__labels_aview = self.__labels.transpose(self.act_transposition)
+
+    @property
+    def labels_filt(self):
+        return self.__labels_filt
+
+    @labels_filt.setter
+    def labels_filt(self, data):
+        self.__labels_filt = data
+
+    @labels_filt.deleter
+    def labels_filt(self):
+        del self.__labels_filt
 
     def load_data(self, filename, slice_idx=-1):
         self.filename = filename
@@ -124,3 +171,12 @@ class Data:
     #
     # def display_contours_R(self):
     #     self.data_vis_R = self.data
+
+if __name__ == '__main__':
+    d = Data()
+    d.labels = np.array([[[1, 1, 1]]])
+    print d.labels
+    # print d.labels_aview
+
+    d.labels = np.array([[[2, 2, 2]]])
+    print d.labels

@@ -291,14 +291,15 @@ class Lession_editor(QtGui.QMainWindow):
     def selection_changed(self, selected, deselected):
         #TODO: povolit oznaceni pouze jednoho objektu?
         if selected.indexes():
-            self.selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.ui.objects_TV.selectionModel().selectedRows()]
+            self.selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
             # print 'show only', self.selected_objects_labels
             slice = [int(x.center[0]) for x in self.cc.actual_data.lesions if x.label == self.selected_objects_labels[0]][0]
             self.ui.slice_C_SB.setValue(slice)
         else:
             self.selected_objects_labels = [x.label for x in self.table_model.objects]
             # print 'show all', self.selected_objects_labels
-        self.cc.objects_filtration(self.selected_objects_labels, min_area=self.ui.min_area_SL.value(), max_area=self.ui.max_area_SL.value())
+        min_area, max_area = self.objects_widget.area_RS.getRange()
+        self.cc.objects_filtration(self.selected_objects_labels, min_area=min_area, max_area=max_area)
         #TODO: nasleduje prasarna
         if self.view_L.show_mode == self.view_L.SHOW_LABELS:
             self.show_labels_L_callback()
@@ -764,7 +765,7 @@ class Lession_editor(QtGui.QMainWindow):
 
         # self.form_widget.update_figures()
         # self.hist_widget.update_figures()
-        self.labels = self.cc.actual_data.labels
+        # self.labels = self.cc.actual_data.labels
         # self.labels = self.cc.labels
 
         # filling table with objects
@@ -1096,3 +1097,5 @@ if __name__ == '__main__':
 # TODO: nahradit slidery pro min a max hodnotu jedinym range sliderem
 #       http://blog.enthought.com/enthought-tool-suite/traits/new-double-slider-editor/#.VfkBEN-oGkA
 #       https://github.com/rsgalloway/QRangeSlider
+
+# TODO: vizualizace filtrovanych objektu

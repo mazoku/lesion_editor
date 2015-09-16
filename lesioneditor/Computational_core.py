@@ -652,6 +652,7 @@ class Computational_core():
         print 'ok'
         self.status_bar.showMessage('Done')
 
+
         # TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 
         # mayavi_visualization(res)

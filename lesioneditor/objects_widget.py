@@ -43,16 +43,29 @@ class Objects_widget(QtGui.QWidget):
         print 'hist widget key event: ',
         if QKeyEvent.key() == QtCore.Qt.Key_Escape:
             print 'Escape'
-            self.close()
+            if self.ui.objects_TV.selectedIndexes():
+                self.ui.objects_TV.clearSelection()
+            else:
+                self.close()
 
 if __name__ == '__main__':
 
     from objects_widget_GUI import Ui_Form
+
+    import Lesion
     app = QtGui.QApplication(sys.argv)
 
+    labels = np.array([[1, 1, 0, 2, 0],
+                       [1, 1, 0, 2, 0],
+                       [0, 0, 0, 2, 0],
+                       [3, 0, 4, 0, 5],
+                       [3, 0, 4, 0, 0]], dtype=np.int)
+    labels = np.dstack((labels, labels, labels))
+    lesions = Lesion.extract_lesions(labels, data=labels)
+
     objects_w = Objects_widget()
+    table_model = mtm.MyTableModel(lesions, labels)
+    objects_w.ui.objects_TV.setModel(table_model)
     objects_w.show()
 
     sys.exit(app.exec_())
-
-# TODO: kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?

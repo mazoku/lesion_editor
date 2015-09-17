@@ -76,11 +76,12 @@ def erase_reg(arr, p, val=0):
 
 class SliceBox(QLabel):
 
-    def __init__(self, sliceSize, voxel_size, mode='seeds'):
+    def __init__(self, sliceSize, voxel_size, main, mode='seeds'):
     # def __init__(self, sliceSize, grid, mode='seeds'):
     # def __init__(self, sliceSize, mode='seeds'):
 
         QLabel.__init__(self)
+        self.main = main
 
         height = 600
         vscale = voxel_size / float(np.min(voxel_size))
@@ -429,7 +430,6 @@ class SliceBox(QLabel):
     def mouseMoveEvent(self, QMouseEvent):
         center = list(self.gridPosition(QMouseEvent.pos()))
         self.mouse_cursor = center
-        # print self.mouse_cursor, QMouseEvent.x()/self.grid[0], QMouseEvent.y()/self.grid[1]
 
         circle_x = (self.circle_strel[1] + center[0] - self.circle_r).astype(np.int)
         circle_y = (self.circle_strel[0] + center[1] - self.circle_r).astype(np.int)
@@ -440,51 +440,20 @@ class SliceBox(QLabel):
         circle_x = circle_x[np.nonzero(idx)]
         circle_y = circle_y[np.nonzero(idx)]
 
-        # print circle_x
-        # print circle_y
-
         self.circle_m = np.ravel_multi_index((circle_y, circle_x), self.slice_size[::-1])
 
         if self.area_hist_widget is not None:
             self.circle_area_data = self.ctslice[(circle_x, circle_y)]
             self.area_hist_widget.set_data(self.circle_area_data)
 
-        # print 'data: ', self.circle_area_data
-
-        # print self.ctslice[np.unravel_index(self.circle_m, self.slice_size)]
-        # for i in range(len(circle_x)):
-        #     print self.ctslice[circle_y[i], circle_x[i]],
-        # print ''
-        # print self.ctslice[np.unravel_index(circle_y, circle_x]
-
         self.updateSlice()
-    # def selectSlice(self, value, force=False):
-    #     if (value < 0) or (value >= self.n_slices):
-    #         return
-    #
-    #     # if (value != self.actual_slice) or force:
-    #         # self.saveSliceSeeds()
-    #         # if self.seeds_modified:
-    #         #     if self.mode == 'crop':
-    #         #         self.updateCropBounds()
-    #         #
-    #         #     elif self.mode == 'mask':
-    #         #         self.updateMaskRegion()
-    #
-    #     if self.contours is None:
-    #         contours = None
-    #
-    #     else:
-    #         contours = self.contours_aview[...,value]
-    #
-    #     # slider_val = self.n_slices - value
-    #     # self.slider.setValue(slider_val)
-    #     # self.slider.label.setText('Slice: %d / %d' % (slider_val, self.n_slices))
-    #
-    #     self.setSlice(self.img_aview[...,value],
-    #                             self.seeds_aview[...,value],
-    #                             contours)
-    #     self.actual_slice = value
+
+    def mousePressEvent(self, QMouseEvent):
+        coords = list(self.gridPosition(QMouseEvent.pos()))
+        # print 'pos = ', coords, ', data = ', self.ctslice[coords[0], coords[1]]
+        if self.show_mode == self.SHOW_LABELS:
+            label = self.main.actual_data
+        return coords
 
 if __name__ == '__main__':
     from lession_editor_GUI_slim2 import Ui_MainWindow

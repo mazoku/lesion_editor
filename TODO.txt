@@ -28,3 +28,10 @@ duben  -------------------------
 - pocitat z eroze, ale pote dorustat do neerodovane
 - ppst
     - tlacitko a nejaky chooser pro tridu (health, hypo, hyper)
+
+zari  --------------------------
+- vizualizace kontur
+- min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
+- kontury 'contours' (obrysy) nefunguji
+- area_hist_widget nefunguje (hodnoty jsou asi spravne, ale histogram je mimo)
+- objects_widget - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?

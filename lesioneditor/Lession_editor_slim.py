@@ -55,6 +55,7 @@ import data_view_widget
 SHOW_IM = 0
 SHOW_LABELS = 1
 SHOW_CONTOURS = 2
+# SHOW_FILTERED_LABELS = 3
 
 class Lession_editor(QtGui.QMainWindow):
     """Main class of the programm."""
@@ -163,13 +164,13 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.figure_R_CB.currentIndexChanged.connect(self.figure_R_CB_callback)
 
         # self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:], self.voxel_size)
-        self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size)
+        self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
         self.view_L.setCW(self.win_l, 'c')
         self.view_L.setCW(self.win_w, 'w')
         # self.view_L.setSlice(self.data_L.data[0,:,:])
         self.view_L.setSlice(self.data_L.data_aview[...,0])
 
-        self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size)
+        self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
         self.view_R.setCW(self.win_l, 'c')
         self.view_R.setCW(self.win_w, 'w')
         # self.view_R.setSlice(self.data_R.data[0,:,:])
@@ -258,6 +259,8 @@ class Lession_editor(QtGui.QMainWindow):
         elif key == QtCore.Qt.Key_L:
             print 'R'
             self.run_callback()
+        # elif key == QtCore.Qt.Key_M:
+        #     print 'M'
         else:
             print key, ' - unrecognized hot key.'
 
@@ -991,18 +994,20 @@ class Lession_editor(QtGui.QMainWindow):
         im = None
         if site == 'L':
             if self.show_mode_L == SHOW_IM or self.show_mode_L == SHOW_CONTOURS:
-                # im = self.data_L.data[self.actual_slice_L, :, :]
                 im = self.data_L.data_aview[...,self.actual_slice_L]
             elif self.show_mode_L == SHOW_LABELS:
-                # im = self.data_L.labels[self.actual_slice_L, :, :]
-                im = self.data_L.labels_aview[...,self.actual_slice_L]
+                # im = self.data_L.labels_aview[...,self.actual_slice_L]
+                im = self.data_L.labels_filt_aview[...,self.actual_slice_L]
+            # elif self.show_mode_L == SHOW_FILTERED_LABELS:
+            #     im = self.data_L.labels_filt_aview[...,self.actual_slice_L]
         elif site == 'R':
             if self.show_mode_R == SHOW_IM or self.show_mode_R == SHOW_CONTOURS:
-                # im = self.data_R.data[self.actual_slice_R, :, :]
                 im = self.data_R.data_aview[...,self.actual_slice_R]
             elif self.show_mode_R == SHOW_LABELS:
-                # im = self.data_R.labels[self.actual_slice_R, :, :]
-                im = self.data_R.labels_aview[...,self.actual_slice_R]
+                # im = self.data_R.labels_aview[...,self.actual_slice_R]
+                im = self.data_R.labels_filt_aview[...,self.actual_slice_R]
+            # elif self.show_mode_R == SHOW_FILTERED_LABELS:
+            #     im = self.data_R.labels_filt_aview[...,self.actual_slice_R]
         return im
 
     def run(self, im, labels, healthy_label, hypo_label, hyper_label, slice_axis=2, disp_smoothed=False):
@@ -1087,15 +1092,3 @@ if __name__ == '__main__':
     le = Lession_editor(fnames)
     le.show()
     sys.exit(app.exec_())
-
-
-# NOTES and TODOS ----------
-# TODO: vizualizace kontur
-# TODO: min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
-# TODO: kontury 'contours' (obrysy) nefunguji
-# TODO: area_hist_widget nefunguje (hodnoty jsou asi spravne, ale histogram je mimo)
-# TODO: nahradit slidery pro min a max hodnotu jedinym range sliderem
-#       http://blog.enthought.com/enthought-tool-suite/traits/new-double-slider-editor/#.VfkBEN-oGkA
-#       https://github.com/rsgalloway/QRangeSlider
-
-# TODO: vizualizace filtrovanych objektu

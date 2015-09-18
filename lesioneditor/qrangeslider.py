@@ -491,7 +491,7 @@ class QRangeSlider(QtGui.QWidget, Ui_Form):
             widget.setMaximumWidth(16777215)
         
         v = self._posToValue(xpos)
-        print xpos
+        # print xpos
         
         if index == self._SPLIT_START:
             _lockWidth(self._tail)

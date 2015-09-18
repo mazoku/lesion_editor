@@ -295,6 +295,14 @@ class SliceBox(QLabel):
         painter = QPainter(self.image)
         painter.drawImage(0, 0, image)
 
+        if self.show_mode == self.SHOW_CONTOURS:# and self.centers is not None:
+            if self.centers is not None:
+                pts = self.centers.nonzero()
+                pen = QPen(Qt.red, 3)
+                painter.setPen(pen)
+                for i in range(len(pts[0])):
+                    painter.drawPoint(pts[1][i] * self.grid[0], pts[0][i] * self.grid[1])
+
         if self.circle_active:
             pen = QPen(Qt.red, 3)
             painter.setPen(pen)
@@ -328,9 +336,10 @@ class SliceBox(QLabel):
 
         self.updateSlice()
 
-    def setSlice(self, ctslice=None, seeds=None, contours=None):
+    def setSlice(self, ctslice=None, seeds=None, contours=None, centers=None):
         # ctslice = 200 * np.triu(np.ones(ctslice.shape, dtype=int))
         self.ctslice = ctslice
+        self.centers = centers
         # ctslice = np.transpose(ctslice)
         if ctslice is not None:
             if self.show_mode in (self.SHOW_IM, self.SHOW_CONTOURS):
@@ -344,11 +353,11 @@ class SliceBox(QLabel):
         else:
             self.seeds = None
 
-        if contours is not None and self.show_mode == self.SHOW_CONTOURS:
-            self.contours = contours.transpose(self.act_transposition).ravel(order='F')
+        # if contours is not None and self.show_mode == self.SHOW_CONTOURS:
+        #     self.contours = contours.transpose(self.act_transposition).ravel(order='F')
             # self.contours = contours.transpose(self.act_transposition)
-        else:
-            self.contours = None
+        # else:
+        #     self.contours = None
 
         self.updateSlice()
 

@@ -16,7 +16,7 @@ class Lesion(object):
         self.center = None  # center of mass
 
         self.mean_density = None
-        self.mean_density_std = None
+        self.std_density = None
 
         self.max_width = None
         self.max_height = None

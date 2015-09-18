@@ -22,6 +22,9 @@ class Objects_widget(QtGui.QWidget):
         self.area_RS.setRange(10, self.area_RS.max())
         self.ui.area_layout.addWidget(self.area_RS)
 
+        # self.area_RS.endValueChanged.connect(self.max_area_changed_callback)
+        # self.area_RS.startValueChanged.connect(self.min_area_changed_callback)
+
         # density range slider
         self.density_RS = QRangeSlider()
         self.density_RS.setMin(-50)
@@ -29,15 +32,16 @@ class Objects_widget(QtGui.QWidget):
         self.density_RS.setRange(10, self.density_RS.max())
         self.ui.density_layout.addWidget(self.density_RS)
 
+    # def max_area_changed_callback(self, value):
+    #     print 'max area changed to ', value
+    #
+    # def min_area_changed(self, value):
+    #     print 'min area changed to ', value
+
     def set_area_range(self, areas):
         self.area_RS.setMin(min(areas))
         self.area_RS.setMax(max(areas))
         self.area_RS.setRange()
-        # self.ui.min_area_SL.setMaximum(max(areas))
-        # self.ui.min_area_SL.setMinimum(min(areas))
-        # self.ui.max_area_SL.setMaximum(max(areas))
-        # self.ui.max_area_SL.setMinimum(min(areas))
-        # self.ui.max_area_SL.setValue(max(areas))
 
     def keyPressEvent(self, QKeyEvent):
         print 'hist widget key event: ',
@@ -47,6 +51,15 @@ class Objects_widget(QtGui.QWidget):
                 self.ui.objects_TV.clearSelection()
             else:
                 self.close()
+
+    # self.cc.objects_filtration(self.selected_objects_labels, min_area=self.ui.min_area_SL.value(), max_area=value)
+    #     # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
+    #     self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
+    #     # TODO: nasleduje prasarna
+    #     if self.view_L.show_mode == self.view_L.SHOW_LABELS:
+    #         self.show_labels_L_callback()
+    #     if self.view_R.show_mode == self.view_R.SHOW_LABELS:
+    #         self.show_labels_R_callback()
 
 if __name__ == '__main__':
 

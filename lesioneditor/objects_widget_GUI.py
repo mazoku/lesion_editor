@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'objects_widget_GUI.ui'
 #
-# Created: Wed Sep 16 09:38:17 2015
+# Created: Fri Sep 18 14:43:29 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,12 @@ except AttributeError:
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
-        Form.resize(400, 346)
+        Form.resize(481, 839)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
+        Form.setSizePolicy(sizePolicy)
         self.verticalLayout = QtGui.QVBoxLayout(Form)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.area_layout = QtGui.QHBoxLayout()
@@ -45,14 +50,16 @@ class Ui_Form(object):
         self.label_2.setSizePolicy(sizePolicy)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.horizontalLayout_2.addWidget(self.label_2)
-        self.lineEdit = QtGui.QLineEdit(Form)
-        self.lineEdit.setMaximumSize(QtCore.QSize(50, 16777215))
-        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
-        self.horizontalLayout_2.addWidget(self.lineEdit)
-        self.horizontalSlider = QtGui.QSlider(Form)
-        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.horizontalSlider.setObjectName(_fromUtf8("horizontalSlider"))
-        self.horizontalLayout_2.addWidget(self.horizontalSlider)
+        self.min_compactness_LE = QtGui.QLineEdit(Form)
+        self.min_compactness_LE.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.min_compactness_LE.setObjectName(_fromUtf8("min_compactness_LE"))
+        self.horizontalLayout_2.addWidget(self.min_compactness_LE)
+        self.min_compactness_SL = QtGui.QSlider(Form)
+        self.min_compactness_SL.setMaximum(100)
+        self.min_compactness_SL.setSingleStep(1)
+        self.min_compactness_SL.setOrientation(QtCore.Qt.Horizontal)
+        self.min_compactness_SL.setObjectName(_fromUtf8("min_compactness_SL"))
+        self.horizontalLayout_2.addWidget(self.min_compactness_SL)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.density_layout = QtGui.QHBoxLayout()
         self.density_layout.setObjectName(_fromUtf8("density_layout"))

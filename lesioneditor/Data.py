@@ -23,6 +23,7 @@ class Data(object):
         self.shape = None
         self.orig_shape = None
         self.objects = None  # array where each object has unique label
+        # self.object_centroids = None
         self.labels_v = None
         self.n_rows = None
         self.n_cols = None
@@ -35,8 +36,9 @@ class Data(object):
         self.__labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
         self.__labels_filt_aview = None
         self.__user_seeds = None
-
-        self.lesions = None  # list of lesions, set it with Lesions.extract_lesions(self.labels)
+        self.__object_centers = None  # array of object centers
+        self.__object_centers_list = None  # list of object centers
+        self.__lesions = None  # list of lesions, set it with Lesions.extract_lesions(self.labels)
 
         self.filename = filename
         self.loaded = False
@@ -57,18 +59,18 @@ class Data(object):
         return self.__data
 
     @data.setter
-    def data(self, data_in):
-        self.__data = data_in
+    def data(self, x):
+        self.__data = x
 
     @property
     def labels(self):
         return self.__labels
 
     @labels.setter
-    def labels(self, data):
-        self.__labels = data
+    def labels(self, x):
+        self.__labels = x
         self.__labels_aview = self.__labels.transpose(self.act_transposition)
-        self.__labels_filt = data
+        self.__labels_filt = x
         self.__labels_filt_aview = self.__labels_filt.transpose(self.act_transposition)
 
     @labels.deleter
@@ -81,17 +83,17 @@ class Data(object):
         return self.__labels_aview
 
     @labels_aview.setter
-    def labels_aview(self, data):
-        self.__labels_aview = data
+    def labels_aview(self, x):
+        self.__labels_aview = x
 
     @property
     def labels_filt(self):
         return self.__labels_filt
 
     @labels_filt.setter
-    def labels_filt(self, data):
-        self.__labels_filt = data
-        self.__labels_filt_aview = data.transpose(self.act_transposition)
+    def labels_filt(self, x):
+        self.__labels_filt = x
+        self.__labels_filt_aview = x.transpose(self.act_transposition)
 
     @labels_filt.deleter
     def labels_filt(self):
@@ -102,8 +104,8 @@ class Data(object):
         return self.__labels_filt_aview
 
     @labels_filt_aview.setter
-    def labels_filt_aview(self, data):
-        self.__labels_filt_aview = data
+    def labels_filt_aview(self, x):
+        self.__labels_filt_aview = x
 
     @property
     def user_seeds(self):
@@ -112,6 +114,38 @@ class Data(object):
     @user_seeds.setter
     def user_seeds(self, data):
         self.__user_seeds = data
+
+    @property
+    def lesions(self):
+        return self.__lesions
+
+    @lesions.setter
+    def lesions(self, x):
+        self.__lesions = x
+        self.__object_centers_list = [l.center for l in self.lesions]
+        self.__object_centers = np.zeros(self.objects.shape, dtype=np.bool)
+        for i in x:
+            try:
+                idx = (np.round(i.center)).astype(np.int)
+                self.__object_centers[idx[0], idx[1], idx[2]] = 1
+            except:
+                pass
+
+    @property
+    def object_centers(self):
+        return self.__object_centers
+
+    @object_centers.setter
+    def object_centers(self, x):
+        self.__object_centers = x
+
+    @property
+    def object_centers_list(self):
+        return self.__object_centers_list
+
+    @object_centers_list.setter
+    def object_centers_list(self, x):
+        self.__object_centers_list = x
 
     def load_data(self, filename, slice_idx=-1):
         self.filename = filename

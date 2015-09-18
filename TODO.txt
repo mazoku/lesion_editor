@@ -1,11 +1,36 @@
 ------  FILE FOR NOTES AND TODOS  ------
 ----------------------------------------
 
+
+----------------------------------------
+VZHLED  --------------------------------
+- loziska barvit ruzne, ne pouze modra a zelena (dat uzivateli moznost volby a prepinani?)
+
+
+----------------------------------------
+FUNKCNOST ------------------------------
+- pocitani kompaktnosti
+- filtrace objektu pres kompaktnost
+- pri kliku na lozisko v datech udelat selection na totez lozisko v tabulce
+- manualni pridani loziska
+- vizualizace kontur
+- area_hist_widget - nefunguje (hodnoty jsou asi spravne, ale histogram je mimo)
+- objects_widget - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
+
+
+---------------------------------------
+DETAILY -------------------------------
+- min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
+- inicializaci hist_widget delat hned v __init__ Lesitoru (nutno po nacteni dat priradit data do hist_widgetu)
+
+
+
+
+
+---------------------------------------
+OLD -----------------------------------
 - General
     - predelat zoom na cv2.resize?
-
-- Vizualizace
-    - kontury nefunguji - ale v iPython notebooku kod funguje
 
 - Lokalizace
     - zoomovani - vytvari tmavy okraj kvuli interpolaci?
@@ -14,24 +39,14 @@
 
 - Table
     - filtrace se spousti 2x, jednou po updatu uzivatelem a jednou jak je zretezen slider s line editem
-    - pri kliknuti do figure zobrazit v tabulce
 
 - mel bych si ukladat rescalovana data, aby se mi pri opakovanem spousteni vypoctu dale nezmensovala
 
-- manualni vyber seedu
 
-- rozsah pro jednotlive parametry nacpat taky do configu (necist z GUIcka)
-- moznost zadavat parametr alpha a beta jako float
+--------------------------------------
+TAK JDE CAS --------------------------
 
-
-duben  -------------------------
+duben  -------------------------------
 - pocitat z eroze, ale pote dorustat do neerodovane
 - ppst
     - tlacitko a nejaky chooser pro tridu (health, hypo, hyper)
-
-zari  --------------------------
-- vizualizace kontur
-- min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
-- kontury 'contours' (obrysy) nefunguji
-- area_hist_widget nefunguje (hodnoty jsou asi spravne, ale histogram je mimo)
-- objects_widget - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?

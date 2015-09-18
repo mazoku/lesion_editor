@@ -1,3 +1,5 @@
+from __future__ import division
+
 __author__ = 'tomas'
 
 import sys
@@ -46,9 +48,7 @@ from hist_widget import Hist_widget
 from objects_widget import Objects_widget
 import My_table_model as mtm
 import area_hist_widget as ahw
-
 import Computational_core
-
 import data_view_widget
 
 # constants definition
@@ -57,8 +57,9 @@ SHOW_LABELS = 1
 SHOW_CONTOURS = 2
 # SHOW_FILTERED_LABELS = 3
 
-class Lession_editor(QtGui.QMainWindow):
+class LessionEditor(QtGui.QMainWindow):
     """Main class of the programm."""
+
 
     def __init__(self, fname, disp_smoothed=False, parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -95,14 +96,25 @@ class Lession_editor(QtGui.QMainWindow):
         self.selected_objects_labels = None  # list of objects' labels selected in tableview
 
         # fill parameters to widgets
-        self.fill_parameters()
+        # self.fill_parameters()
 
         self.voxel_size = self.params['voxel_size']
         self.view_widget_width = 50
         self.two_views = False
 
         self.hist_widget = None
-        self.objects_widget = None
+
+        self.objects_widget = Objects_widget()
+        self.params['compactness_step'] = self.objects_widget.ui.min_compactness_SL.singleStep() / self.objects_widget.ui.min_compactness_SL.maximum()
+        self.objects_widget.area_RS.endValueChanged.connect(self.object_slider_changed)
+        self.objects_widget.area_RS.startValueChanged.connect(self.object_slider_changed)
+        self.objects_widget.density_RS.endValueChanged.connect(self.object_slider_changed)
+        self.objects_widget.density_RS.startValueChanged.connect(self.object_slider_changed)
+        self.objects_widget.ui.min_compactness_SL.valueChanged.connect(self.min_compactness_SL_changed)
+        # connecting min_compactness line edit and slider
+        ww_val = QtGui.QIntValidator(0, 1)
+        self.objects_widget.ui.min_compactness_LE.setValidator(ww_val)
+        self.objects_widget.ui.min_compactness_LE.textChanged.connect(self.min_compactness_LE_changed)
 
         # self.area_hist_widget = ahw.AreaHistWidget()
 
@@ -190,12 +202,6 @@ class Lession_editor(QtGui.QMainWindow):
         data_viewer_layout.addWidget(self.view_R)
         self.ui.viewer_F.setLayout(data_viewer_layout)
 
-        # adding widget for displaying data histograms
-        # self.hist_widget = hist_widget.Hist_widget(self, self.cc)
-        # hist_viewer_layout = QtGui.QHBoxLayout()
-        # hist_viewer_layout.addWidget(self.hist_widget)
-        # self.ui.histogram_F.setLayout(hist_viewer_layout)
-
         # connecting callbacks ----------------------------------
         self.ui.view_L_BTN.clicked.connect(self.view_L_callback)
         self.ui.view_R_BTN.clicked.connect(self.view_R_callback)
@@ -212,18 +218,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.ui.show_contours_L_BTN.clicked.connect(self.show_contours_L_callback)
         self.ui.show_contours_R_BTN.clicked.connect(self.show_contours_R_callback)
 
-        # main buttons
-        # self.ui.calculate_models_BTN.clicked.connect(self.calculate_models_callback)
-        # self.ui.run_BTN.clicked.connect(self.run_callback)
-
-        # connecting spin boxes
-        # self.ui.hypo_mean_SB.valueChanged.connect(self.hypo_mean_SB_callback)
-        # self.ui.hypo_std_SB.valueChanged.connect(self.hypo_std_SB_callback)
-        # self.ui.hyper_mean_SB.valueChanged.connect(self.hyper_mean_SB_callback)
-        # self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
-        # self.ui.heal_mean_SB.valueChanged.connect(self.heal_mean_SB_callback)
-        # self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
-
         # connecting scrollbars
         self.ui.slice_C_SB.valueChanged.connect(self.slider_C_changed)
         self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
@@ -231,12 +225,6 @@ class Lession_editor(QtGui.QMainWindow):
 
         # to be able to capture key press events immediately
         self.setFocus()
-
-        # connecting sliders with their line edit
-        # self.connect_SL_and_LE()
-
-        # remove btn
-        # self.ui.remove_obj_BTN.clicked.connect(self.remove_obj_BTN_callback)
 
     def keyPressEvent(self, QKeyEvent):
         print 'key event: ',
@@ -264,6 +252,17 @@ class Lession_editor(QtGui.QMainWindow):
         else:
             print key, ' - unrecognized hot key.'
 
+    def min_compactness_SL_changed(self, value):
+        self.objects_widget.ui.min_compactness_LE.setText('%.3f' % (value * self.params['compactness_step']))
+        self.object_slider_changed(value)
+
+    def min_compactness_LE_changed(self, value):
+        try:  # must be due to the possibility that no character could be entered
+            self.objects_widget.ui.min_compactness_SL.setValue(int(value * self.objects_widget.ui.min_compactness_SL.maximum()))
+            # self.params['compactness'] = value
+        except:
+            pass
+
     def action_circle_callback(self):
         self.view_L.circle_active = True
         self.view_L.setMouseTracking(True)
@@ -278,8 +277,10 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.setFocus()
 
     def action_show_object_list_callback(self):
-        if self.objects_widget is None:
-            self.objects_widget = Objects_widget()
+        # if self.objects_widget is None:
+        #     self.objects_widget = Objects_widget()
+        #     self.objects_widget.area_RS.endValueChanged.connect(self.max_area_changed_callback)
+        #     self.objects_widget.area_RS.startValueChanged.connect(self.min_area_changed_callback)
         self.objects_widget.show()
         self.objects_widget.setFocus()
 
@@ -309,212 +310,26 @@ class Lession_editor(QtGui.QMainWindow):
         if self.view_R.show_mode == self.view_R.SHOW_LABELS:
             self.show_labels_R_callback()
 
-        # self.slider_C_changed(slice)
+    def object_slider_changed(self, value):
+        self.params['max_area'] = self.objects_widget.area_RS.end()
+        self.params['min_area'] = self.objects_widget.area_RS.start()
+        self.params['max_density'] = self.objects_widget.density_RS.end()
+        self.params['min_density'] = self.objects_widget.density_RS.start()
+        self.params['min_compactness'] = self.objects_widget.ui.min_compactness_SL.value()
+        self.params['compactness'] = self.objects_widget.ui.min_compactness_SL.value() * self.params['compactness_step']
 
-    def comp_fact_SB_changed(self, value):
-        self.ui.comp_fact_LE.setText(str(value))
-        self.params['comp_fact'] = value
-
-    def comp_fact_LE_changed(self, value):
-        try:  # must be due to the possibility that no character could be entered
-            self.ui.comp_fact_SB.setValue(int(value))
-            # self.params['comp_fact'] = int(value)
-        except:
-            pass
-
-    def min_comp_SL_changed(self, value):
-        self.ui.min_comp_LE.setText(str(value))
-        self.params['min_compactness'] = value
-        self.cc.objects_filtration(self.selected_objects_labels)
+        self.cc.objects_filtration(self.selected_objects_labels,
+                                   area= (self.objects_widget.area_RS.start(), self.objects_widget.area_RS.end()),
+                                   density=(self.objects_widget.density_RS.start(), self.objects_widget.density_RS.end()),
+                                   compactness=self.params['compactness'])
         # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-
-    def min_comp_LE_changed(self, value):
-        try:  # must be due to the possibility that no character could be entered
-            self.ui.min_comp_SL.setValue(int(value))
-            # self.params['min_compactness'] = int(value)
-            # self.cc.objects_filtration()
-            ## self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-            #self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-        except:
-            pass
-
-    def max_area_SL_changed(self, value):
-        self.ui.max_area_LE.setText(str(value))
-        self.params['max_area'] = value
-        self.cc.objects_filtration(self.selected_objects_labels, min_area=self.ui.min_area_SL.value(), max_area=value)
-        # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-        # TODO: nasleduje prasarna
-        if self.view_L.show_mode == self.view_L.SHOW_LABELS:
-            self.show_labels_L_callback()
-        if self.view_R.show_mode == self.view_R.SHOW_LABELS:
-            self.show_labels_R_callback()
-
-    def max_area_LE_changed(self, value):
-        try:  # must be due to the possibility that no character could be entered
-            self.ui.max_area_SL.setValue(int(value))
-            # self.params['max_area'] = int(value)
-            # self.cc.objects_filtration()
-            ## self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-            # self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-        except:
-            pass
-
-    def min_area_SL_changed(self, value):
-        self.ui.min_area_LE.setText(str(value))
-        self.params['min_area'] = value
-        self.cc.objects_filtration(self.selected_objects_labels, min_area=value, max_area=self.ui.max_area_SL.value())
-        # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-        # TODO: nasleduje prasarna
-        if self.view_L.show_mode == self.view_L.SHOW_LABELS:
-            self.show_labels_L_callback()
-        if self.view_R.show_mode == self.view_R.SHOW_LABELS:
-            self.show_labels_R_callback()
-
-    # def min_area_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.min_area_SL.setValue(int(value))
-    #         # self.params['min_area'] = int(value)
-    #         # self.cc.objects_filtration()
-    #         ## self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-    #         # self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
-    #     except:
-    #         pass
-    #
-    # def tum_std_k_SL_changed(self, value):
-    #     self.ui.k_std_t_LE.setText(str(value))
-    #     self.params['k_std_t'] = value
-    #
-    # def k_std_t_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.tum_std_k_SL.setValue(int(value))
-    #         self.params['k_std_t'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def heal_std_k_SL_changed(self, value):
-    #     self.ui.k_std_h_LE.setText(str(value))
-    #     self.params['k_std_h'] = value
-    #
-    # def k_std_h_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.heal_std_k_SL.setValue(int(value))
-    #         self.params['k_std_h'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def frac_SL_changed(self, value):
-    #     self.ui.perc_LE.setText(str(value))
-    #     self.params['perc'] = value
-    #
-    # def perc_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.frac_SL.setValue(int(value))
-    #         self.params['perc'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def beta_SL_changed(self, value):
-    #     self.ui.beta_LE.setText(str(value))
-    #     self.params['beta'] = value
-    #
-    # def beta_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.beta_SL.setValue(int(value))
-    #         self.params['beta'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def alpha_SL_changed(self, value):
-    #     self.ui.alpha_LE.setText(str(value))
-    #     self.params['alpha'] = value
-    #
-    # def alpha_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.alpha_SL.setValue(int(value))
-    #         self.params['alpha'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def tv_weight_SL_changed(self, value):
-    #     self.ui.tv_weight_LE.setText(str(float(value)/1000))
-    #     self.params['tv_weight'] = value
-    #
-    # def tv_weight_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         w = int(float(value)*1000)
-    #         self.ui.tv_weight_SL.setValue(w)
-    #         self.params['tv_weight'] = w
-    #     except:
-    #         pass
-    #
-    # def sigma_spatial_SL_changed(self, value):
-    #     self.ui.bilateral_spatial_LE.setText(str(value))
-    #     self.params['sigma_spatial'] = value
-    #
-    # def bilateral_spatial_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.sigma_spatial_SL.setValue(int(value))
-    #         self.params['sigma_spatial'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def sigma_range_SL_changed(self, value):
-    #     self.ui.bilateral_range_LE.setText(str(value))
-    #     self.params['sigma_range'] = value
-    #
-    # def bilateral_range_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.sigma_range_SL.setValue(int(value))
-    #         self.params['sigma_range'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def sigma_SL_changed(self, value):
-    #     self.ui.gaussian_sigma_LE.setText(str(value))
-    #     self.params['sigma'] = value
-    #
-    # def gaussian_sigma_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.sigma_SL.setValue(int(value))
-    #         self.params['sigma'] = int(value)
-    #     except:
-    #         pass
-    #
-    # def voxel_size_SB_changed(self, value):
-    #     self.ui.voxel_size_LE.setText(str(value))
-    #     self.params['working_voxel_size'] = value
-    #
-    # def voxel_size_LE_changed(self, value):
-    #     try:  # must be due to the possibility that no character could be entered
-    #         self.ui.voxel_size_SB.setValue(int(value))
-    #         self.params['working_voxel_size'] = int(value)
-    #     except:
-    #         pass
-
-    def win_wdth_SL_changed(self, value):
-        self.ui.win_width_LE.setText(str(value))
-        self.params['win_width'] = value
-
-    def win_width_LE_changed(self, value):
-        try:  # must be due to the possibility that no character could be entered
-            self.ui.win_wdth_SL.setValue(int(value))
-            self.params['win_width'] = int(value)
-        except:
-            pass
-
-    def win_lvl_SL_changed(self, value):
-        self.ui.win_level_LE.setText(str(value))
-        self.params['win_level'] = value
-
-    def win_level_LE_changed(self, value):
-        try:  # must be due to the possibility that the character '-' or nothing could be entered
-            self.ui.win_lvl_SL.setValue(int(value))
-            self.params['win_level'] = int(value)
-        except:
-            pass
+        if self.cc.filtered_idxs is not None:
+            self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
+            # TODO: nasleduje prasarna
+            if self.view_L.show_mode == self.view_L.SHOW_LABELS:
+                self.show_labels_L_callback()
+            if self.view_R.show_mode == self.view_R.SHOW_LABELS:
+                self.show_labels_R_callback()
 
     def load_parameters(self, config_path='config.xml'):
         config = ConfigParser.ConfigParser()
@@ -538,107 +353,6 @@ class Lession_editor(QtGui.QMainWindow):
                             params[option] = config.get(section, option)
 
         return params
-
-    def fill_parameters(self):
-        pass
-        # # general parameters
-        # self.ui.win_wdth_SL.setValue(self.params['win_width'])
-        # self.ui.win_width_LE.setText(str(self.params['win_width']))
-        #
-        # self.ui.win_lvl_SL.setValue(self.params['win_level'])
-        # self.ui.win_level_LE.setText(str(self.params['win_level']))
-        #
-        # self.ui.voxel_size_SB.setValue(self.params['working_voxel_size_mm'])
-        # self.ui.voxel_size_LE.setText(str(self.params['working_voxel_size_mm']))
-        #
-        # # smoothing parameters
-        # self.ui.sigma_SL.setValue(self.params['sigma'])
-        # self.ui.gaussian_sigma_LE.setText(str(self.params['sigma']))
-        #
-        # self.ui.sigma_range_SL.setValue(self.params['sigma_range'])
-        # self.ui.bilateral_range_LE.setText(str(self.params['sigma_range']))
-        #
-        # self.ui.sigma_spatial_SL.setValue(self.params['sigma_spatial'])
-        # self.ui.bilateral_spatial_LE.setText(str(self.params['sigma_spatial']))
-        #
-        # self.ui.tv_weight_SL.setValue(self.params['tv_weight'])
-        # self.ui.tv_weight_LE.setText(str(self.params['tv_weight']))
-        #
-        # # color model parameters
-        # self.ui.frac_SL.setValue(self.params['perc'])
-        # self.ui.perc_LE.setText(str(self.params['perc']))
-        #
-        # self.ui.heal_std_k_SL.setValue(self.params['k_std_h'])
-        # self.ui.k_std_h_LE.setText(str(self.params['k_std_h']))
-        #
-        # self.ui.tum_std_k_SL.setValue(self.params['k_std_t'])
-        # self.ui.k_std_t_LE.setText(str(self.params['k_std_t']))
-        #
-        # # localization parameters
-        # self.ui.alpha_SL.setValue(self.params['alpha'])
-        # self.ui.alpha_LE.setText(str(self.params['alpha']))
-        #
-        # self.ui.beta_SL.setValue(self.params['beta'])
-        # self.ui.beta_LE.setText(str(self.params['beta']))
-        #
-        # # self.ui.min_area_SL.setValue(self.params['min_area'])
-        # # self.ui.min_area_LE.setText(str(self.params['min_area']))
-        # self.ui.min_area_SL.setValue(0)
-        # self.ui.min_area_LE.setText('0')
-        #
-        # # self.ui.max_area_SL.setValue(self.params['max_area'])
-        # # self.ui.max_area_LE.setText(str(self.params['max_area']))
-        #
-        # self.ui.max_area_SL.setValue(0)
-        # self.ui.max_area_LE.setText('0')
-        #
-        # self.ui.min_comp_SL.setValue(self.params['min_compactness'])
-        # self.ui.min_comp_LE.setText(str(self.params['min_compactness']))
-        #
-        # self.ui.comp_fact_SB.setValue(self.params['comp_fact'])
-        # self.ui.comp_fact_LE.setText(str(self.params['comp_fact']))
-
-    # def hypo_mean_SB_callback(self, value):
-    #     self.statusBar().showMessage('Hypodense model updated thru spin box.')
-    #     rv = scista.norm(value, self.cc.models['rv_hypo'].std())
-    #     self.cc.models['rv_hypo'] = rv
-    #     self.hist_widget.update_hypo_rv(rv)
-    #     self.hist_widget.update_figures()
-    #
-    # def hypo_std_SB_callback(self, value):
-    #     self.statusBar().showMessage('Hypodense model updated thru spin box.')
-    #     rv = scista.norm(self.cc.models['rv_hypo'].mean(), value)
-    #     self.cc.models['rv_hypo'] = rv
-    #     self.hist_widget.update_hypo_rv(rv)
-    #     self.hist_widget.update_figures()
-    #
-    # def hyper_mean_SB_callback(self, value):
-    #     self.statusBar().showMessage('Hyperdense model updated thru spin box.')
-    #     rv = scista.norm(value, self.cc.models['rv_hyper'].std())
-    #     self.cc.models['rv_hyper'] = rv
-    #     self.hist_widget.update_hyper_rv(rv)
-    #     self.hist_widget.update_figures()
-    #
-    # def hyper_std_SB_callback(self, value):
-    #     self.statusBar().showMessage('Hyperdense model updated thru spin box.')
-    #     rv = scista.norm(self.cc.models['rv_hyper'].mean(), value)
-    #     self.cc.models['rv_hyper'] = rv
-    #     self.hist_widget.update_hyper_rv(rv)
-    #     self.hist_widget.update_figures()
-    #
-    # def heal_mean_SB_callback(self, value):
-    #     self.statusBar().showMessage('Healthy model updated thru spin box.')
-    #     rv = scista.norm(value, self.cc.models['rv_heal'].std())
-    #     self.cc.models['rv_heal'] = rv
-    #     self.hist_widget.update_heal_rv(rv)
-    #     self.hist_widget.update_figures()
-    #
-    # def heal_std_SB_callback(self, value):
-    #     self.statusBar().showMessage('Healthy model updated thru spin box.')
-    #     rv = scista.norm(self.cc.models['rv_heal'].mean(), value)
-    #     self.cc.models['rv_heal'] = rv
-    #     self.hist_widget.update_heal_rv(rv)
-    #     self.hist_widget.update_figures()
 
     def scroll_event(self, value, who):
         if who == 0:  # left viewer
@@ -675,15 +389,19 @@ class Lession_editor(QtGui.QMainWindow):
         im_R = self.get_image('R')
         if self.show_mode_L == SHOW_CONTOURS:
             labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
+            obj_centers_L = self.data_L.object_centers[self.actual_slice_L, ...]
         else:
             labels_L = None
+            obj_centers_L = None
         if self.show_mode_R == SHOW_CONTOURS:
             labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
+            obj_centers_R = self.data_R.object_centers[self.actual_slice_R, ...]
         else:
             labels_R = None
+            obj_centers_R = None
 
-        self.view_L.setSlice(im_L, contours=labels_L)
-        self.view_R.setSlice(im_R, contours=labels_R)
+        self.view_L.setSlice(im_L, contours=labels_L, centers=obj_centers_L)
+        self.view_R.setSlice(im_R, contours=labels_R, centers=obj_centers_R)
 
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
         self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
@@ -702,10 +420,12 @@ class Lession_editor(QtGui.QMainWindow):
         im_L = self.get_image('L')
         if self.show_mode_L == SHOW_CONTOURS:
             labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
+            obj_centers = self.data_L.object_centers[self.actual_slice_L, ...]
         else:
             labels_L = None
+            obj_centers = None
 
-        self.view_L.setSlice(im_L, contours=labels_L)
+        self.view_L.setSlice(im_L, contours=labels_L, centers=obj_centers)
 
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
         self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
@@ -721,10 +441,12 @@ class Lession_editor(QtGui.QMainWindow):
         im_R = self.get_image('R')
         if self.show_mode_R == SHOW_CONTOURS:
             labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
+            obj_centers = self.data_R.object_centers[self.actual_slice_R, ...]
         else:
             labels_R = None
+            obj_centers = None
 
-        self.view_R.setSlice(im_R, contours=labels_R)
+        self.view_R.setSlice(im_R, contours=labels_R, centers=obj_centers)
 
     def calculate_models_callback(self):
         self.statusBar().showMessage('Calculating intensity models...')
@@ -745,15 +467,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.hist_widget.update_hypo_rv(self.cc.models['rv_hypo'])
         self.hist_widget.update_hyper_rv(self.cc.models['rv_hyper'])
 
-        # self.ui.heal_mean_SB.setValue(self.cc.models['rv_heal'].mean())
-        # self.ui.heal_std_SB.setValue(self.cc.models['rv_heal'].std())
-        #
-        # self.ui.hypo_mean_SB.setValue(self.cc.models['rv_hypo'].mean())
-        # self.ui.hypo_std_SB.setValue(self.cc.models['rv_hypo'].std())
-        #
-        # self.ui.hyper_mean_SB.setValue(self.cc.models['rv_hyper'].mean())
-        # self.ui.hyper_std_SB.setValue(self.cc.models['rv_hyper'].std())
-
         self.hist_widget.update_figures()
 
     def run_callback(self):
@@ -765,11 +478,6 @@ class Lession_editor(QtGui.QMainWindow):
         self.statusBar().showMessage('Localization started...')
         self.cc.run()
         self.update_models()
-
-        # self.form_widget.update_figures()
-        # self.hist_widget.update_figures()
-        # self.labels = self.cc.actual_data.labels
-        # self.labels = self.cc.labels
 
         # filling table with objects
         # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
@@ -900,7 +608,9 @@ class Lession_editor(QtGui.QMainWindow):
 
         im = self.get_image('L')
         labels = self.data_L.labels_filt[self.actual_slice_L, :, :]
-        self.view_L.setSlice(im, contours=labels)
+        # obj_centers = [self.data_L.object_centers[:2] if self.data_L.object_centers[2] == self.actual_slice_L]
+        # obj_centers = [x[1:] for x in self.data_L.object_centers if round(x[0]) == self.actual_slice_L]
+        self.view_L.setSlice(im, contours=labels, centers=self.data_L.object_centers[self.actual_slice_L,...])
 
         self.statusBar().showMessage('data_L set to contours')
 
@@ -994,18 +704,18 @@ class Lession_editor(QtGui.QMainWindow):
         im = None
         if site == 'L':
             if self.show_mode_L == SHOW_IM or self.show_mode_L == SHOW_CONTOURS:
-                im = self.data_L.data_aview[...,self.actual_slice_L]
+                im = self.data_L.data_aview[..., self.actual_slice_L]
             elif self.show_mode_L == SHOW_LABELS:
                 # im = self.data_L.labels_aview[...,self.actual_slice_L]
-                im = self.data_L.labels_filt_aview[...,self.actual_slice_L]
+                im = self.data_L.labels_filt_aview[..., self.actual_slice_L]
             # elif self.show_mode_L == SHOW_FILTERED_LABELS:
             #     im = self.data_L.labels_filt_aview[...,self.actual_slice_L]
         elif site == 'R':
             if self.show_mode_R == SHOW_IM or self.show_mode_R == SHOW_CONTOURS:
-                im = self.data_R.data_aview[...,self.actual_slice_R]
+                im = self.data_R.data_aview[..., self.actual_slice_R]
             elif self.show_mode_R == SHOW_LABELS:
                 # im = self.data_R.labels_aview[...,self.actual_slice_R]
-                im = self.data_R.labels_filt_aview[...,self.actual_slice_R]
+                im = self.data_R.labels_filt_aview[..., self.actual_slice_R]
             # elif self.show_mode_R == SHOW_FILTERED_LABELS:
             #     im = self.data_R.labels_filt_aview[...,self.actual_slice_R]
         return im
@@ -1015,22 +725,9 @@ class Lession_editor(QtGui.QMainWindow):
             im = np.transpose(im, (1, 2, 0))
             labels = np.transpose(labels, (1, 2, 0))
         app = QtGui.QApplication(sys.argv)
-        le = Lession_editor(im, labels, healthy_label, hypo_label, hyper_label, disp_smoothed)
+        le = LessionEditor(im, labels, healthy_label, hypo_label, hyper_label, disp_smoothed)
         le.show()
         sys.exit(app.exec_())
-
-
-# class MyApplication(QtGui.QApplication):
-#
-#     def __init__(self, args):
-#       super(MyApplication, self).__init__(args)
-#
-#
-#     def notify(self, receiver, event):
-#         if(event.type() == QtCore.QEvent.KeyPress):
-#             QtGui.QMessageBox.information(None,"Received Key Press Event!!", "You Pressed: "+ event.text())
-#       #Call Base Class Method to Continue Normal Event Processing
-#         return super(MyApplication, self).notify(receiver, event)
 
 ################################################################################
 ################################################################################
@@ -1089,6 +786,6 @@ if __name__ == '__main__':
     # runing application -------------------------
     app = QtGui.QApplication(sys.argv)
     # app = MyApplication(sys.argv)
-    le = Lession_editor(fnames)
+    le = LessionEditor(fnames)
     le.show()
     sys.exit(app.exec_())

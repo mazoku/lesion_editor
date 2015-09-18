@@ -486,12 +486,31 @@ class Computational_core():
 
         return models
 
-    def objects_filtration(self, selected_labels=None, min_area=0, max_area=np.Infinity):
+    def objects_filtration(self, selected_labels=None,
+                           area=None,#min_area=0, max_area=np.Infinity,
+                           density=None,#min_density=-np.Infinity, max_density=np.Infinity):
+                           compactness=None):
         # min_area = self.params['min_area']
         # max_area = self.params['max_area']
         # min_compactness = self.params['min_compactness']
-        self.filtered_idxs = [x.label for x in self.actual_data.lesions
-                              if min_area <= x.area <= max_area]
+        if self.actual_data.lesions is not None:
+            lesions = self.actual_data.lesions[:]  # copy of the list
+        else:
+            return
+        if area is not None:
+            # self.filtered_idxs = [x.label for x in self.actual_data.lesions if area[0] <= x.area <= area[1]]
+            lesions = [x for x in lesions if area[0] <= x.area <= area[1]]
+
+        if density is not None:
+            lesions = [x for x in lesions if density[0] <= x.mean_density <= density[1]]
+
+        if compactness is not None:
+            if compactness > 1:
+                compactness = float(compactness) / self.params['compactness_step']
+            lesions = [x for x in lesions if compactness <= x.compactness]
+
+        # geting labels of filtered objects
+        self.filtered_idxs = [x.label for x in lesions]
 
         if selected_labels is not None:
             self.filtered_idxs = np.intersect1d(self.filtered_idxs, selected_labels)

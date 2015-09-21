@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt4.QtGui import QApplication, QFrame, QVBoxLayout
+from PyQt4.QtCore import Qt
 
 import numpy as np
 import skimage.exposure as skiexp
@@ -23,7 +24,10 @@ class AreaHistWidget(QFrame):
         self.setMinimumSize(400, 250)
         self.setWindowTitle('Histogram of selected area')
 
-        self.data = None
+        self.data = data
+
+        if data is not None:
+            self.set_data(data)
 
         self.init_UI_form()
 
@@ -63,8 +67,15 @@ class AreaHistWidget(QFrame):
         plt.plot(self.bins, self.hist, 'b')
         ax = plt.axis()
         plt.axis([ax[0]-5, ax[1]+5, ax[2], ax[3]])
+        plt.hold(False)
 
         self.canvas.draw()
+
+    # def keyPressEvent(self, QKeyEvent):
+    #     print 'hist widget key event: ',
+    #     if QKeyEvent.key() == Qt.Key_Escape:
+    #         print 'Escape'
+    #         self.close()
 
 
 ################################################################################

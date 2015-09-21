@@ -247,6 +247,9 @@ class LessionEditor(QtGui.QMainWindow):
         elif key == QtCore.Qt.Key_L:
             print 'R'
             self.run_callback()
+        elif key == QtCore.Qt.Key_C:
+            print 'C'
+            self.action_circle_callback()
         # elif key == QtCore.Qt.Key_M:
         #     print 'M'
         else:
@@ -303,7 +306,10 @@ class LessionEditor(QtGui.QMainWindow):
             self.selected_objects_labels = [x.label for x in self.table_model.objects]
             # print 'show all', self.selected_objects_labels
         min_area, max_area = self.objects_widget.area_RS.getRange()
-        self.cc.objects_filtration(self.selected_objects_labels, min_area=min_area, max_area=max_area)
+        min_density, max_density = self.objects_widget.density_RS.getRange()
+        min_comp = self.objects_widget.ui.min_compactness_SL.value() / self.params['compactness_step']
+        self.cc.objects_filtration(self.selected_objects_labels, area=(min_area, max_area), density=(min_density, max_density),
+                                   compactness=min_comp)
         #TODO: nasleduje prasarna
         if self.view_L.show_mode == self.view_L.SHOW_LABELS:
             self.show_labels_L_callback()

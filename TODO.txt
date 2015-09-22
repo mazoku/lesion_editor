@@ -9,11 +9,13 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
+- manualni pridani loziska
 - pocitani kompaktnosti
 - pri kliku na lozisko v datech udelat selection na totez lozisko v tabulce
-- manualni pridani loziska
 - vizualizace kontur
-- objects_widget - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
+- objects_widget
+    - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
+    - klik na polozku -> filtrovat i stredy
 
 
 ---------------------------------------

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'objects_widget_GUI.ui'
 #
-# Created: Fri Sep 18 14:43:29 2015
+# Created: Tue Sep 22 08:36:58 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,7 +55,7 @@ class Ui_Form(object):
         self.min_compactness_LE.setObjectName(_fromUtf8("min_compactness_LE"))
         self.horizontalLayout_2.addWidget(self.min_compactness_LE)
         self.min_compactness_SL = QtGui.QSlider(Form)
-        self.min_compactness_SL.setMaximum(100)
+        self.min_compactness_SL.setMaximum(1000)
         self.min_compactness_SL.setSingleStep(1)
         self.min_compactness_SL.setOrientation(QtCore.Qt.Horizontal)
         self.min_compactness_SL.setObjectName(_fromUtf8("min_compactness_SL"))
@@ -67,6 +67,18 @@ class Ui_Form(object):
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.density_layout.addWidget(self.label_3)
         self.verticalLayout.addLayout(self.density_layout)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.crop_objects_BTN = QtGui.QPushButton(Form)
+        self.crop_objects_BTN.setObjectName(_fromUtf8("crop_objects_BTN"))
+        self.horizontalLayout.addWidget(self.crop_objects_BTN)
+        self.remove_obj_BTN = QtGui.QPushButton(Form)
+        self.remove_obj_BTN.setObjectName(_fromUtf8("remove_obj_BTN"))
+        self.horizontalLayout.addWidget(self.remove_obj_BTN)
+        self.add_obj_BTN = QtGui.QPushButton(Form)
+        self.add_obj_BTN.setObjectName(_fromUtf8("add_obj_BTN"))
+        self.horizontalLayout.addWidget(self.add_obj_BTN)
+        self.verticalLayout.addLayout(self.horizontalLayout)
         self.objects_TV = QtGui.QTableView(Form)
         self.objects_TV.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.objects_TV.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
@@ -81,4 +93,7 @@ class Ui_Form(object):
         self.label.setText(_translate("Form", "area [ml]:", None))
         self.label_2.setText(_translate("Form", "min. compactness=", None))
         self.label_3.setText(_translate("Form", "density [HU]:", None))
+        self.crop_objects_BTN.setText(_translate("Form", "Crop", None))
+        self.remove_obj_BTN.setText(_translate("Form", "Remove", None))
+        self.add_obj_BTN.setText(_translate("Form", "Add", None))
 

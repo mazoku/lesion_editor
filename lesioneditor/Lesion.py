@@ -3,10 +3,47 @@ __author__ = 'tomas'
 import numpy as np
 import tools
 
+PRIORITY_LOW = 0  # for lessions that are extracted autonomously
+PRIORITY_HIGH = 1  # for lessions that are added by the user, these wil not be filtrated by sliders (area, density, ...)
+
+def create_lesion_from_pt(center, density, lbl):
+    """
+
+    :param center: center of lesion, [s, x, y] = [s, c, r]
+    :param density:
+    :param lbl:
+    :return:
+    """
+    les = Lesion(lbl)
+
+    les.area = 1
+    les.compactness = 1
+    les.center = center
+    les.priority = PRIORITY_HIGH
+    les.mean_density = density
+    les.std_density = 0
+
+    les.max_width = 1
+    les.max_height = 1
+    les.max_depth = 1
+    # minimal and maximal row, column and slice
+    les.r_min = center[2]
+    les.r_max = center[2]
+    les.c_min = center[1]
+    les.c_max = center[1]
+    les.s_min = center[0]
+    les.s_max = center[0]
+
+    les.hist = None  # histogram of density
+
+    les.chord = 1  # longest chord (tetiva in czech)
+
+    return les
+
 class Lesion(object):
     """ This class represents lesions. """
 
-    def __init__(self, label, mask=None, data=None):
+    def __init__(self, label, mask=None, data=None, priority=PRIORITY_LOW):
         self.label = label  # label of the lesion in segmented data; its identifier
 
         self.area = None  # area of the lesion
@@ -14,6 +51,8 @@ class Lesion(object):
         self.compactness = None
 
         self.center = None  # center of mass
+
+        self.priority = priority
 
         self.mean_density = None
         self.std_density = None

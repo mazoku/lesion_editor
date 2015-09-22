@@ -493,10 +493,12 @@ class Computational_core():
         # min_area = self.params['min_area']
         # max_area = self.params['max_area']
         # min_compactness = self.params['min_compactness']
+
         if self.actual_data.lesions is not None:
             lesions = self.actual_data.lesions[:]  # copy of the list
         else:
             return
+
         if area is not None:
             # self.filtered_idxs = [x.label for x in self.actual_data.lesions if area[0] <= x.area <= area[1]]
             lesions = [x for x in lesions if area[0] <= x.area <= area[1]]

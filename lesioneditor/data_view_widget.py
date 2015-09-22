@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 import sys
 
-from PyQt4.QtCore import Qt, QSize, QString, SIGNAL, QPoint
+from PyQt4.QtCore import Qt, QSize, QString, SIGNAL, QPoint, pyqtSignal
 from PyQt4.QtGui import QImage, QDialog,\
     QApplication, QSlider, QPushButton,\
     QLabel, QPixmap, QPainter, qRgba,\
@@ -75,6 +75,8 @@ def erase_reg(arr, p, val=0):
 
 
 class SliceBox(QLabel):
+
+    mouseClickSignal = pyqtSignal(list, int)
 
     def __init__(self, sliceSize, voxel_size, main, mode='seeds'):
     # def __init__(self, sliceSize, grid, mode='seeds'):
@@ -457,12 +459,25 @@ class SliceBox(QLabel):
 
         self.updateSlice()
 
-    def mousePressEvent(self, QMouseEvent):
+    # def mousePressEvent(self, QMouseEvent):
+    #     print 'click'
+    #     coords = list(self.gridPosition(QMouseEvent.pos()))
+    #     print 'pos = ', coords, ', data = ', self.ctslice[coords[0], coords[1]]
+        # if self.show_mode == self.SHOW_LABELS:
+        #     label = self.main.actual_data
+        # return coords
+
+    def myMousePressEvent(self, QMouseEvent):
+        print 'myMousePressEvent: ',
         coords = list(self.gridPosition(QMouseEvent.pos()))
-        # print 'pos = ', coords, ', data = ', self.ctslice[coords[0], coords[1]]
-        if self.show_mode == self.SHOW_LABELS:
-            label = self.main.actual_data
-        return coords
+        density =  self.ctslice[coords[0], coords[1]]
+        print 'pos = ', coords, ', data = ', density
+        self.mouseClickSignal.emit(coords, density)
+        # self.mousePressEvent = None
+        self.mousePressEvent = self.myEmptyMousePressEvent
+
+    def myEmptyMousePressEvent(self, QMouseEvevnt):
+        print 'dummy mouse press event'
 
 if __name__ == '__main__':
     from lession_editor_GUI_slim2 import Ui_MainWindow

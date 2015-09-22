@@ -50,6 +50,7 @@ import My_table_model as mtm
 import area_hist_widget as ahw
 import Computational_core
 import data_view_widget
+import Lesion
 
 # constants definition
 SHOW_IM = 0
@@ -104,6 +105,7 @@ class LessionEditor(QtGui.QMainWindow):
 
         self.hist_widget = None
 
+        # creating object widget, linking its sliders and buttons
         self.objects_widget = Objects_widget()
         self.params['compactness_step'] = self.objects_widget.ui.min_compactness_SL.singleStep() / self.objects_widget.ui.min_compactness_SL.maximum()
         self.objects_widget.area_RS.endValueChanged.connect(self.object_slider_changed)
@@ -115,6 +117,8 @@ class LessionEditor(QtGui.QMainWindow):
         ww_val = QtGui.QIntValidator(0, 1)
         self.objects_widget.ui.min_compactness_LE.setValidator(ww_val)
         self.objects_widget.ui.min_compactness_LE.textChanged.connect(self.min_compactness_LE_changed)
+        # button callbacks
+        self.objects_widget.ui.add_obj_BTN.clicked.connect(self.add_obj_BTN_callback)
 
         # self.area_hist_widget = ahw.AreaHistWidget()
 
@@ -181,6 +185,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L.setCW(self.win_w, 'w')
         # self.view_L.setSlice(self.data_L.data[0,:,:])
         self.view_L.setSlice(self.data_L.data_aview[...,0])
+        self.view_L.mouseClickSignal.connect(self.add_obj_event)
 
         self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
         self.view_R.setCW(self.win_l, 'c')
@@ -231,7 +236,7 @@ class LessionEditor(QtGui.QMainWindow):
         key = QKeyEvent.key()
         if key == QtCore.Qt.Key_Escape:
             print 'Escape'
-            if self.view_L.area_hist_widget is not None:
+            if self.view_L.area_hist_widget is not None and self.view_L.area_hist_widget.isVisible():
                 self.view_L.circle_active = False
                 self.view_L.area_hist_widget.close()
                 self.view_L.setMouseTracking(False)
@@ -250,10 +255,27 @@ class LessionEditor(QtGui.QMainWindow):
         elif key == QtCore.Qt.Key_C:
             print 'C'
             self.action_circle_callback()
-        # elif key == QtCore.Qt.Key_M:
-        #     print 'M'
+        elif key == QtCore.Qt.Key_A:  # interactively add an object
+            print 'A'
+            self.add_obj_BTN_callback()
         else:
             print key, ' - unrecognized hot key.'
+
+    def add_obj_BTN_callback(self):
+        print 'adding object'
+        # self.view_L.mouseClickSignal.connect(self.add_obj_event)
+        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+
+    def add_obj_event(self, coords, density):
+        print 'add_obj_event - coords: ', coords, ', density: ', density
+        center = [self.actual_slice_L, coords[0], coords[1]]
+        if self.data_L.labels is not None:
+            lbl = self.data_L.labels.max() + 1
+        else:
+            lbl = 1
+        new_les = Lesion.create_lesion_from_pt(center, density, lbl)
+        pass
+        #TODO: pridat do objektu a aktualizovat tabulku
 
     def min_compactness_SL_changed(self, value):
         self.objects_widget.ui.min_compactness_LE.setText('%.3f' % (value * self.params['compactness_step']))

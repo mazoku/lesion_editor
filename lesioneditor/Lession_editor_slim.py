@@ -817,6 +817,7 @@ if __name__ == '__main__':
     # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz')
     # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz')
 
+
     # hyper, 1 on the border -------------------
     # arterial 0.6mm - not that bad
     # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Art_Abd_0.75_I26f_M_0.5-.pklz'
@@ -830,6 +831,7 @@ if __name__ == '__main__':
     # TODO: study ID 18 - velke najde (hyper v arterialni fazi), 1/2 z malych
     # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_venous_5.0_B30f-.pklz')
     # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_arterial_5.0_B30f-.pklz')
+
 
     # targeted
     # arterial 0.6mm - bad
@@ -852,3 +854,13 @@ if __name__ == '__main__':
     le = LessionEditor(fnames)
     le.show()
     sys.exit(app.exec_())
+
+    # import io3d
+    # dr = io3d.DataReader()
+    # datap = dr.Get3DData('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz', dataplus_format=True)
+    #
+    # use:
+    # data3d
+    # segmentation
+    # slab
+    # voxelsize_mm

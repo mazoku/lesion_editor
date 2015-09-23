@@ -32,6 +32,11 @@ import pickle
 
 import Viewer_3D
 
+import cv2
+
+import Data
+import Lesion
+
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -44,161 +49,99 @@ class Computational_core():
         self.models = None
         self.status_bar = status_bar
 
-        self.labels = None
+        self.labels = None  # list of unique labels
         self.filtered_idxs = None
 
         ext_list = ('pklz', 'pickle')
         self.fname = fname
-        if self.fname.split('.')[-1] in ext_list:
-            self.data, self.mask, self.voxel_size = self.load_pickle_data(self.fname)
-        else:
-            msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
-            raise IOError(msg)
-        self.orig_shape = self.data.shape
+        self.data_1 = Data.Data()
+        self.data_2 = Data.Data()
+        self.actual_data = self.data_1
+        self.active_serie = 1
+
+        self.objects = list()  # list of segmented lesions
+
+        # loading data - both series if provided
+        if len(self.fname) > 0:
+            name = self.fname[0]
+            if name.split('.')[-1] in ext_list:
+                self.data_1.load_data(name)
+
+                # -------------------------------------------------------
+                # import sys
+                # import os
+                # path_to_script = os.path.dirname(os.path.abspath(__file__))
+                # sys.path.append(os.path.join(path_to_script, "../../pyseg_base/pysegbase"))
+                # from seed_editor_qt import QTSeedEditor
+                # pyed = QTSeedEditor(self.data_1.data,
+                #             # voxelSize=self.params['working_voxel_size_mm'],
+                #             volume_unit='ml')
+                # pyed.exec_()
+                # TODO: predelat ala QTSeedEditor !!
+                # -------------------------------------------------------
+
+                # self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
+            else:
+                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+                raise IOError(msg)
+        if len(self.fname) > 1:
+            name = self.fname[1]
+            if name.split('.')[-1] in ext_list:
+                self.data_2.load_data(name)
+                # self.data_2, self.mask_2, self.voxel_size_2 = self.load_pickle_data(name)
+            else:
+                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+                raise IOError(msg)
+
+        # if self.data_1 is not None:
+        #     self.orig_shape_1 = self.data_1.shape
+        #     self.res_1 = np.zeros(self.orig_shape_1)
+        # if self.data_2 is not None:
+        #     self.orig_shape_2 = self.data_2.shape
+        #     self.res_2 = np.zeros(self.orig_shape_2)
 
         # smooth data if allowed
-        self.smooth_data()
-
-
-    # def init_params(self):
-    #     params = dict()
-    #     params['slice_idx'] = -1
-    #     # params['sigma'] = 10  # sigma for gaussian blurr
-    #     params['alpha'] = 3  # weightening parameter for pairwise term
-    #     params['beta'] = 1  # weightening parameter for unary term
-    #     params['perc'] = 0.3  # what portion of liver parenchym around peak is used to calculate std of liver normal pdf
-    #     params['k_std_h'] = 3  # weightening parameter for sigma of normal distribution of healthy parenchym
-    #     params['k_std_t'] = 3  # weightening parameter for sigma of normal distribution of tumor
-    #     # params['tv_weight'] = 0.05  # weighting parameter for total variation filter
-    #     params['healthy_simple_estim'] = False  # simple healthy parenchym pdf estimation from all data
-    #     params['prob_w'] = 0.0001
-    #
-    #     params['working_voxelsize_mm'] = 2  # size of voxels that will be used in computation
-    #
-    #     # data smoothing
-    #     # 0 ... no smoothing
-    #     # 1 ... gaussian blurr, param = sigma
-    #     # 2 ... bilateral filter, param = sigma_range (0.05)
-    #     # 3 ... total variation filter, param = weight (0.1)
-    #     params['smoothing'] = -1
-    #     params['sigma'] = 1
-    #     params['sigma_range'] = 0.05
-    #     params['sigma_spatial'] = 15
-    #     params['weight'] = 0.05
-    #
-    #     params['win_width'] = 350  # width of window for visualising abdomen
-    #     params['win_level'] = 50  # level of window for visualising abdomen
-    #
-    #     params['unaries_as_cdf'] = True  # whether to estimate the prob. model of outliers as cumulative density function
-    #
-    #     # These are not necessary now - user can edit the color model in the GUI.
-    #     # However, using it in automated mode can be usefull.
-    #     params['hack_hypo_mu'] = -0  # hard move of mean of hypodense pdf to the left
-    #     params['hack_hypo_sigma'] = 0  # hard widening of sigma of hypodense pdf
-    #     params['hack_hyper_mu'] = -0 #5  # hard move of mean of hyperdense pdf to the right
-    #     params['hack_hyper_sigma'] = 0 #5  # hard widening of sigma of hyperdense pdf
-    #     params['hack_healthy_mu'] = -0 #5  # hard move of mean of healthy pdf to the right
-    #     params['hack_healthy_sigma'] = 0 #5  # hard widening of sigma of healthy pdf
-    #
-    #     params['show_healthy_pdf_estim'] = False
-    #     params['show_outlier_pdf_estim'] = False
-    #     params['show_estimated_pdfs'] = False
-    #     params['show_unaries'] = False
-    #
-    #     params['hypo_label'] = 0  # label of hypodense objects
-    #     params['healthy_label'] = 1
-    #     params['hyper_label'] = 2  # label of hyperdense objects
-    #
-    #     params['filtration'] = False  # whether to filtrate or not
-    #     params['min_area'] = 20
-    #     params['min_compactness'] = 0.2
-    #
-    #     params['erode_mask'] = True
-    #
-    #     return params
-
-#-------------------------------------------------------------
-    def load_data(self, slice_idx=-1):
-        print 'TODO: must be recoded to be consistent with outputs given by self.load_pickle_data(...)'
-    # TODO: must be recoded to be consistent with outputs given by self.load_pickle_data(...)
-    #     # 33 ... hypodense
-    #     # 41 ... small tumor
-    #     # 138 ... hyperdense
-    #
-    #     # labels = np.load('label_im.npy')
-    #     data = np.load('input_data.npy')
-    #     o_data = np.load('input_orig_data.npy')
-    #     mask = np.load('mask.npy')
-    #
-    #     # to be sure that the mask is only binary
-    #     mask = np.where(mask > 0, 1, 0)
-    #
-    #     if slice_idx != -1:
-    #         data_s = data[slice_idx, :, :]
-    #         o_data_s = o_data[slice_idx, :, :]
-    #         mask_s = mask[slice_idx, :, :]
-    #
-    #         data, _ = tools.crop_to_bbox(data_s, mask_s)
-    #         o_data, _ = tools.crop_to_bbox(o_data_s, mask_s)
-    #         mask, _ = tools.crop_to_bbox(mask_s, mask_s)
-    #
-    #     # plt.figure()
-    #     # plt.subplot(131), plt.imshow(data_bbox, 'gray')
-    #     # plt.subplot(132), plt.imshow(o_data_bbox, 'gray')
-    #     # plt.subplot(133), plt.imshow(mask_bbox, 'gray')
-    #     # plt.show()
-    #
-    #     return data, o_data, mask
+        self.data_1.data = self.smooth_data(self.data_1.data)
+        self.data_2.data = self.smooth_data(self.data_2.data)
 
     def data_zoom(self, data, voxelsize_mm, working_voxelsize_mm):
         zoom = voxelsize_mm / (1.0 * working_voxelsize_mm)
         data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
         return data_res
 
-
     def zoom_to_shape(self, data, shape):
-        zoom = np.array(shape, dtype=np.float) / np.array(self.data.shape, dtype=np.float)
+        zoom = np.array(shape, dtype=np.float) / np.array(data.shape, dtype=np.float)
         data_res = scindi.zoom(data, zoom, mode='nearest', order=1).astype(np.int16)
         return data_res
 
-
-    def load_pickle_data(self, fname, slice_idx=-1):
-        fcontent = None
-        try:
-            import gzip
-            f = gzip.open(fname, 'rb')
-            fcontent = f.read()
-            f.close()
-        except Exception as e:
-            logger.warning("Input gzip exception: " + str(e))
-            f = open(fname, 'rb')
-            fcontent = f.read()
-            f.close()
-        data_dict = pickle.loads(fcontent)
-
-        data = tools.windowing(data_dict['data3d'], level=self.params['win_level'], width=self.params['win_width'])
-
-        mask = data_dict['segmentation']
-
-        voxel_size = data_dict['voxelsize_mm']
-        # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
-        # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
-
-
-        if slice_idx != -1:
-            data = data[slice_idx, :, :]
-            mask = mask[slice_idx, :, :]
-
-            # data, _ = tools.crop_to_bbox(data_s, mask_s)
-            # mask, _ = tools.crop_to_bbox(mask_s, mask_s)
-
-        # plt.figure()
-        # plt.subplot(121), plt.imshow(data_bbox, 'gray')
-        # plt.subplot(122), plt.imshow(mask_bbox, 'gray')
-        # plt.show()
-
-        return data, mask, voxel_size
-
+    # def load_pickle_data(self, fname, slice_idx=-1):
+    #     fcontent = None
+    #     try:
+    #         import gzip
+    #         f = gzip.open(fname, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     except Exception as e:
+    #         logger.warning("Input gzip exception: " + str(e))
+    #         f = open(fname, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     data_dict = pickle.loads(fcontent)
+    #
+    #     data = tools.windowing(data_dict['data3d'], level=self.params['win_level'], width=self.params['win_width'])
+    #
+    #     mask = data_dict['segmentation']
+    #
+    #     voxel_size = data_dict['voxelsize_mm']
+    #     # data = data_zoom(data, voxel_size, params['working_voxelsize_mm'])
+    #     # mask = data_zoom(data_dict['segmentation'], voxel_size, params['working_voxelsize_mm'])
+    #
+    #
+    #     if slice_idx != -1:
+    #         data = data[slice_idx, :, :]
+    #         mask = mask[slice_idx, :, :]
+    #
+    #     return data, mask, voxel_size
 
     def estimate_healthy_pdf(self, data, mask, params):
         perc = params['perc']
@@ -257,8 +200,7 @@ class Computational_core():
             plt.title('estimated normal pdf of healthy parenchym')
             # plt.show()
 
-        return mu, sigma, rv
-
+        return rv
 
     def estimate_outlier_pdf(self, data, mask, rv_healthy, outlier_type, params):
         prob_w = params['prob_w']
@@ -332,15 +274,14 @@ class Computational_core():
             plt.title('estimated normal pdf of %sdense obejcts' % outlier_type)
             plt.show()
 
-        return mu, sigma, rv
-
+        return rv
 
     def get_unaries(self, data, mask, models, params):
         rv_heal = models['rv_heal']
         rv_hyper = models['rv_hyper']
         rv_hypo = models['rv_hypo']
         # mu_heal = models['mu_heal']
-        mu_heal = self.mu_heal
+        mu_heal = rv_heal.mean()
 
         if params['erode_mask']:
             if data.ndim == 3:
@@ -365,6 +306,25 @@ class Computational_core():
         unaries = np.dstack((unaries_hypo.reshape(-1, 1), unaries_healthy.reshape(-1, 1), unaries_hyper.reshape(-1, 1)))
         unaries = unaries.astype(np.int32)
 
+        # slice = 17
+        # # slice = 6
+        # plt.figure()
+        # plt.imshow(unaries_hypo.reshape(data.shape)[slice,:,:], 'gray')
+        # while True:
+        #     pt = plt.ginput(1)
+        #     print pt[0][1], pt[0][0], ' - ',
+        #     print 'hypo = ', unaries_hypo.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print 'heal = ', unaries_healthy.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print 'hyper = ', unaries_hyper.reshape(data.shape)[slice, int(pt[0][1]), int(pt[0][0])],
+        #     print ', int = ', data[slice, int(pt[0][1]), int(pt[0][0])]
+        #
+        # plt.figure()
+        # plt.subplot(221), plt.imshow(unaries_hypo.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.subplot(222), plt.imshow(unaries_hyper.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.subplot(223), plt.imshow(unaries_healthy.reshape(data.shape)[6,:,:], 'gray'), plt.colorbar()
+        # plt.show()
+
+        # self.params['show_unaries'] = True
         if self.params['show_unaries']:
             ints = data[np.nonzero(mask)]
             hist, bins = skiexp.histogram(ints, nbins=256)
@@ -385,16 +345,16 @@ class Computational_core():
             plt.title('histogram of input data')
             plt.subplot(212)
             plt.plot(x, hypo, 'm')
+            plt.hold(True)
             plt.plot(x, healthy, 'g')
             plt.plot(x, hyper, 'r')
             ax = plt.axis()
             plt.axis([0, 256, ax[2], ax[3]])
             plt.title('histogram of input data')
             plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
-            # plt.show()
+            plt.show()
 
         return unaries
-
 
     # def mayavi_visualization(self, res):
     #     ### Read the data in a numpy 3D array ##########################################
@@ -431,7 +391,6 @@ class Computational_core():
     #
     #     mlab.show()
 
-
     def get_compactness(self, labels):
         nlabels = labels.max() + 1
         # nlabels = len(np.unique(labels)) - 1
@@ -460,7 +419,6 @@ class Computational_core():
 
         return eccs
 
-
     def get_areas(self, labels):
         nlabels = labels.max() + 1
         areas = np.zeros(nlabels)
@@ -469,7 +427,6 @@ class Computational_core():
             areas[i] = obj.sum()
 
         return areas
-
 
     # def filter_objects(self, feature_v, features, params):
     #     min_area = params['min_area']
@@ -495,57 +452,71 @@ class Computational_core():
     #
     #     return obj_ok
 
+    def smooth_data(self, data):
+        if data is not None:
+            # smoothing data
+            print 'smoothing data...'
+            if self.params['smoothing'] == 1:
+                data = skifil.gaussian_filter(self.data, sigma=self.params['sigma'])
+            elif self.params['smoothing'] == 2:
+                data = tools.smoothing_bilateral(data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
+            elif self.params['smoothing'] == 3:
+                data = tools.smoothing_tv(data, weight=self.params['weight'], sliceId=0)
+            else:
+                print '\tcurrently switched off'
 
-    def smooth_data(self):
-        # smoothing data
-        print 'smoothing data...'
-        if self.params['smoothing'] == 1:
-            self.data = skifil.gaussian_filter(self.data, )
-        elif self.params['smoothing'] == 2:
-            self.data = tools.smoothing_bilateral(self.data, sigma_space=self.params['sigma_spatial'], sigma_color=self.params['sigma_range'], sliceId=0)
-        elif self.params['smoothing'] == 3:
-            self.data = tools.smoothing_tv(self.data, weight=self.params['weight'], sliceId=0)
-        else:
-            print '\tcurrently switched off'
+        return data
 
-
-    def calculate_intensity_models(self):
+    def calculate_intensity_models(self, data, mask):
         print 'calculating intensity models...'
         # liver pdf ------------
-        self.mu_heal, self.sigma_heal, self.rv_heal = self.estimate_healthy_pdf(self.data, self.mask, self.params)
-        print '\tliver pdf: mu = ', self.mu_heal, ', sigma = ', self.sigma_heal
+        rv_heal = self.estimate_healthy_pdf(data, mask, self.params)
+        print '\tliver pdf: mu = ', rv_heal.mean(), ', sigma = ', rv_heal.std()
         # hypodense pdf ------------
-        self.mu_hypo, self.sigma_hypo, self.rv_hypo = self.estimate_outlier_pdf(self.data, self.mask, self.rv_heal, 'hypo', self.params)
-        print '\thypodense pdf: mu = ', self.mu_hypo, ', sigma= ', self.sigma_hypo
+        rv_hypo = self.estimate_outlier_pdf(data, mask, rv_heal, 'hypo', self.params)
+        print '\thypodense pdf: mu = ', rv_hypo.mean(), ', sigma = ', rv_hypo.std()
         # hyperdense pdf ------------
-        self.mu_hyper, self.sigma_hyper, self.rv_hyper = self.estimate_outlier_pdf(self.data, self.mask, self.rv_heal, 'hyper', self.params)
-        print '\thyperdense pdf: mu = ', self.mu_hyper, ', sigma= ', self.sigma_hyper
+        rv_hyper = self.estimate_outlier_pdf(data, mask, rv_heal, 'hyper', self.params)
+        print '\thyperdense pdf: mu = ', rv_hyper.mean(), ', sigma = ', rv_hyper.std()
 
-        self.models = dict()
-        # self.models['mu_heal'] = self.mu_heal
-        # self.models['sigma_heal'] = self.sigma_heal
-        # self.models['mu_hypo'] = self.mu_hypo
-        # self.models['sigma_hypo'] = self.sigma_hypo
-        # self.models['mu_hyper'] = self.mu_hyper
-        # self.models['sigma_hyper'] = self.sigma_hyper
-        self.models['rv_heal'] = self.rv_heal
-        self.models['rv_hypo'] = self.rv_hypo
-        self.models['rv_hyper'] = self.rv_hyper
+        models = dict()
+        models['rv_heal'] = rv_heal
+        models['rv_hypo'] = rv_hypo
+        models['rv_hyper'] = rv_hyper
 
+        return models
 
-    def objects_filtration(self):
-        min_area = self.params['min_area']
-        max_area = self.params['max_area']
-        min_compactness = self.params['min_compactness']
+    def objects_filtration(self, selected_labels=None,
+                           area=None,#min_area=0, max_area=np.Infinity,
+                           density=None,#min_density=-np.Infinity, max_density=np.Infinity):
+                           compactness=None):
 
-        self.filtered_idxs = np.ones(self.n_objects, dtype=np.bool)
+        if self.actual_data.lesions is not None:
+            lesions = self.actual_data.lesions[:]  # copy of the list
+        else:
+            return
 
-        for i in range(self.n_objects):
-            # TODO: test the compactness
-            if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
-                self.filtered_idxs[i] = False
+        if area is not None:
+            lesions = [x for x in lesions if area[0] <= x.area <= area[1] or x.priority == Lesion.PRIORITY_HIGH]
 
+        if density is not None:
+            lesions = [x for x in lesions if density[0] <= x.mean_density <= density[1] or x.priority == Lesion.PRIORITY_HIGH]
 
+        if compactness is not None:
+            if compactness > 1:
+                compactness = float(compactness) / self.params['compactness_step']
+            lesions = [x for x in lesions if compactness <= x.compactness or x.priority == Lesion.PRIORITY_HIGH]
+
+        # geting labels of filtered objects
+        self.filtered_idxs = [x.label for x in lesions]
+
+        if selected_labels is not None:
+            self.filtered_idxs = np.intersect1d(self.filtered_idxs, selected_labels)
+
+        self.actual_data.labels_filt = np.where(self.actual_data.labels > self.params['bgd_label'], self.params['healthy_label'], self.params['bgd_label'])
+        is_in = np.in1d(self.actual_data.labels, self.filtered_idxs).reshape(self.actual_data.labels.shape)
+        self.actual_data.labels_filt = np.where(is_in, self.actual_data.labels, self.actual_data.labels_filt)
+        pass
 
     def run(self):
         # slice_idx = self.params['slice_idx']
@@ -562,9 +533,8 @@ class Computational_core():
 
         # TumorVisualiser.run(data, mask, params['healthy_label'], params['hypo_label'], params['hyper_label'], slice_axis=0, disp_smoothed=True)
 
-
-        print 'estimating number of clusters...'
-        print '\tcurrently switched off'
+        # print 'estimating number of clusters ...',
+        # print '\tcurrently switched off'
         # d = scindiint.zoom(data_o, 0.5)
         # m = skitra.resize(mask, np.array(mask.shape) * 0.5).astype(np.bool)
         # ints = d[np.nonzero(m)]
@@ -586,44 +556,50 @@ class Computational_core():
         # data_d = np.where(data_d < 0, 0, data_d)
 
         # zooming the data
+        print 'rescaling data ...',
         if self.params['zoom']:
-            print 'zooming data...'
-            self.data = self.data_zoom(self.data, self.voxel_size, self.params['working_voxel_size_mm'])
-            self.mask = self.data_zoom(self.mask, self.voxel_size, self.params['working_voxel_size_mm'])
+            self.actual_data.data = self.data_zoom(self.actual_data.data, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
+            self.actual_data.mask = self.data_zoom(self.actual_data.mask, self.actual_data.voxel_size, self.params['working_voxel_size_mm'])
         else:
-            self.data = tools.resize3D(self.data, self.params['scale'], sliceId=0)
-            self.mask = tools.resize3D(self.mask, self.params['scale'], sliceId=0)
+            data = tools.resize3D(self.actual_data.data, self.params['scale'], sliceId=0)
+            mask = tools.resize3D(self.actual_data.mask, self.params['scale'], sliceId=0)
+        print 'ok'
         # data = data.astype(np.uint8)
 
-
         # calculating intensity models if necesarry
+        print 'estimating color models ...'
         if not self.models:
-            self.calculate_intensity_models()
+            self.models = self.calculate_intensity_models(data, mask)
+            print 'ok'
+        else:
+            print 'already done'
 
-        print 'calculating unary potentials...'
+        print 'calculating unary potentials ...',
         self.status_bar.showMessage('Calculating unary potentials...')
         # create unaries
         # unaries = data_d
         # # as we convert to int, we need to multipy to get sensible values
         # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
-        self.unaries = beta * self.get_unaries(self.data, self.mask, self.models, self.params)
+        self.unaries = beta * self.get_unaries(data, mask, self.models, self.params)
         n_labels = self.unaries.shape[2]
+        print 'ok'
 
-        print 'calculating pairwise potentials...'
+        print 'calculating pairwise potentials ...',
         self.status_bar.showMessage('Calculating pairwise potentials...')
         # create potts pairwise
         self.pairwise = -alpha * np.eye(n_labels, dtype=np.int32)
+        print 'ok'
 
-        print 'deriving graph edges...'
+        print 'deriving graph edges ...',
         self.status_bar.showMessage('Deriving graph edges...')
         # use the gerneral graph algorithm
         # first, we construct the grid graph
-        inds = np.arange(self.data.size).reshape(self.data.shape)
-        if self.data.ndim == 2:
+        inds = np.arange(data.size).reshape(data.shape)
+        if data.ndim == 2:
             horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
             vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
             self.edges = np.vstack([horz, vert]).astype(np.int32)
-        elif self.data.ndim == 3:
+        elif data.ndim == 3:
             # horz = np.c_[inds[:, :-1].ravel(), inds[:, 1:].ravel()]
             # vert = np.c_[inds[:-1, :].ravel(), inds[1:, :].ravel()]
             horz = np.c_[inds[:, :, :-1].ravel(), inds[:, :, 1:].ravel()]
@@ -631,9 +607,10 @@ class Computational_core():
             dept = np.c_[inds[:-1, :, :].ravel(), inds[1:, :, :].ravel()]
             self.edges = np.vstack([horz, vert, dept]).astype(np.int32)
         # deleting edges with nodes outside the mask
-        nodes_in = np.ravel_multi_index(np.nonzero(self.mask), self.data.shape)
+        nodes_in = np.ravel_multi_index(np.nonzero(mask), data.shape)
         rows_inds = np.in1d(self.edges, nodes_in).reshape(self.edges.shape).sum(axis=1) == 2
         self.edges = self.edges[rows_inds, :]
+        print 'ok'
 
         # plt.show()
 
@@ -642,94 +619,51 @@ class Computational_core():
         # un = unaries[:, :, 2].reshape(data_o.shape)
         # py3DSeedEditor.py3DSeedEditor(un).show()
 
-        print 'calculating graph cut...'
+        print 'calculating graph cut ...',
         self.status_bar.showMessage('Calculating graph cut...')
         # we flatten the unaries
         # result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, 2), pairwise)
         # print 'tu: ', unaries.reshape(-1, n_labels).shape
         result_graph = pygco.cut_from_graph(self.edges, self.unaries.reshape(-1, n_labels), self.pairwise)
-        self.res = result_graph.reshape(self.data.shape)
+        labels = result_graph.reshape(data.shape) + 1  # +1 to shift the first class to label number 1
 
-        self.res = np.where(self.mask, self.res, -1)
+        labels = np.where(mask, labels, self.params['bgd_label'])
 
         # zooming to the original size
         if self.params['zoom']:
-            self.res = self.zoom_to_shape(self.res, self.orig_shape)
+            self.actual_data.labels = self.zoom_to_shape(labels, self.actual_data.orig_shape)
         else:
-            self.res = tools.resize3D(self.res, 1. / self.params['scale'], sliceId=0)
+            # self.actual_data.labels = tools.resize3D(labels, scale=1. / self.params['scale'], sliceId=0)
+            # self.actual_data.labels2 = skitra.resize(labels, self.actual_data.orig_shape, mode='nearest', preserve_range=True).astype(np.int64)
+            self.actual_data.labels = tools.resize3D(labels, shape=self.actual_data.orig_shape, sliceId=0)#.astype(np.int64)
 
-        print '\t...done'
+        print 'ok'
         self.status_bar.showMessage('Done')
 
         # debug visualization
         # self.viewer = Viewer_3D.Viewer_3D(self.res, range=True)
         # self.viewer.show()
 
+        print 'extracting objects ...',
+        self.status_bar.showMessage('Extracting objects ...'),
+        labels_tmp = np.where(self.actual_data.labels == self.params['healthy_label'], self.params['bgd_label'], self.actual_data.labels)  # because we can set only one label as bgd
+        self.actual_data.objects = skimea.label(labels_tmp, background=self.params['bgd_label'])
+        self.actual_data.lesions = Lesion.extract_lesions(self.actual_data.objects, self.actual_data.data)
+        # areas = [x.area for x in self.actual_data.lesions]
+        self.status_bar.showMessage('Done')
+        print 'ok'
 
-        self.status_bar.showMessage('Extracting objects...')
-        labels_hypo, n_hypo = scindimea.label(self.res == hypo_lab)
-        labels_hypo -= 1  # shifts background to -1
-        labels_hyper, n_hyper = scindimea.label(self.res == hyper_lab)
-        labels_hyper -= 1  # shifts background to -1
-        self.n_objects = n_hypo + n_hyper
-        # self.objects = labels_hypo + (labels_hyper + n_hypo)
-        self.objects = labels_hypo
-        self.objects = np.where(labels_hyper >= 0, labels_hyper + n_hypo, self.objects)
+        print 'initial filtration ...',
+        self.objects_filtration(area=(self.params['min_area'], self.params['max_area']),
+                                density=(self.params['min_density'], self.params['max_density']),
+                                compactness=self.params['min_compactness'])
+        print 'ok'
         self.status_bar.showMessage('Done')
 
-        self.status_bar.showMessage('Calculating object features...')
-        print 'Calculating object features...'
-        self.areas = self.get_areas(self.objects)
-        # self.comps = self.get_compactness(self.objects)
-        self.comps = np.zeros(self.n_objects)
-        self.labels = np.unique(self.objects)[1:]  # from 1 because the first idex is background (-1)
-        # self.features = np.hstack((self.areas, self.comps))
 
-        print 'Initial filtration...'
-        self.objects_filtration()
+        # TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
 
-        # self.fill_table(self.areas, self.comps)
-        print 'Done'
-        self.status_bar.showMessage('Done')
-
-        # if self.params['filtration']:
-        #     print 'calculating features of hypodense tumors...'
-        #     labels_hypo, n_labels = scindimea.label(self.res == hypo_lab)
-        #     labels_hypo -= 1  # shifts background to -1
-        #     areas_hypo = np.zeros(n_labels)
-        #     comps_hypo = self.get_compactness(labels_hypo)
-        #     for i in range(n_labels):
-        #         lab = labels_hypo == (i + 1)
-        #         areas_hypo[i] = lab.sum()
-        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hypo[i], comps_hypo[i])
-        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-        #     print '\t...done'
-        #
-        #     print 'calculating features of hyperdense tumors...'
-        #     labels_hyper, n_labels = scindimea.label(self.res == hyper_lab)
-        #     labels_hyper -= 1  # shifts background to -1
-        #     areas_hyper = np.zeros(n_labels)
-        #     comps_hyper = self.get_compactness(labels_hyper)
-        #     for i in range(n_labels):
-        #         lab = labels_hyper == (i + 1)
-        #         areas_hyper[i] = lab.sum()
-        #         print 'label = %i, area = %i, comp = %.2f' % (i, areas_hyper[i], comps_hyper[i])
-        #         # py3DSeedEditor.py3DSeedEditor(data_o, contour=lab).show()
-        #     print '\t...done'
-        #
-        #     print 'filtering false objects...'
-        #     features = ('area', 'compactness')
-        #     features_hypo_v = np.vstack((areas_hypo, comps_hypo)).T
-        #     features_hyper_v = np.vstack((areas_hyper, comps_hyper)).T
-        #     hypo_ok = self.filter_objects(features_hypo_v, features, self.params).sum(axis=1) == len(features)
-        #     hyper_ok = self.filter_objects(features_hyper_v, features, self.params).sum(axis=1) == len(features)
-        #     print '\tfiltrated hypodense: %i/%i' % (hypo_ok.sum(), hypo_ok.shape[0])
-        #     print '\tfiltrated hyperdense: %i/%i' % (hyper_ok.sum(), hyper_ok.shape[0])
-
-
-        #     TumorVisualiser.run(self.data, self.res, self.params['healthy_label'], self.params['hypo_label'], self.params['hyper_label'], slice_axis=0)
-
-            # mayavi_visualization(res)
+        # mayavi_visualization(res)
 
 #-------------------------------------------------------------
 if __name__ == '__main__':

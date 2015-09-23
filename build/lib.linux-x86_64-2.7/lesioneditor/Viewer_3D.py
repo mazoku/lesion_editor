@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
+import Data
+
 # from simple_viewer import Ui_MainWindow
 from simple_viewer import Ui_Form
 
@@ -38,7 +40,7 @@ class Viewer_3D(QtGui.QWidget):
 
         self.update_figures()
 
-        self.data = data
+        # self.data = data
         # adding widget for displaying image data
         # self.form_widget = Form_widget.Form_widget(self)
         data_viewer_layout = QtGui.QHBoxLayout()
@@ -115,14 +117,23 @@ class Viewer_3D(QtGui.QWidget):
 if __name__ == '__main__':
 
     # preparing data -----------------------------
-    size = 100
-    n_slices = 4
-    data = np.zeros((n_slices, size, size))
-    step = size / n_slices
-    for i in range(n_slices):
-        data[i, i * step:(i + 1) * step, :] = 150
+    # size = 100
+    # n_slices = 4
+    # data = np.zeros((n_slices, size, size))
+    # step = size / n_slices
+    # for i in range(n_slices):
+    #     data[i, i * step:(i + 1) * step, :] = 150
+
+    # fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
+    fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz'
+
+    data = Data.Data()
+    data.load_data(fname)
+
+    # data.data = np.load('/home/tomas/Data/labels.npy')
+    data.data = np.load('labels_filt.npy')
 
     app = QtGui.QApplication(sys.argv)
-    viewer = Viewer_3D(data)
+    viewer = Viewer_3D(data.data, range=True)
     viewer.show()
     sys.exit(app.exec_())

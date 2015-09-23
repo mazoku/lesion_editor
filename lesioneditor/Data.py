@@ -31,14 +31,14 @@ class Data(object):
 
         # properties
         self.__data = data
-        self.__labels = None  # array of labeled results
+        self.__labels = None  # array of labeled results (only 3 classes: healthy, hypodense and hyperdense
         self.__labels_aview = None
         self.__labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
         self.__labels_filt_aview = None
         self.__user_seeds = None
         self.__object_centers = None  # array of object centers
-        self.__object_centers_list = None  # list of object centers
-        self.__lesions = None  # list of lesions, set it with Lesions.extract_lesions(self.labels)
+        self.__object_centers_list = list()  # list of object centers
+        self.__lesions = list()  # list of lesions, set it with Lesions.extract_lesions(self.labels)
 
         self.filename = filename
         self.loaded = False
@@ -61,6 +61,9 @@ class Data(object):
     @data.setter
     def data(self, x):
         self.__data = x
+        self.labels = np.zeros(x.shape)
+        self.objects = np.zeros(x.shape)
+        self.object_centers = np.zeros(x.shape)
 
     @property
     def labels(self):
@@ -146,6 +149,11 @@ class Data(object):
     @object_centers_list.setter
     def object_centers_list(self, x):
         self.__object_centers_list = x
+
+    def append_lesion(self, les):
+        self.__lesions.append(les)
+        self.__object_centers[les.center[0], les.center[1], les.center[2]] = 1
+        self.__object_centers_list.append(les.center)
 
     def load_data(self, filename, slice_idx=-1):
         self.filename = filename

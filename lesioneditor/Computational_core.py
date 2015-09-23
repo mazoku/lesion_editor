@@ -490,9 +490,6 @@ class Computational_core():
                            area=None,#min_area=0, max_area=np.Infinity,
                            density=None,#min_density=-np.Infinity, max_density=np.Infinity):
                            compactness=None):
-        # min_area = self.params['min_area']
-        # max_area = self.params['max_area']
-        # min_compactness = self.params['min_compactness']
 
         if self.actual_data.lesions is not None:
             lesions = self.actual_data.lesions[:]  # copy of the list
@@ -500,38 +497,26 @@ class Computational_core():
             return
 
         if area is not None:
-            # self.filtered_idxs = [x.label for x in self.actual_data.lesions if area[0] <= x.area <= area[1]]
-            lesions = [x for x in lesions if area[0] <= x.area <= area[1]]
+            lesions = [x for x in lesions if area[0] <= x.area <= area[1] or x.priority == Lesion.PRIORITY_HIGH]
 
         if density is not None:
-            lesions = [x for x in lesions if density[0] <= x.mean_density <= density[1]]
+            lesions = [x for x in lesions if density[0] <= x.mean_density <= density[1] or x.priority == Lesion.PRIORITY_HIGH]
 
         if compactness is not None:
             if compactness > 1:
                 compactness = float(compactness) / self.params['compactness_step']
-            lesions = [x for x in lesions if compactness <= x.compactness]
+            lesions = [x for x in lesions if compactness <= x.compactness or x.priority == Lesion.PRIORITY_HIGH]
 
         # geting labels of filtered objects
         self.filtered_idxs = [x.label for x in lesions]
 
         if selected_labels is not None:
             self.filtered_idxs = np.intersect1d(self.filtered_idxs, selected_labels)
-        # areas = [x.area for x in self.actual_data.lesions if x.label in self.filtered_idxs]
-        # print max(areas)
-        # self.actual_data.labels_filt = self.params['healthy_label'] * (self.actual_data.labels > self.params['bgd_label'])
+
         self.actual_data.labels_filt = np.where(self.actual_data.labels > self.params['bgd_label'], self.params['healthy_label'], self.params['bgd_label'])
-        is_in = np.in1d(self.actual_data.objects, self.filtered_idxs).reshape(self.actual_data.labels.shape)
+        is_in = np.in1d(self.actual_data.labels, self.filtered_idxs).reshape(self.actual_data.labels.shape)
         self.actual_data.labels_filt = np.where(is_in, self.actual_data.labels, self.actual_data.labels_filt)
         pass
-        # self.actual_data.labels_filt = self.actual_data.labels * np.in1d(self.actual_data.objects, self.filtered_idxs).reshape(self.actual_data.labels.shape)
-        # self.actual_data.labels_filt[self.actual_data.labels == self.params['bgd_label']] = self.params['bgd_label']
-
-        # self.filtered_idxs = np.ones(self.n_objects, dtype=np.bool)
-        #
-        # for i in range(self.n_objects):
-        #     # TODO: test the compactness
-        #     if self.areas[i] < min_area or self.areas[i] > max_area:# or self.comps[i] < min_compactness:
-        #         self.filtered_idxs[i] = False
 
     def run(self):
         # slice_idx = self.params['slice_idx']
@@ -669,7 +654,9 @@ class Computational_core():
         print 'ok'
 
         print 'initial filtration ...',
-        self.objects_filtration()
+        self.objects_filtration(area=(self.params['min_area'], self.params['max_area']),
+                                density=(self.params['min_density'], self.params['max_density']),
+                                compactness=self.params['min_compactness'])
         print 'ok'
         self.status_bar.showMessage('Done')
 

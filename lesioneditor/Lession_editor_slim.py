@@ -119,6 +119,11 @@ class LessionEditor(QtGui.QMainWindow):
         self.objects_widget.ui.min_compactness_LE.textChanged.connect(self.min_compactness_LE_changed)
         # button callbacks
         self.objects_widget.ui.add_obj_BTN.clicked.connect(self.add_obj_BTN_callback)
+        self.params['max_area'] = self.objects_widget.area_RS.end()
+        self.params['min_area'] = self.objects_widget.area_RS.start()
+        self.params['max_density'] = self.objects_widget.density_RS.end()
+        self.params['min_density'] = self.objects_widget.density_RS.start()
+        self.params['min_compactness'] = self.objects_widget.ui.min_compactness_SL.value() * self.params['compactness_step']
 
         # self.area_hist_widget = ahw.AreaHistWidget()
 
@@ -186,6 +191,7 @@ class LessionEditor(QtGui.QMainWindow):
         # self.view_L.setSlice(self.data_L.data[0,:,:])
         self.view_L.setSlice(self.data_L.data_aview[...,0])
         self.view_L.mouseClickSignal.connect(self.add_obj_event)
+        self.view_L.mousePressEvent = self.view_L.myEmptyMousePressEvent
 
         self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
         self.view_R.setCW(self.win_l, 'c')
@@ -196,6 +202,8 @@ class LessionEditor(QtGui.QMainWindow):
             self.view_L.setVisible(False)
         if not self.show_view_R:
             self.view_R.setVisible(False)
+        # self.view_R.mouseClickSignal.connect(self.add_obj_event)
+        # self.view_R.mousePressEvent = self.view_R.myEmptyMousePressEvent
         # self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:])
         # self.update_view_L()
         # self.view_R = data_view_widget.SliceBox(self.data_R.shape[1:])
@@ -269,13 +277,29 @@ class LessionEditor(QtGui.QMainWindow):
     def add_obj_event(self, coords, density):
         print 'add_obj_event - coords: ', coords, ', density: ', density
         center = [self.actual_slice_L, coords[0], coords[1]]
-        if self.data_L.labels is not None:
-            lbl = self.data_L.labels.max() + 1
+        if self.data_L.objects is not None:
+            idx = self.data_L.objects.max() + 1
         else:
-            lbl = 1
-        new_les = Lesion.create_lesion_from_pt(center, density, lbl)
-        pass
-        #TODO: pridat do objektu a aktualizovat tabulku
+            idx = 1
+        new_les = Lesion.create_lesion_from_pt(center, density, idx)
+        if self.cc.models is not None and self.cc.models['rv_heal'].mean() < density:
+            lbl = self.params['hyper_label']
+        else:
+            lbl = self.params['hypo_label']
+        self.data_L.labels[center[0], center[2], center[1]] = lbl
+        self.data_L.objects[center[0], center[2], center[1]] = idx
+
+        self.data_L.append_lesion(new_les)
+
+        self.cc.objects_filtration(area=(self.params['min_area'], self.params['max_area']),
+                                density=(self.params['min_density'], self.params['max_density']),
+                                compactness=self.params['min_compactness'])
+        # self.fill_table(self.data_L.lesions, self.data_L.labels)
+        # self.fill_table(self.data_L.lesions, self.data_L.labels, self.data_L.labels_filt) #self.cc.filtered_idxs)
+        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
+        # self.actual_data.labels_filt
+        self.ui.show_contours_L_BTN.setEnabled(True)
+        #TODO: aktualizovat tabulku
 
     def min_compactness_SL_changed(self, value):
         self.objects_widget.ui.min_compactness_LE.setText('%.3f' % (value * self.params['compactness_step']))
@@ -339,17 +363,23 @@ class LessionEditor(QtGui.QMainWindow):
             self.show_labels_R_callback()
 
     def object_slider_changed(self, value):
-        self.params['max_area'] = self.objects_widget.area_RS.end()
-        self.params['min_area'] = self.objects_widget.area_RS.start()
-        self.params['max_density'] = self.objects_widget.density_RS.end()
-        self.params['min_density'] = self.objects_widget.density_RS.start()
-        self.params['min_compactness'] = self.objects_widget.ui.min_compactness_SL.value()
-        self.params['compactness'] = self.objects_widget.ui.min_compactness_SL.value() * self.params['compactness_step']
+        min_area = self.objects_widget.area_RS.start()
+        max_area = self.objects_widget.area_RS.end()
+        min_density = self.objects_widget.density_RS.start()
+        max_density = self.objects_widget.density_RS.end()
+        min_comp = self.objects_widget.ui.min_compactness_SL.value() * self.params['compactness_step']
+        self.params['max_area'] = max_area
+        self.params['min_area'] = min_area
+        self.params['max_density'] = max_density
+        self.params['min_density'] = min_density
+        self.params['min_compactness'] = min_comp
 
-        self.cc.objects_filtration(self.selected_objects_labels,
-                                   area= (self.objects_widget.area_RS.start(), self.objects_widget.area_RS.end()),
-                                   density=(self.objects_widget.density_RS.start(), self.objects_widget.density_RS.end()),
-                                   compactness=self.params['compactness'])
+        self.selected_objects_labels
+
+        self.cc.objects_filtration(#self.selected_objects_labels,
+                                   area= (min_area, max_area),
+                                   density=(min_density, max_density),
+                                   compactness=min_comp)
         # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
         if self.cc.filtered_idxs is not None:
             self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
@@ -525,16 +555,20 @@ class LessionEditor(QtGui.QMainWindow):
         # self.cc.n_objects = len(np.unique(self.cc.objects)) - 1
         # self.fill_table(self.cc.labels, self.cc.areas, self.cc.comps)
 
-    def fill_table(self, lesions, labels, idxs):
-        if self.objects_widget is None:
-            self.objects_widget = Objects_widget()
+    def fill_table(self, lesions, labels, idxs=None):
+        # if self.objects_widget is None:
+        #     self.objects_widget = Objects_widget()
+        #     # tableview selection changed
+        #     self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
+        if idxs is None:
+            idxs = [x.label for x in lesions]
+            # lesions_filtered = lesions[:]  # copying the list
+        # else:
         lesions_filtered = [x for x in lesions if x.label in idxs]
         # labels_filtered = np.where(labels in idxs, labels, 0)
         labels_filtered = labels * np.in1d(labels, idxs).reshape(labels.shape)
         self.table_model = mtm.MyTableModel(lesions_filtered, labels_filtered)
         self.objects_widget.ui.objects_TV.setModel(self.table_model)
-
-        # tableview selection changed
         self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
 
         # self.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
@@ -617,6 +651,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L.show_mode = self.view_L.SHOW_LABELS
 
         im = self.get_image('L')
+        print im.dtype
         self.view_L.setSlice(im)
 
         self.statusBar().showMessage('data_L set to labels')

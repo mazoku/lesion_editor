@@ -6,7 +6,7 @@ import tools
 PRIORITY_LOW = 0  # for lessions that are extracted autonomously
 PRIORITY_HIGH = 1  # for lessions that are added by the user, these wil not be filtrated by sliders (area, density, ...)
 
-def create_lesion_from_pt(center, density, lbl):
+def create_lesion_from_pt(center, density, lbl, priority=PRIORITY_HIGH):
     """
 
     :param center: center of lesion, [s, x, y] = [s, c, r]
@@ -19,7 +19,7 @@ def create_lesion_from_pt(center, density, lbl):
     les.area = 1
     les.compactness = 1
     les.center = center
-    les.priority = PRIORITY_HIGH
+    les.priority = priority
     les.mean_density = density
     les.std_density = 0
 

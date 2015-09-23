@@ -9,7 +9,6 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
-- manualni pridani loziska
 - pocitani kompaktnosti
 - pri kliku na lozisko v datech udelat selection na totez lozisko v tabulce
 - vizualizace kontur

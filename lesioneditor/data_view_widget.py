@@ -303,7 +303,7 @@ class SliceBox(QLabel):
                 pen = QPen(Qt.red, 3)
                 painter.setPen(pen)
                 for i in range(len(pts[0])):
-                    painter.drawPoint(pts[1][i] * self.grid[0], pts[0][i] * self.grid[1])
+                    painter.drawPoint(pts[0][i] * self.grid[0], pts[1][i] * self.grid[1])
 
         if self.circle_active:
             pen = QPen(Qt.red, 3)

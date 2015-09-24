@@ -308,8 +308,11 @@ class LessionEditor(QtGui.QMainWindow):
     def find_clicked_object(self, coords):
         print 'finding clicked object'
         lbl = self.active_data.objects[self.actual_slice_L, coords[1], coords[0]]
-        self.objects_widget.ui.objects_TV.selectRow(lbl - 1) #selectionModel(). .selectedRows()
-        coco.objects_filtration(self.active_data, self.params)
+        if lbl > -1:
+            self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.disconnect()
+            self.objects_widget.ui.objects_TV.selectRow(lbl - 1) #selectionModel(). .selectedRows()
+            self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
+        # coco.objects_filtration(self.active_data, self.params)
         self.view_L.updateSlice()
 
     def add_obj_event(self, coords, density):

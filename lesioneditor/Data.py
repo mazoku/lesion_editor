@@ -20,6 +20,7 @@ class Data(object):
     def __init__(self, data=None, mask=None, filename=None):
         self.mask = mask
         self.voxel_size = None
+        self.slab = None
         self.shape = None
         self.orig_shape = None
         self.objects = None  # array where each object has unique label
@@ -28,6 +29,7 @@ class Data(object):
         self.n_rows = None
         self.n_cols = None
         self.n_slices = None
+        self.models = None  # color models
 
         # properties
         self.__data = data
@@ -64,6 +66,8 @@ class Data(object):
         self.labels = np.zeros(x.shape)
         self.objects = np.zeros(x.shape)
         self.object_centers = np.zeros(x.shape)
+        self.orig_shape = x.shape
+        self.shape = x.shape
 
     @property
     def labels(self):
@@ -155,34 +159,67 @@ class Data(object):
         self.__object_centers[les.center[0], les.center[1], les.center[2]] = 1
         self.__object_centers_list.append(les.center)
 
-    def load_data(self, filename, slice_idx=-1):
-        self.filename = filename
-        fcontent = None
-        try:
-            import gzip
-            f = gzip.open(self.filename, 'rb')
-            fcontent = f.read()
-            f.close()
-        except Exception as e:
-            logger.warning("Input gzip exception: " + str(e))
-            f = open(self.filename, 'rb')
-            fcontent = f.read()
-            f.close()
-        data_dict = pickle.loads(fcontent)
+    # def load_data(self, filename, slice_idx=-1):
+    #     self.filename = filename
+    #     fcontent = None
+    #     try:
+    #         import gzip
+    #         f = gzip.open(self.filename, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     except Exception as e:
+    #         logger.warning("Input gzip exception: " + str(e))
+    #         f = open(self.filename, 'rb')
+    #         fcontent = f.read()
+    #         f.close()
+    #     data_dict = pickle.loads(fcontent)
+    #
+    #     self.data = data_dict['data3d']
+    #     self.mask = data_dict['segmentation']
+    #
+    #     self.voxel_size = data_dict['voxelsize_mm']
+    #
+    #     if slice_idx != -1:
+    #         self.data = self.data[:, :, slice_idx]
+    #         self.mask = self.mask[:, :, slice_idx]
+    #
+    #     # data_s = 200 * np.triu(np.ones((100,120), dtype=np.int))
+    #     # data = np.dstack((data_s, data_s))
+    #     # self.data = np.rollaxis(data, 2, 0)
+    #     # self.mask = np.ones_like(self.data)
+    #
+    #     self.data_vis = self.data
+    #     self.data_aview = self.data.transpose(self.act_transposition)
+    #
+    #     self.orig_shape = self.data.shape
+    #     self.n_slices, self.n_rows, self.n_cols = self.orig_shape
+    #     self.shape = self.data.shape
+    #
+    #     self.loaded = True
 
-        self.data = data_dict['data3d']
-        self.mask = data_dict['segmentation']
+    def create_data(self, datap=None, filename=None):
+        if datap is None and filename is None:
+            raise AttributeError('No data nor filename given.')
 
-        self.voxel_size = data_dict['voxelsize_mm']
+        if filename is not None:
+            self.filename = filename
+            fcontent = None
+            try:
+                import gzip
+                f = gzip.open(self.filename, 'rb')
+                fcontent = f.read()
+                f.close()
+            except Exception as e:
+                logger.warning("Input gzip exception: " + str(e))
+                f = open(self.filename, 'rb')
+                fcontent = f.read()
+                f.close()
+            datap = pickle.loads(fcontent)
 
-        if slice_idx != -1:
-            self.data = self.data[:, :, slice_idx]
-            self.mask = self.mask[:, :, slice_idx]
-
-        # data_s = 200 * np.triu(np.ones((100,120), dtype=np.int))
-        # data = np.dstack((data_s, data_s))
-        # self.data = np.rollaxis(data, 2, 0)
-        # self.mask = np.ones_like(self.data)
+        self.data = datap['data3d']
+        self.mask = datap['segmentation']
+        self.voxel_size = datap['voxelsize_mm']
+        self.slab = datap['slab']
 
         self.data_vis = self.data
         self.data_aview = self.data.transpose(self.act_transposition)

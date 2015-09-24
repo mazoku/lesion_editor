@@ -45,64 +45,42 @@ class Computational_core():
 
     def __init__(self, fname, params, status_bar):
         # self.params = self.init_params()
-        self.params = params
-        self.models = None
+        # self.params = params
+        # self.models = None
         self.status_bar = status_bar
 
-        self.labels = None  # list of unique labels
-        self.filtered_idxs = None
+        # self.labels = None  # list of unique labels
+        # self.filtered_idxs = None
 
-        ext_list = ('pklz', 'pickle')
-        self.fname = fname
-        self.data_1 = Data.Data()
-        self.data_2 = Data.Data()
-        self.actual_data = self.data_1
-        self.active_serie = 1
+        # ext_list = ('pklz', 'pickle')
+        # self.fname = fname
+        # self.data_1 = Data.Data()
+        # self.data_2 = Data.Data()
+        # self.actual_data = self.data_1
+        # self.active_serie = 1
 
-        self.objects = list()  # list of segmented lesions
+        # self.objects = list()  # list of segmented lesions
 
         # loading data - both series if provided
-        if len(self.fname) > 0:
-            name = self.fname[0]
-            if name.split('.')[-1] in ext_list:
-                self.data_1.load_data(name)
-
-                # -------------------------------------------------------
-                # import sys
-                # import os
-                # path_to_script = os.path.dirname(os.path.abspath(__file__))
-                # sys.path.append(os.path.join(path_to_script, "../../pyseg_base/pysegbase"))
-                # from seed_editor_qt import QTSeedEditor
-                # pyed = QTSeedEditor(self.data_1.data,
-                #             # voxelSize=self.params['working_voxel_size_mm'],
-                #             volume_unit='ml')
-                # pyed.exec_()
-                # TODO: predelat ala QTSeedEditor !!
-                # -------------------------------------------------------
-
-                # self.data_1, self.mask_1, self.voxel_size_1 = self.load_pickle_data(name)
-            else:
-                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
-                raise IOError(msg)
-        if len(self.fname) > 1:
-            name = self.fname[1]
-            if name.split('.')[-1] in ext_list:
-                self.data_2.load_data(name)
-                # self.data_2, self.mask_2, self.voxel_size_2 = self.load_pickle_data(name)
-            else:
-                msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
-                raise IOError(msg)
-
-        # if self.data_1 is not None:
-        #     self.orig_shape_1 = self.data_1.shape
-        #     self.res_1 = np.zeros(self.orig_shape_1)
-        # if self.data_2 is not None:
-        #     self.orig_shape_2 = self.data_2.shape
-        #     self.res_2 = np.zeros(self.orig_shape_2)
+        # if len(self.fname) > 0:
+        #     name = self.fname[0]
+        #     if name.split('.')[-1] in ext_list:
+        #         self.data_1.load_data(name)
+        #
+        #     else:
+        #         msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+        #         raise IOError(msg)
+        # if len(self.fname) > 1:
+        #     name = self.fname[1]
+        #     if name.split('.')[-1] in ext_list:
+        #         self.data_2.load_data(name)
+        #     else:
+        #         msg = 'Wrong data type, supported extensions: ', ', '.join(ext_list)
+        #         raise IOError(msg)
 
         # smooth data if allowed
-        self.data_1.data = self.smooth_data(self.data_1.data)
-        self.data_2.data = self.smooth_data(self.data_2.data)
+        # self.data_1.data = self.smooth_data(self.data_1.data)
+        # self.data_2.data = self.smooth_data(self.data_2.data)
 
     def data_zoom(self, data, voxelsize_mm, working_voxelsize_mm):
         zoom = voxelsize_mm / (1.0 * working_voxelsize_mm)

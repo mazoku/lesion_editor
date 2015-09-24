@@ -9,6 +9,7 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
+- spatne vykreslovani stredu lozisek
 - pocitani kompaktnosti
 - pri kliku na lozisko v datech udelat selection na totez lozisko v tabulce
 - vizualizace kontur

@@ -48,9 +48,11 @@ from hist_widget import Hist_widget
 from objects_widget import Objects_widget
 import My_table_model as mtm
 import area_hist_widget as ahw
-import Computational_core
+# import Computational_core
+import computational_core as coco
 import data_view_widget
 import Lesion
+import Data
 
 # constants definition
 SHOW_IM = 0
@@ -62,7 +64,8 @@ class LessionEditor(QtGui.QMainWindow):
     """Main class of the programm."""
 
 
-    def __init__(self, fname, disp_smoothed=False, parent=None):
+    def __init__(self, datap_1=None, datap_2=None, fname_1=None, fname_2=None, disp_smoothed=False, parent=None):
+
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -89,8 +92,19 @@ class LessionEditor(QtGui.QMainWindow):
         self.win_l = self.params['win_level']
         self.win_w = self.params['win_width']
 
-        self.data_L = None
-        self.data_R = None
+        # DATA ---------------------------------------------
+        if datap_1 is not None or fname_1 is not None:
+            self.data_1 = Data.Data()
+            self.data_1.create_data(datap=datap_1, filename=fname_1)
+        else:
+            self.data_1 = None
+        if datap_2 is not None or fname_2 is not None:
+            self.data_2 = Data.Data()
+            self.data_2.create_data(datap=datap_2, filename=fname_2)
+        else:
+            self.data_2 = None
+        #--------------------------------------------------
+
         self.actual_slice_L = 0
         self.actual_slice_R = 0
 
@@ -128,22 +142,26 @@ class LessionEditor(QtGui.QMainWindow):
         # self.area_hist_widget = ahw.AreaHistWidget()
 
         # computational core
-        self.cc = Computational_core.Computational_core(fname, self.params, self.statusBar())
-        if self.cc.data_1.loaded:
+        # self.coco = Computational_core.Computational_core(fname, self.params, self.statusBar())
+        if self.data_1.loaded:
             # self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.cc.data_1.filename.split('/')[-1])
-            self.data_L = self.cc.data_1
-            if not self.cc.data_2.loaded:
-                self.data_R = self.cc.data_1
-        if self.cc.data_2.loaded:
+            self.ui.figure_L_CB.addItem(self.data_1.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.data_1.filename.split('/')[-1])
+            self.data_L = self.data_1
+            self.active_data_idx = 1
+            self.active_data = self.data_1
+            if not self.data_2.loaded:
+                self.data_R = self.data_1
+        if self.data_2.loaded:
             # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.cc.data_2.filename.split('/')[-1])
-            self.data_R = self.cc.data_2
+            self.ui.figure_L_CB.addItem(self.data_2.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.data_2.filename.split('/')[-1])
+            self.data_R = self.data_2
             self.ui.figure_R_CB.setCurrentIndex(1)
-            if not self.cc.data_1.loaded:
-                self.data_L = self.cc.data_2
+            if not self.data_1.loaded:
+                self.data_L = self.data_2
+                self.active_data = self.data_2
+                self.active_data_idx = 2
 
         # radio buttons
         # self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
@@ -152,7 +170,6 @@ class LessionEditor(QtGui.QMainWindow):
         #     self.cc.active_serie = 1
         # else:
         #     self.cc.active_serie = 2
-        self.cc.active_serie = 1
 
         self.ui.action_load_serie_1.triggered.connect(lambda: self.action_load_serie_callback(1))
         self.ui.action_load_serie_2.triggered.connect(lambda: self.action_load_serie_callback(2))
@@ -170,15 +187,15 @@ class LessionEditor(QtGui.QMainWindow):
         #----------------------------------------------------------------------------------
 
         # seting up the range of the scrollbar to cope with the number of slices
-        if self.cc.active_serie == 1:
-            self.ui.slice_C_SB.setMaximum(self.cc.data_1.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.cc.data_1.n_slices - 1)
+        if self.active_data_idx == 1:
+            self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
+            self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
         else:
-            self.ui.slice_C_SB.setMaximum(self.cc.data_2.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.cc.data_2.n_slices - 1)
+            self.ui.slice_C_SB.setMaximum(self.data_2.n_slices - 1)
+            self.ui.slice_L_SB.setMaximum(self.data_2.n_slices - 1)
 
-        if self.cc.data_2.loaded:
-            self.ui.slice_R_SB.setMaximum(self.cc.data_2.n_slices - 1)
+        if self.data_2.loaded:
+            self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
 
         # combo boxes - for figure views
         self.ui.figure_L_CB.currentIndexChanged.connect(self.figure_L_CB_callback)
@@ -258,7 +275,7 @@ class LessionEditor(QtGui.QMainWindow):
             print 'O'
             self.action_show_object_list_callback()
         elif key == QtCore.Qt.Key_L:
-            print 'R'
+            print 'L'
             self.run_callback()
         elif key == QtCore.Qt.Key_C:
             print 'C'
@@ -282,7 +299,7 @@ class LessionEditor(QtGui.QMainWindow):
         else:
             idx = 1
         new_les = Lesion.create_lesion_from_pt(center, density, idx)
-        if self.cc.models is not None and self.cc.models['rv_heal'].mean() < density:
+        if self.active_data.models is not None and self.active_data.models['rv_heal'].mean() < density:
             lbl = self.params['hyper_label']
         else:
             lbl = self.params['hypo_label']
@@ -291,12 +308,11 @@ class LessionEditor(QtGui.QMainWindow):
 
         self.data_L.append_lesion(new_les)
 
-        self.cc.objects_filtration(area=(self.params['min_area'], self.params['max_area']),
-                                density=(self.params['min_density'], self.params['max_density']),
-                                compactness=self.params['min_compactness'])
+        # objects_labels = [x.label for x in self.active_data.lesions]
+        filtered_idxs = coco.objects_filtration(self.active_data, self.params)
         # self.fill_table(self.data_L.lesions, self.data_L.labels)
         # self.fill_table(self.data_L.lesions, self.data_L.labels, self.data_L.labels_filt) #self.cc.filtered_idxs)
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
+        self.fill_table(self.active_data.lesions, self.active_data.labels, filtered_idxs)
         # self.actual_data.labels_filt
         self.ui.show_contours_L_BTN.setEnabled(True)
         #TODO: aktualizovat tabulku
@@ -333,29 +349,30 @@ class LessionEditor(QtGui.QMainWindow):
         self.objects_widget.show()
         self.objects_widget.setFocus()
 
-    def serie_1_RB_callback(self):
-        self.cc.active_serie = 1
-        self.cc.actual_data = self.cc.data_1
-
-    def serie_2_RB_callback(self):
-        self.cc.active_serie = 2
-        self.cc.actual_data = self.cc.data_2
+    # def serie_1_RB_callback(self):
+    #     self.active_data_idx = 1
+    #     self.active_data = self.cc.data_1
+    #
+    # def serie_2_RB_callback(self):
+    #     self.active_data_idx = 2
+    #     self.active_data = self.cc.data_2
 
     def selection_changed(self, selected, deselected):
         #TODO: povolit oznaceni pouze jednoho objektu?
         if selected.indexes():
-            self.selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
+            selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
             # print 'show only', self.selected_objects_labels
-            slice = [int(x.center[0]) for x in self.cc.actual_data.lesions if x.label == self.selected_objects_labels[0]][0]
+            slice = [int(x.center[0]) for x in self.active_data.lesions if x.label == self.selected_objects_labels[0]][0]
             self.ui.slice_C_SB.setValue(slice)
         else:
-            self.selected_objects_labels = [x.label for x in self.table_model.objects]
+            selected_objects_labels = [x.label for x in self.table_model.objects]
             # print 'show all', self.selected_objects_labels
-        min_area, max_area = self.objects_widget.area_RS.getRange()
-        min_density, max_density = self.objects_widget.density_RS.getRange()
-        min_comp = self.objects_widget.ui.min_compactness_SL.value() / self.params['compactness_step']
-        self.cc.objects_filtration(self.selected_objects_labels, area=(min_area, max_area), density=(min_density, max_density),
-                                   compactness=min_comp)
+        # min_area, max_area = self.objects_widget.area_RS.getRange()
+        # min_density, max_density = self.objects_widget.density_RS.getRange()
+        # min_comp = self.objects_widget.ui.min_compactness_SL.value() / self.params['compactness_step']
+        # coco.objects_filtration(self.selected_objects_labels, self.params, area=(min_area, max_area),
+        #                         density=(min_density, max_density), compactness=min_comp)
+        coco.objects_filtration(self.active_data, self.params, selected_labels=selected_objects_labels)
         #TODO: nasleduje prasarna
         if self.view_L.show_mode == self.view_L.SHOW_LABELS:
             self.show_labels_L_callback()
@@ -374,15 +391,11 @@ class LessionEditor(QtGui.QMainWindow):
         self.params['min_density'] = min_density
         self.params['min_compactness'] = min_comp
 
-        self.selected_objects_labels
-
-        self.cc.objects_filtration(#self.selected_objects_labels,
-                                   area= (min_area, max_area),
-                                   density=(min_density, max_density),
-                                   compactness=min_comp)
-        # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-        if self.cc.filtered_idxs is not None:
-            self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.labels, self.cc.filtered_idxs)
+        # self.selected_objects_labels
+        # objects_labels = [x.label for x in self.active_data.lesions]
+        filtered_idxs = coco.objects_filtration(self.active_data, self.params)
+        if filtered_idxs is not None:
+            self.fill_table(self.active_data.lesions, self.active_data.labels, filtered_idxs)
             # TODO: nasleduje prasarna
             if self.view_L.show_mode == self.view_L.SHOW_LABELS:
                 self.show_labels_L_callback()
@@ -509,21 +522,21 @@ class LessionEditor(QtGui.QMainWindow):
     def calculate_models_callback(self):
         self.statusBar().showMessage('Calculating intensity models...')
         if self.params['zoom']:
-            data = self.data_zoom(self.cc.actual_data.data, self.cc.actual_data.voxel_size, self.params['working_voxel_size_mm'])
-            mask = self.data_zoom(self.cc.actual_data.mask, self.cc.actual_data.voxel_size, self.params['working_voxel_size_mm'])
+            data = self.data_zoom(self.active_data.data, self.active_data.voxel_size, self.params['working_voxel_size_mm'])
+            mask = self.data_zoom(self.active_data.mask, self.active_data.voxel_size, self.params['working_voxel_size_mm'])
         else:
-            data = tools.resize3D(self.cc.actual_data.data, self.params['scale'], sliceId=0)
-            mask = tools.resize3D(self.cc.actual_data.mask, self.params['scale'], sliceId=0)
-        self.cc.models = self.cc.calculate_intensity_models(data, mask)
+            data = tools.resize3D(self.active_data.data, self.params['scale'], sliceId=0)
+            mask = tools.resize3D(self.active_data.mask, self.params['scale'], sliceId=0)
+        self.active_data.models = coco.calculate_intensity_models(data, mask, self.params)
         self.statusBar().showMessage('Intensity models calculated.')
         self.update_models()
 
     def update_models(self):
         if self.hist_widget is None:
             self.hist_widget = Hist_widget(data=self.data_L.data)
-        self.hist_widget.update_heal_rv(self.cc.models['rv_heal'])
-        self.hist_widget.update_hypo_rv(self.cc.models['rv_hypo'])
-        self.hist_widget.update_hyper_rv(self.cc.models['rv_hyper'])
+        self.hist_widget.update_heal_rv(self.active_data.models['rv_heal'])
+        self.hist_widget.update_hypo_rv(self.active_data.models['rv_hypo'])
+        self.hist_widget.update_hyper_rv(self.active_data.models['rv_hyper'])
 
         self.hist_widget.update_figures()
 
@@ -534,26 +547,20 @@ class LessionEditor(QtGui.QMainWindow):
 
         # run localization
         self.statusBar().showMessage('Localization started...')
-        self.cc.run()
+        coco.run_mrf(self.active_data, self.params)
+        # self.active_data, self.models = coco.run_mrf(self.active_data, self.params, models=self.models)
         self.update_models()
 
-        # filling table with objects
-        # self.fill_table(self.cc.labels[self.cc.filtered_idxs], self.cc.areas[self.cc.filtered_idxs], self.cc.comps[self.cc.filtered_idxs])
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.objects, self.cc.filtered_idxs)
-        self.selected_objects_labels = [x.label for x in self.table_model.objects]
         # seting up range of area slider
-        areas = [x.area for x in self.cc.actual_data.lesions]
+        areas = [x.area for x in self.active_data.lesions]
         self.objects_widget.set_area_range(areas)
+
+        # filling table with objects
+        objects_labels = [x.label for x in self.active_data.lesions]
+        self.fill_table(self.active_data.lesions, self.active_data.objects, objects_labels)
 
         self.ui.show_labels_L_BTN.setEnabled(True)
         self.ui.show_contours_L_BTN.setEnabled(True)
-
-        # self.cc.areas = np.array([10, 20, 30, 8])
-        # self.cc.comps = np.array([51, 60, 70, 80])
-        # self.cc.objects = np.array([[0,0,-1,3,3],[0,-1,-1,3,3],[-1,-1,-1,-1,-1],[1,1,-1,-1,2],[1,-1,-1,2,2]])
-        # self.cc.labels = np.unique(self.cc.objects)[1:]
-        # self.cc.n_objects = len(np.unique(self.cc.objects)) - 1
-        # self.fill_table(self.cc.labels, self.cc.areas, self.cc.comps)
 
     def fill_table(self, lesions, labels, idxs=None):
         # if self.objects_widget is None:
@@ -689,9 +696,9 @@ class LessionEditor(QtGui.QMainWindow):
 
     def figure_L_CB_callback(self):
         if self.ui.figure_L_CB.currentIndex() == 0:
-            self.data_L = self.cc.data_1
+            self.data_L = self.data_1
         elif self.ui.figure_L_CB.currentIndex() == 1:
-            self.data_L = self.cc.data_2
+            self.data_L = self.data_2
 
         if self.actual_slice_L >= self.data_L.n_slices:
             self.actual_slice_L = self.data_L.n_slices - 1
@@ -711,9 +718,9 @@ class LessionEditor(QtGui.QMainWindow):
 
     def figure_R_CB_callback(self):
         if self.ui.figure_R_CB.currentIndex() == 0:
-            self.data_R = self.cc.data_1
+            self.data_R = self.data_1
         elif self.ui.figure_R_CB.currentIndex() == 1:
-            self.data_R = self.cc.data_2
+            self.data_R = self.data_2
 
         if self.actual_slice_R >= self.data_R.n_slices:
             self.actual_slice_R = self.data_R.n_slices - 1
@@ -744,10 +751,9 @@ class LessionEditor(QtGui.QMainWindow):
             obj = self.table_model.objects[i.row()]
             self.remove_object(obj)
 
-        # self.cc.actual_data.filtered_idxs = [x.label for x in self.cc.actual_data.lesions]
-        self.selected_objects_labels = [x.label for x in self.cc.actual_data.lesions]
-        self.cc.objects_filtration(self.selected_objects_labels, min_area=self.ui.min_area_SL.value(), max_area=self.ui.max_area_SL.value())
-        self.fill_table(self.cc.actual_data.lesions, self.cc.actual_data.objects, self.cc.filtered_idxs)
+        # objects_labels = [x.label for x in self.active_data.lesions]
+        filtered_idxs = coco.objects_filtration(self.active_data, self.params)
+        self.fill_table(self.active_data.lesions, self.active_data.objects, filtered_idxs)
         #TODO: nasleduje prasarna
         if self.view_L.show_mode == self.view_L.SHOW_LABELS:
             self.show_labels_L_callback()
@@ -756,11 +762,11 @@ class LessionEditor(QtGui.QMainWindow):
 
     def remove_object(self, obj):
         lbl = obj.label
-        im = self.cc.actual_data.objects == lbl
-        self.cc.actual_data.objects[np.nonzero(im)] = self.params['bgd_label']
-        self.cc.actual_data.labels[np.nonzero(im)] = self.params['healthy_label']
+        im = self.active_data.objects == lbl
+        self.active_data.objects[np.nonzero(im)] = self.params['bgd_label']
+        self.active_data.labels[np.nonzero(im)] = self.params['healthy_label']
 
-        self.cc.actual_data.lesions.remove(obj)
+        self.active_data.lesions.remove(obj)
         print 'removed label', lbl
 
     def get_image(self, site):
@@ -795,63 +801,54 @@ class LessionEditor(QtGui.QMainWindow):
 ################################################################################
 ################################################################################
 if __name__ == '__main__':
-    fname = ''
-    fnames = list()
+    fname_1 = None
+    fname_2 = None
 
     # 2 hypo, 1 on the border --------------------
-    # arterial 0.6mm - bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_arterial_0.6_B30f-.pklz'
-    # venous 0.6mm - good
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_183_46324212_venous_0.6_B20f-.pklz'
-    # venous 5mm - ok, but wrong approach
     # TODO: study ID 29 - 3/3, 2 velke spoji v jeden
     # slice = 17
-    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz')
-    fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz')
+    fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
+    fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz'
 
     # hypo in venous -----------------------
     # arterial - bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz'
+    # fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz'
     # venous - good
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz'
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_0.6_B20f-.pklz')
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz')
+    # fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_0.6_B20f-.pklz'
 
 
     # hyper, 1 on the border -------------------
     # arterial 0.6mm - not that bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Art_Abd_0.75_I26f_M_0.5-.pklz'
+    # fname_1 = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Art_Abd_0.75_I26f_M_0.5-.pklz'
     # venous 5mm - bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Ven_Abd_0.75_I26f_M_0.5-.pklz'
+    # fname_2 = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_239_61293268_DE_Ven_Abd_0.75_I26f_M_0.5-.pklz'
 
     # shluk -----------------
     # arterial 5mm
-    # fname = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_arterial_5.0_B30f-.pklz'
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/tryba/data_other/org-exp_180_49509315_arterial_0.6_B20f-.pklz'
     # TODO: study ID 18 - velke najde (hyper v arterialni fazi), 1/2 z malych
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_venous_5.0_B30f-.pklz')
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_arterial_5.0_B30f-.pklz')
+    # fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_venous_5.0_B30f-.pklz'
+    # fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_180_49509315_arterial_5.0_B30f-.pklz'
 
 
     # targeted
     # arterial 0.6mm - bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Arterial_0.75_I26f_3-.pklz'
+    # fname_1 = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Arterial_0.75_I26f_3-.pklz'
     # venous 0.6mm - bad
-    # fname = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Venous_0.75_I26f_3-.pklz'
+    # fname_2 = '/home/tomas/Data/liver_segmentation_06mm/hyperdenzni/org-exp_238_54280551_Abd_Venous_0.75_I26f_3-.pklz'
 
     # TODO: study ID 25 - 2/2
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_185_48441644_venous_5.0_B30f-.pklz')
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_185_48441644_arterial_5.0_B30f-.pklz')
+    # fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_185_48441644_venous_5.0_B30f-.pklz'
+    # fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_185_48441644_arterial_5.0_B30f-.pklz'
 
     # TODO: study ID 21 - 0/2, nenasel ani jeden pekny hypo
     # slice = 6
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_5.0_B30f-.pklz')
-    # fnames.append('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_5.0_B30f-.pklz')
+    # fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_venous_5.0_B30f-.pklz'
+    # fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_5.0_B30f-.pklz'
 
     # runing application -------------------------
     app = QtGui.QApplication(sys.argv)
     # app = MyApplication(sys.argv)
-    le = LessionEditor(fnames)
+    le = LessionEditor(fname_1=fname_1, fname_2=fname_2)
     le.show()
     sys.exit(app.exec_())
 

@@ -6,7 +6,7 @@ import tools
 PRIORITY_LOW = 0  # for lessions that are extracted autonomously
 PRIORITY_HIGH = 1  # for lessions that are added by the user, these wil not be filtrated by sliders (area, density, ...)
 
-def create_lesion_from_pt(center, density, lbl, priority=PRIORITY_HIGH):
+def create_lesion_from_pt(pt, density, lbl, priority=PRIORITY_HIGH):
     """
 
     :param center: center of lesion, [s, x, y] = [s, c, r]
@@ -18,7 +18,7 @@ def create_lesion_from_pt(center, density, lbl, priority=PRIORITY_HIGH):
 
     les.area = 1
     les.compactness = 1
-    les.center = center
+    les.center = pt
     les.priority = priority
     les.mean_density = density
     les.std_density = 0
@@ -27,12 +27,12 @@ def create_lesion_from_pt(center, density, lbl, priority=PRIORITY_HIGH):
     les.max_height = 1
     les.max_depth = 1
     # minimal and maximal row, column and slice
-    les.r_min = center[2]
-    les.r_max = center[2]
-    les.c_min = center[1]
-    les.c_max = center[1]
-    les.s_min = center[0]
-    les.s_max = center[0]
+    les.r_min = pt[1]
+    les.r_max = pt[1]
+    les.c_min = pt[2]
+    les.c_max = pt[2]
+    les.s_min = pt[0]
+    les.s_max = pt[0]
 
     les.hist = None  # histogram of density
 

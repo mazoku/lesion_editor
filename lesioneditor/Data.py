@@ -37,7 +37,6 @@ class Data(object):
         self.__labels_aview = None
         self.__labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
         self.__labels_filt_aview = None
-        self.__user_seeds = None
         self.__object_centers = None  # array of object centers
         self.__object_centers_list = list()  # list of object centers
         self.__lesions = list()  # list of lesions, set it with Lesions.extract_lesions(self.labels)
@@ -117,10 +116,6 @@ class Data(object):
     @property
     def user_seeds(self):
         return self.__user_seeds
-
-    @user_seeds.setter
-    def user_seeds(self, data):
-        self.__user_seeds = data
 
     @property
     def lesions(self):

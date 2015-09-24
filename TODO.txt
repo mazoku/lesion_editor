@@ -9,9 +9,9 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
-- spatne vykreslovani stredu lozisek
+- rozlisit selection_changed (click na do tabulky nebo do dat)
+  - pri kliku do dat se data prescrolluji na stred objektu a prefiltruji se - NEZADOUCI
 - pocitani kompaktnosti
-- pri kliku na lozisko v datech udelat selection na totez lozisko v tabulce
 - vizualizace kontur
 - objects_widget
     - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?

@@ -281,8 +281,7 @@ class SliceBox(QLabel):
 
         if self.contours is not None:
             if self.contour_mode == 'fill':
-                self.composeRgba(img, self.contours,
-                                 CONTOURS_COLORTABLE)
+                self.composeRgba(img, self.contours, CONTOURS_COLORTABLE)
 
             elif self.contour_mode == 'contours':
                 self.get_contours(img, self.contours)
@@ -303,7 +302,7 @@ class SliceBox(QLabel):
                 pen = QPen(Qt.red, 3)
                 painter.setPen(pen)
                 for i in range(len(pts[0])):
-                    painter.drawPoint(pts[0][i] * self.grid[0], pts[1][i] * self.grid[1])
+                    painter.drawPoint(pts[1][i] * self.grid[0], pts[0][i] * self.grid[1])
 
         if self.circle_active:
             pen = QPen(Qt.red, 3)
@@ -470,11 +469,11 @@ class SliceBox(QLabel):
     def myMousePressEvent(self, QMouseEvent):
         print 'myMousePressEvent: ',
         coords = list(self.gridPosition(QMouseEvent.pos()))
-        density =  self.ctslice[coords[0], coords[1]]
+        density = self.ctslice[coords[0], coords[1]]
         print 'pos = ', coords, ', data = ', density
         self.mouseClickSignal.emit(coords, density)
         # self.mousePressEvent = None
-        self.mousePressEvent = self.myEmptyMousePressEvent
+        # self.mousePressEvent = self.myEmptyMousePressEvent
 
     def myEmptyMousePressEvent(self, QMouseEvevnt):
         print 'dummy mouse press event'

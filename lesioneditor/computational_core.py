@@ -396,15 +396,16 @@ def objects_filtration(data, params, selected_labels=None, area=None, density=No
         lesions = [x for x in lesions if compactness <= x.compactness or x.priority == Lesion.PRIORITY_HIGH]
 
     # geting labels of filtered objects
-    filtered_idxs = [x.label for x in lesions]
+    filtered_lbls = [x.label for x in lesions]
 
     if selected_labels is not None:
-        filtered_idxs = np.intersect1d(filtered_idxs, selected_labels)
+        filtered_lbls = np.intersect1d(filtered_lbls, selected_labels)
 
     data.labels_filt = np.where(data.labels > params['bgd_label'], params['healthy_label'], params['bgd_label'])
-    is_in = np.in1d(data.labels, filtered_idxs).reshape(data.labels.shape)
+    is_in = np.in1d(data.objects, filtered_lbls).reshape(data.labels.shape)
     data.labels_filt = np.where(is_in, data.labels, data.labels_filt)
-    return filtered_idxs
+
+    return filtered_lbls
 
 def run_mrf(data_o, params):
     # slice_idx = self.params['slice_idx']

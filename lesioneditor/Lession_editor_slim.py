@@ -60,6 +60,9 @@ SHOW_LABELS = 1
 SHOW_CONTOURS = 2
 # SHOW_FILTERED_LABELS = 3
 
+MODE_VIEWING = 0
+MODE_ADDING = 1
+
 class LessionEditor(QtGui.QMainWindow):
     """Main class of the programm."""
 
@@ -75,6 +78,7 @@ class LessionEditor(QtGui.QMainWindow):
 
         # self.im = im
         # self.labels = labels
+        self.mode = MODE_VIEWING
         self.show_view_L = True
         self.show_view_R = False
         # self.healthy_label = healthy_label
@@ -207,8 +211,10 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L.setCW(self.win_w, 'w')
         # self.view_L.setSlice(self.data_L.data[0,:,:])
         self.view_L.setSlice(self.data_L.data_aview[...,0])
-        self.view_L.mouseClickSignal.connect(self.add_obj_event)
-        self.view_L.mousePressEvent = self.view_L.myEmptyMousePressEvent
+        # mouse click signal
+        self.view_L.mouseClickSignal.connect(self.mouse_click_event)
+        # self.view_L.mousePressEvent = self.view_L.myEmptyMousePressEvent
+        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
 
         self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
         self.view_R.setCW(self.win_l, 'c')
@@ -286,14 +292,30 @@ class LessionEditor(QtGui.QMainWindow):
         else:
             print key, ' - unrecognized hot key.'
 
+    def mouse_click_event(self, coords, density):
+        if self.mode == MODE_ADDING:
+            self.add_obj_event(coords, density)
+        elif self.mode == MODE_VIEWING:
+            self.find_clicked_object(coords)
+
     def add_obj_BTN_callback(self):
         print 'adding object'
+        self.mode = MODE_ADDING
         # self.view_L.mouseClickSignal.connect(self.add_obj_event)
-        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+        # self.view_L.mouseClickSignal.connect(self.add_obj_event)
+        # self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+
+    def find_clicked_object(self, coords):
+        print 'finding clicked object'
+        lbl = self.active_data.objects[self.actual_slice_L, coords[1], coords[0]]
+        self.objects_widget.ui.objects_TV.selectRow(lbl - 1) #selectionModel(). .selectedRows()
+        coco.objects_filtration(self.active_data, self.params)
+        self.view_L.updateSlice()
 
     def add_obj_event(self, coords, density):
+        self.mode = MODE_VIEWING
         print 'add_obj_event - coords: ', coords, ', density: ', density
-        center = [self.actual_slice_L, coords[0], coords[1]]
+        center = [self.actual_slice_L, coords[1], coords[0]]
         if self.data_L.objects is not None:
             idx = self.data_L.objects.max() + 1
         else:
@@ -315,7 +337,8 @@ class LessionEditor(QtGui.QMainWindow):
         self.fill_table(self.active_data.lesions, self.active_data.labels, filtered_idxs)
         # self.actual_data.labels_filt
         self.ui.show_contours_L_BTN.setEnabled(True)
-        #TODO: aktualizovat tabulku
+
+        self.view_L.updateSlice()
 
     def min_compactness_SL_changed(self, value):
         self.objects_widget.ui.min_compactness_LE.setText('%.3f' % (value * self.params['compactness_step']))
@@ -362,7 +385,7 @@ class LessionEditor(QtGui.QMainWindow):
         if selected.indexes():
             selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
             # print 'show only', self.selected_objects_labels
-            slice = [int(x.center[0]) for x in self.active_data.lesions if x.label == self.selected_objects_labels[0]][0]
+            slice = [int(x.center[0]) for x in self.active_data.lesions if x.label == selected_objects_labels[0]][0]
             self.ui.slice_C_SB.setValue(slice)
         else:
             selected_objects_labels = [x.label for x in self.table_model.objects]
@@ -658,7 +681,6 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L.show_mode = self.view_L.SHOW_LABELS
 
         im = self.get_image('L')
-        print im.dtype
         self.view_L.setSlice(im)
 
         self.statusBar().showMessage('data_L set to labels')

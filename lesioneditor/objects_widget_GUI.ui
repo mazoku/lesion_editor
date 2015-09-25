@@ -16,6 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Objects</string>
   </property>
@@ -111,6 +114,9 @@
     <widget class="QTableView" name="objects_TV">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>

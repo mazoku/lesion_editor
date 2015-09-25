@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'objects_widget_GUI.ui'
 #
-# Created: Tue Sep 22 08:36:58 2015
+# Created: Fri Sep 25 14:16:10 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -32,6 +32,7 @@ class Ui_Form(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
         Form.setSizePolicy(sizePolicy)
+        Form.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.verticalLayout = QtGui.QVBoxLayout(Form)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.area_layout = QtGui.QHBoxLayout()
@@ -81,6 +82,7 @@ class Ui_Form(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.objects_TV = QtGui.QTableView(Form)
         self.objects_TV.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.objects_TV.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.objects_TV.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.objects_TV.setObjectName(_fromUtf8("objects_TV"))
         self.verticalLayout.addWidget(self.objects_TV)

@@ -309,10 +309,7 @@ class LessionEditor(QtGui.QMainWindow):
         print 'finding clicked object'
         lbl = self.active_data.objects[self.actual_slice_L, coords[1], coords[0]]
         if lbl > -1:
-            self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.disconnect()
             self.objects_widget.ui.objects_TV.selectRow(lbl - 1)
-            self.objects_widget.ui.objects_TV.selectionModel().selectionChanged.connect(self.selection_changed)
-        # coco.objects_filtration(self.active_data, self.params)
         self.view_L.updateSlice()
 
     def add_obj_event(self, coords, density):
@@ -383,27 +380,32 @@ class LessionEditor(QtGui.QMainWindow):
     #     self.active_data_idx = 2
     #     self.active_data = self.cc.data_2
 
+    def my_selection_changed(self):
+        pass
+
     def selection_changed(self, selected, deselected):
-        #TODO: povolit oznaceni pouze jednoho objektu?
-        if selected.indexes():
-            selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
-            # print 'show only', self.selected_objects_labels
-            slice = [int(x.center[0]) for x in self.active_data.lesions if x.label == selected_objects_labels[0]][0]
-            self.ui.slice_C_SB.setValue(slice)
-        else:
-            selected_objects_labels = [x.label for x in self.table_model.objects]
-            # print 'show all', self.selected_objects_labels
-        # min_area, max_area = self.objects_widget.area_RS.getRange()
-        # min_density, max_density = self.objects_widget.density_RS.getRange()
-        # min_comp = self.objects_widget.ui.min_compactness_SL.value() / self.params['compactness_step']
-        # coco.objects_filtration(self.selected_objects_labels, self.params, area=(min_area, max_area),
-        #                         density=(min_density, max_density), compactness=min_comp)
-        coco.objects_filtration(self.active_data, self.params, selected_labels=selected_objects_labels)
+        if self.objects_widget.isActiveWindow():
+            if selected.indexes():
+                selected_objects_labels = [self.table_model.objects[x.row()].label for x in self.objects_widget.ui.objects_TV.selectionModel().selectedRows()]
+                # print 'show only', self.selected_objects_labels
+                slice = [int(x.center[0]) for x in self.active_data.lesions if x.label == selected_objects_labels[0]][0]
+                self.ui.slice_C_SB.setValue(slice)
+            else:
+                selected_objects_labels = [x.label for x in self.table_model.objects]
+                # print 'show all', self.selected_objects_labels
+            # min_area, max_area = self.objects_widget.area_RS.getRange()
+            # min_density, max_density = self.objects_widget.density_RS.getRange()
+            # min_comp = self.objects_widget.ui.min_compactness_SL.value() / self.params['compactness_step']
+            # coco.objects_filtration(self.selected_objects_labels, self.params, area=(min_area, max_area),
+            #                         density=(min_density, max_density), compactness=min_comp)
+            coco.objects_filtration(self.active_data, self.params, selected_labels=selected_objects_labels)
         #TODO: nasleduje prasarna
         if self.view_L.show_mode == self.view_L.SHOW_LABELS:
             self.show_labels_L_callback()
         if self.view_R.show_mode == self.view_R.SHOW_LABELS:
             self.show_labels_R_callback()
+        # self.activateWindow()
+        # self.objects_widget.activateWindow()
 
     def object_slider_changed(self, value):
         min_area = self.objects_widget.area_RS.start()

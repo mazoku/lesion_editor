@@ -78,13 +78,14 @@ class SliceBox(QLabel):
 
     mouseClickSignal = pyqtSignal(list, int)
 
-    def __init__(self, sliceSize, voxel_size, main, mode='seeds'):
+    def __init__(self, main):#, sliceSize, voxel_size, main, mode='seeds'):
     # def __init__(self, sliceSize, grid, mode='seeds'):
     # def __init__(self, sliceSize, mode='seeds'):
 
         QLabel.__init__(self)
         self.main = main
 
+    def setup_widget(self, sliceSize, voxel_size):
         height = 600
         vscale = voxel_size / float(np.min(voxel_size))
         grid = height / float(sliceSize[1] * vscale[1])

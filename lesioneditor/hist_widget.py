@@ -58,8 +58,12 @@ class Hist_widget(QtGui.QWidget):
         layout.addWidget(self.canvas, 1)
         self.ui.histogram_F.setLayout(layout)
 
-        self.set_data(data)#, mask)
-        self.set_models(models)
+        if data is not None:
+            self.set_data(data)#, mask)
+        if models is not None:
+            self.set_models(models)
+        else:
+            self.models = None
 
         # seting up min and max values
 
@@ -89,8 +93,8 @@ class Hist_widget(QtGui.QWidget):
     def set_data(self, data):#, mask):
         self.data = data
         # self.mask = mask
-        if self.data is not None:
-            self.hist, self.bins = skiexp.histogram(self.data, nbins=1000)
+        # if self.data is not None:
+        self.hist, self.bins = skiexp.histogram(self.data, nbins=1000)
             # if mask is not None:
             #     self.data_m = self.data[np.nonzero(self.mask)]
             # else:
@@ -98,16 +102,16 @@ class Hist_widget(QtGui.QWidget):
 
         if self.params and self.params.has_key('data_min'):
             self.data_min = self.params['data_min']
-        elif self.data is not None:
-            self.data_min = self.data.min()
-        else:
-            self.data_min = 0
+        # elif self.data is not None:
+        self.data_min = self.data.min()
+        # else:
+        #     self.data_min = 0
         if self.params and self.params.has_key('datam_max'):
             self.data_max = self.params['data_max']
-        elif self.data is not None:
-            self.data_max = self.data.max()
-        else:
-            self.data_max = 0
+        # elif self.data is not None:
+        self.data_max = self.data.max()
+        # else:
+        #     self.data_max = 0
 
         self.ui.hypo_mean_SL.setMinimum(self.data_min)
         self.ui.heal_mean_SL.setMinimum(self.data_min)
@@ -272,7 +276,8 @@ class Hist_widget(QtGui.QWidget):
         # plt.subplot(411)
         plt.plot(self.bins, self.hist, 'k')
         plt.hold(True)
-        if self.rv_heal is not None and self.rv_hypo is not None and self.rv_hyper is not None:
+        # if self.rv_heal is not None and self.rv_hypo is not None and self.rv_hyper is not None:
+        if self.models is not None:
             healthy_y = self.rv_heal.pdf(x)
             if self.unaries_as_cdf:
                 hypo_y = (1 - self.rv_hypo.cdf(x)) * self.rv_heal.pdf(self.rv_heal.mean())
@@ -288,7 +293,7 @@ class Hist_widget(QtGui.QWidget):
             plt.plot(x, fac * hyper_y, 'r', linewidth=2)
         ax = plt.axis()
         # plt.axis([0, 256, ax[2], ax[3]])
-        plt.gca().tick_params(direction='in', pad=-50)
+        plt.gca().tick_params(direction='in', pad=1)
         plt.hold(False)
         # plt.grid(True)
 

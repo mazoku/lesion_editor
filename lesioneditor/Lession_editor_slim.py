@@ -35,6 +35,8 @@ from sklearn.cluster import KMeans
 
 import pickle
 
+import io3d
+
 import ConfigParser
 
 import logging
@@ -67,9 +69,10 @@ class LessionEditor(QtGui.QMainWindow):
     """Main class of the programm."""
 
 
-    def __init__(self, datap_1=None, datap_2=None, fname_1=None, fname_2=None, disp_smoothed=False, parent=None):
+    # def __init__(self, datap_1=None, datap_2=None, fname_1=None, fname_2=None, disp_smoothed=False, parent=None):
+    def __init__(self, datap1=None, datap2=None):
 
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent=None)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -81,10 +84,17 @@ class LessionEditor(QtGui.QMainWindow):
         self.mode = MODE_VIEWING
         self.show_view_L = True
         self.show_view_R = False
+
+        self.view_L = data_view_widget.SliceBox(self)
+        self.view_R = data_view_widget.SliceBox(self)
+
+        self.data_1 = None
+        self.data_2 = None
+
         # self.healthy_label = healthy_label
         # self.hypo_label = hypo_label
         # self.hyper_label = hyper_label
-        self.disp_smoothed = disp_smoothed
+        # self.disp_smoothed = disp_smoothed
         # self.view_L_curr_idx = 0
         # self.view_R_curr_idx = 0
 
@@ -96,40 +106,23 @@ class LessionEditor(QtGui.QMainWindow):
         self.win_l = self.params['win_level']
         self.win_w = self.params['win_width']
 
-        # DATA ---------------------------------------------
-        if datap_1 is not None or fname_1 is not None:
-            self.data_1 = Data.Data()
-            self.data_1.create_data(datap=datap_1, filename=fname_1)
-        else:
-            self.data_1 = None
-        if datap_2 is not None or fname_2 is not None:
-            self.data_2 = Data.Data()
-            self.data_2.create_data(datap=datap_2, filename=fname_2)
-        else:
-            self.data_2 = None
-        #--------------------------------------------------
-
         self.actual_slice_L = 0
         self.actual_slice_R = 0
 
         self.selected_objects_labels = None  # list of objects' labels selected in tableview
 
-        # fill parameters to widgets
-        # self.fill_parameters()
-
         self.voxel_size = self.params['voxel_size']
         self.view_widget_width = 50
         self.two_views = False
 
-        if self.data_1.loaded:
-            self.hist_widget = Hist_widget(data=self.data_1.data[np.nonzero(self.data_1.mask)])
-        else:
-            self.hist_widget = Hist_widget()
+        self.hist_widget = Hist_widget()
         self.hist_widget.heal_parameter_changed.connect(self.update_models_from_widget)
         self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
         self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)
 
-        # creating object widget, linking its sliders and buttons
+        self.setup_data(datap1, datap2)
+
+       # creating object widget, linking its sliders and buttons
         self.objects_widget = Objects_widget()
         self.params['compactness_step'] = self.objects_widget.ui.min_compactness_SL.singleStep() / self.objects_widget.ui.min_compactness_SL.maximum()
         self.objects_widget.area_RS.endValueChanged.connect(self.object_slider_changed)
@@ -150,38 +143,6 @@ class LessionEditor(QtGui.QMainWindow):
         self.params['min_density'] = self.objects_widget.density_RS.start()
         self.params['min_compactness'] = self.objects_widget.ui.min_compactness_SL.value() * self.params['compactness_step']
 
-        # self.area_hist_widget = ahw.AreaHistWidget()
-
-        # computational core
-        # self.coco = Computational_core.Computational_core(fname, self.params, self.statusBar())
-        if self.data_1.loaded:
-            # self.ui.serie_1_RB.setText('Serie #1: ' + self.cc.data_1.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.data_1.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.data_1.filename.split('/')[-1])
-            self.data_L = self.data_1
-            self.active_data_idx = 1
-            self.active_data = self.data_1
-            if not self.data_2.loaded:
-                self.data_R = self.data_1
-        if self.data_2.loaded:
-            # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
-            self.ui.figure_L_CB.addItem(self.data_2.filename.split('/')[-1])
-            self.ui.figure_R_CB.addItem(self.data_2.filename.split('/')[-1])
-            self.data_R = self.data_2
-            self.ui.figure_R_CB.setCurrentIndex(1)
-            if not self.data_1.loaded:
-                self.data_L = self.data_2
-                self.active_data = self.data_2
-                self.active_data_idx = 2
-
-        # radio buttons
-        # self.ui.serie_1_RB.clicked.connect(self.serie_1_RB_callback)
-        # self.ui.serie_2_RB.clicked.connect(self.serie_2_RB_callback)
-        # if self.ui.serie_1_RB.isChecked():
-        #     self.cc.active_serie = 1
-        # else:
-        #     self.cc.active_serie = 2
-
         self.ui.action_load_serie_1.triggered.connect(lambda: self.action_load_serie_callback(1))
         self.ui.action_load_serie_2.triggered.connect(lambda: self.action_load_serie_callback(2))
 
@@ -190,54 +151,9 @@ class LessionEditor(QtGui.QMainWindow):
         self.ui.action_show_object_list.triggered.connect(self.action_show_object_list_callback)
         self.ui.action_run.triggered.connect(self.run_callback)
 
-        # self.n_slices = self.data.shape[0]
-        # self.n_slices = self.cc.data_1.n_slices
-
-        # seting up the callback for the test button --------------------------------------
-        # self.ui.test_BTN.clicked.connect(self.test_callback)
-        #----------------------------------------------------------------------------------
-
-        # seting up the range of the scrollbar to cope with the number of slices
-        if self.active_data_idx == 1:
-            self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
-        else:
-            self.ui.slice_C_SB.setMaximum(self.data_2.n_slices - 1)
-            self.ui.slice_L_SB.setMaximum(self.data_2.n_slices - 1)
-
-        if self.data_2.loaded:
-            self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
-
         # combo boxes - for figure views
         self.ui.figure_L_CB.currentIndexChanged.connect(self.figure_L_CB_callback)
         self.ui.figure_R_CB.currentIndexChanged.connect(self.figure_R_CB_callback)
-
-        # self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:], self.voxel_size)
-        self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_L.setCW(self.win_l, 'c')
-        self.view_L.setCW(self.win_w, 'w')
-        # self.view_L.setSlice(self.data_L.data[0,:,:])
-        self.view_L.setSlice(self.data_L.data_aview[...,0])
-        # mouse click signal
-        self.view_L.mouseClickSignal.connect(self.mouse_click_event)
-        # self.view_L.mousePressEvent = self.view_L.myEmptyMousePressEvent
-        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
-
-        self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_R.setCW(self.win_l, 'c')
-        self.view_R.setCW(self.win_w, 'w')
-        # self.view_R.setSlice(self.data_R.data[0,:,:])
-        self.view_R.setSlice(self.data_R.data_aview[...,0])
-        if not self.show_view_L:
-            self.view_L.setVisible(False)
-        if not self.show_view_R:
-            self.view_R.setVisible(False)
-        # self.view_R.mouseClickSignal.connect(self.add_obj_event)
-        # self.view_R.mousePressEvent = self.view_R.myEmptyMousePressEvent
-        # self.view_L = data_view_widget.SliceBox(self.data_L.shape[1:])
-        # self.update_view_L()
-        # self.view_R = data_view_widget.SliceBox(self.data_R.shape[1:])
-        # self.update_view_R()
 
         data_viewer_layout = QtGui.QHBoxLayout()
         # data_viewer_layout.addWidget(self.form_widget)
@@ -266,8 +182,145 @@ class LessionEditor(QtGui.QMainWindow):
         self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
         self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
 
+        # # DATA ---------------------------------------------
+        # if datap1 is not None:
+        #     self.data_1 = Data.Data()
+        #     self.data_1.create_data(datap1, 'datap1')
+        #     self.params['voxel_size'] = datap1['voxelsize_mm']
+        # else:
+        #     self.data_1 = None
+        # if datap2 is not None:
+        #     self.data_2 = Data.Data()
+        #     self.data_2.create_data(datap2, 'datap2')
+        # else:
+        #     self.data_2 = None
+        # #--------------------------------------------------
+
+        # if self.data_1.loaded:
+        #     self.hist_widget = Hist_widget(data=self.data_1.data[np.nonzero(self.data_1.mask)])
+        # else:
+        #     self.hist_widget = Hist_widget()
+        # self.hist_widget.heal_parameter_changed.connect(self.update_models_from_widget)
+        # self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
+        # self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)
+
+        # self.area_hist_widget = ahw.AreaHistWidget()
+
+        # computational core
+        ## self.coco = Computational_core.Computational_core(fname, self.params, self.statusBar())
+        # if self.data_1.loaded:
+        #     self.ui.figure_L_CB.addItem(self.data_1.filename.split('/')[-1])
+        #     self.ui.figure_R_CB.addItem(self.data_1.filename.split('/')[-1])
+        #     self.data_L = self.data_1
+        #     self.active_data_idx = 1
+        #     self.active_data = self.data_1
+        #     if not self.data_2.loaded:
+        #         self.data_R = self.data_1
+        # if self.data_2.loaded:
+        #     # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
+        #     self.ui.figure_L_CB.addItem(self.data_2.filename.split('/')[-1])
+        #     self.ui.figure_R_CB.addItem(self.data_2.filename.split('/')[-1])
+        #     self.data_R = self.data_2
+        #     self.ui.figure_R_CB.setCurrentIndex(1)
+        #     if not self.data_1.loaded:
+        #         self.data_L = self.data_2
+        #         self.active_data = self.data_2
+        #         self.active_data_idx = 2
+
+        # seting up the range of the scrollbar to cope with the number of slices
+        # if self.active_data_idx == 1:
+        #     self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
+        #     self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
+        # else:
+        #     self.ui.slice_C_SB.setMaximum(self.data_2.n_slices - 1)
+        #     self.ui.slice_L_SB.setMaximum(self.data_2.n_slices - 1)
+
+        # if self.data_2.loaded:
+        #     self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
+
+        # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
+        # self.view_L.setCW(self.win_l, 'c')
+        # self.view_L.setCW(self.win_w, 'w')
+        # self.view_L.setSlice(self.data_L.data_aview[...,0])
+        # # mouse click signal
+        # self.view_L.mouseClickSignal.connect(self.mouse_click_event)
+        # self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+
+        # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
+        # self.view_R.setCW(self.win_l, 'c')
+        # self.view_R.setCW(self.win_w, 'w')
+        # self.view_R.setSlice(self.data_R.data_aview[...,0])
+        # if not self.show_view_L:
+        #     self.view_L.setVisible(False)
+        # if not self.show_view_R:
+        #     self.view_R.setVisible(False)
+
         # to be able to capture key press events immediately
         self.setFocus()
+
+    def setup_data(self, datap1=None, datap2=None):
+        # DATA ---------------------------------------------
+        if datap1 is not None:
+            self.data_1 = Data.Data()
+            self.data_1.create_data(datap1, 'datap1')
+            self.params['voxel_size'] = datap1['voxelsize_mm']
+        if datap2 is not None:
+            self.data_2 = Data.Data()
+            self.data_2.create_data(datap2, 'datap2')
+
+        if self.data_1.loaded:
+            # self.hist_widget = Hist_widget(data=self.data_1.data[np.nonzero(self.data_1.mask)])
+            self.hist_widget.set_data(data=self.data_1.data[np.nonzero(self.data_1.mask)])
+
+            #seting up figure and data_L, data_R
+            self.ui.figure_L_CB.addItem(self.data_1.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.data_1.filename.split('/')[-1])
+            self.data_L = self.data_1
+            self.active_data_idx = 1
+            self.active_data = self.data_1
+            if not self.data_2.loaded:
+                self.data_R = self.data_1
+
+            self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
+            self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
+
+        if self.data_2.loaded:
+            # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
+            self.ui.figure_L_CB.addItem(self.data_2.filename.split('/')[-1])
+            self.ui.figure_R_CB.addItem(self.data_2.filename.split('/')[-1])
+            self.data_R = self.data_2
+            self.ui.figure_R_CB.setCurrentIndex(1)
+            if not self.data_1.loaded:
+                self.data_L = self.data_2
+                self.active_data = self.data_2
+                self.active_data_idx = 2
+
+                self.hist_widget.set_data(data=self.data_2.data[np.nonzero(self.data_2.mask)])
+
+                self.ui.slice_C_SB.setMaximum(self.data_2.n_slices - 1)
+                self.ui.slice_L_SB.setMaximum(self.data_2.n_slices - 1)
+
+            self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
+
+        # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
+        self.view_L.setup_widget(self.data_L.data_aview.shape[:-1], self.voxel_size)
+        self.view_L.setCW(self.win_l, 'c')
+        self.view_L.setCW(self.win_w, 'w')
+        self.view_L.setSlice(self.data_L.data_aview[...,0])
+        # mouse click signal
+        self.view_L.mouseClickSignal.connect(self.mouse_click_event)
+        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+
+        # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
+        self.view_R.setup_widget(self.data_R.data_aview.shape[:-1], self.voxel_size)
+        self.view_R.setCW(self.win_l, 'c')
+        self.view_R.setCW(self.win_w, 'w')
+        self.view_R.setSlice(self.data_R.data_aview[...,0])
+        if not self.show_view_L:
+            self.view_L.setVisible(False)
+        if not self.show_view_R:
+            self.view_R.setVisible(False)
+
 
     def keyPressEvent(self, QKeyEvent):
         print 'key event: ',
@@ -728,6 +781,9 @@ class LessionEditor(QtGui.QMainWindow):
     def show_contours_L_callback(self):
         if self.show_mode_L == SHOW_CONTOURS:
             self.view_L.contours_mode_is_fill = not self.view_L.contours_mode_is_fill
+        self.show_contours_L()
+
+    def show_contours_L(self):
         self.show_mode_L = SHOW_CONTOURS
         self.view_L.show_mode = self.view_L.SHOW_CONTOURS
 
@@ -742,6 +798,9 @@ class LessionEditor(QtGui.QMainWindow):
     def show_contours_R_callback(self):
         if self.show_mode_R == SHOW_CONTOURS:
             self.view_R.contours_mode_is_fill = not self.view_R.contours_mode_is_fill
+        self.show_contours_R()
+
+    def show_contours_R(self):
         self.show_mode_R = SHOW_CONTOURS
         self.view_R.show_mode = self.view_R.SHOW_CONTOURS
 
@@ -756,14 +815,16 @@ class LessionEditor(QtGui.QMainWindow):
             if self.view_L.show_mode == self.view_L.SHOW_LABELS:
                 self.show_labels_L_callback()
             elif self.view_L.show_mode == self.view_L.SHOW_CONTOURS:
-                self.show_contours_L_callback()
+                # self.show_contours_L_callback()
+                self.show_contours_L()
 
     def update_view_R(self):
         if self.show_view_R:
             if self.view_R.show_mode == self.view_R.SHOW_LABELS:
                 self.show_labels_R_callback()
             elif self.view_R.show_mode == self.view_R.SHOW_CONTOURS:
-                self.show_contours_R_callback()
+                # self.show_contours_R_callback()
+                self.show_contours_R()
 
     def figure_L_CB_callback(self):
         if self.ui.figure_L_CB.currentIndex() == 0:
@@ -810,9 +871,20 @@ class LessionEditor(QtGui.QMainWindow):
         self.show_im_R_callback()
 
     def action_load_serie_callback(self, serie_number):
-        fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir'])
-        print 'Does not work yet.'
-        print fname
+        # loading file and creating dataplus format
+        fname = str(QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.params['data_dir']))
+        datap = dr.Get3DData(fname, dataplus_format=True)
+
+        # creating data structure
+        # data = Data.Data()
+        # data.create_data(datap, fname)
+
+        if serie_number == 1:
+            self.setup_data(datap1=datap)
+        else:
+            self.setup_data(datap2=datap)
+        # print 'Does not work yet.'
+        # print fname
 
     def remove_obj_BTN_callback(self):
         indexes = self.objects_widget.ui.objects_TV.selectionModel().selectedRows()
@@ -919,18 +991,19 @@ if __name__ == '__main__':
     # fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_186_49290986_arterial_5.0_B30f-.pklz'
 
     # runing application -------------------------
+    # reading data
+    dr = io3d.DataReader()
+    if fname_1 is not None:
+        datap_1 = dr.Get3DData(fname_1, dataplus_format=True)
+    else:
+        datap_1 = {'data3d': None, 'segmentation':None, 'slab':None, 'voxelsize_mm':None}
+    if fname_2 is not None:
+        datap_2 = dr.Get3DData(fname_2, dataplus_format=True)
+    else:
+        datap_2 = {'data3d': None, 'segmentation':None, 'slab':None, 'voxelsize_mm':None}
+
+    # starting application
     app = QtGui.QApplication(sys.argv)
-    # app = MyApplication(sys.argv)
-    le = LessionEditor(fname_1=fname_1, fname_2=fname_2)
+    le = LessionEditor(datap1=datap_1, datap2=datap_2)
     le.show()
     sys.exit(app.exec_())
-
-    # import io3d
-    # dr = io3d.DataReader()
-    # datap = dr.Get3DData('/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz', dataplus_format=True)
-    #
-    # use:
-    # data3d
-    # segmentation
-    # slab
-    # voxelsize_mm

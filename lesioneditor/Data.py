@@ -236,24 +236,26 @@ class Data(object):
     #
     #     self.loaded = True
 
-    def create_data(self, datap=None, filename=None):
+    def create_data(self, datap, filename):
         if datap is None and filename is None:
             raise AttributeError('No data nor filename given.')
 
-        if filename is not None:
-            self.filename = filename
-            fcontent = None
-            try:
-                import gzip
-                f = gzip.open(self.filename, 'rb')
-                fcontent = f.read()
-                f.close()
-            except Exception as e:
-                logger.warning("Input gzip exception: " + str(e))
-                f = open(self.filename, 'rb')
-                fcontent = f.read()
-                f.close()
-            datap = pickle.loads(fcontent)
+        # if filename is not None:
+        #     self.filename = filename
+        #     fcontent = None
+        #     try:
+        #         import gzip
+        #         f = gzip.open(self.filename, 'rb')
+        #         fcontent = f.read()
+        #         f.close()
+        #     except Exception as e:
+        #         logger.warning("Input gzip exception: " + str(e))
+        #         f = open(self.filename, 'rb')
+        #         fcontent = f.read()
+        #         f.close()
+        #     datap = pickle.loads(fcontent)
+        # else:
+        self.filename = filename
 
         self.data = datap['data3d']
         self.mask = datap['segmentation']

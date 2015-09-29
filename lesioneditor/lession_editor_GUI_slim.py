@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'lession_editor_GUI_slim.ui'
+# Form implementation generated from reading ui file 'lession_editor_GUI_slim_orez.ui'
 #
-# Created: Mon Sep 28 23:46:16 2015
+# Created: Tue Sep 29 10:52:55 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -285,7 +285,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuSerie = QtGui.QMenu(self.menubar)
         self.menuSerie.setObjectName(_fromUtf8("menuSerie"))
@@ -295,8 +295,6 @@ class Ui_MainWindow(object):
         self.menuShow.setObjectName(_fromUtf8("menuShow"))
         self.menuTools = QtGui.QMenu(self.menubar)
         self.menuTools.setObjectName(_fromUtf8("menuTools"))
-        self.menuView = QtGui.QMenu(self.menubar)
-        self.menuView.setObjectName(_fromUtf8("menuView"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
@@ -337,15 +335,10 @@ class Ui_MainWindow(object):
         self.menuShow.addAction(self.action_show_color_model)
         self.menuShow.addAction(self.action_show_object_list)
         self.menuTools.addAction(self.action_circle)
-        self.menuTools.addAction(self.actionRuler)
-        self.menuView.addAction(self.actionAxial)
-        self.menuView.addAction(self.actionFrontal)
-        self.menuView.addAction(self.actionSagital)
         self.menubar.addAction(self.menuSerie.menuAction())
         self.menubar.addAction(self.menuAction.menuAction())
         self.menubar.addAction(self.menuShow.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
-        self.menubar.addAction(self.menuView.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -366,7 +359,6 @@ class Ui_MainWindow(object):
         self.menuAction.setTitle(_translate("MainWindow", "Action", None))
         self.menuShow.setTitle(_translate("MainWindow", "Show", None))
         self.menuTools.setTitle(_translate("MainWindow", "Tools", None))
-        self.menuView.setTitle(_translate("MainWindow", "View", None))
         self.action_load_serie_1.setText(_translate("MainWindow", "Load serie #1...", None))
         self.action_load_serie_2.setText(_translate("MainWindow", "Load serie #2...", None))
         self.action_run.setText(_translate("MainWindow", "Run localization", None))

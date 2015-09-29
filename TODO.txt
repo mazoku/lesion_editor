@@ -15,7 +15,7 @@ FUNKCNOST ------------------------------
 - dve faze
     - registrace
     - srovnani vysledku
-
+- resize - nepouzivat cv2 ale skimage
 
 ---------------------------------------
 DETAILY -------------------------------

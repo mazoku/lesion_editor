@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_slim.ui'
 #
-# Created: Wed Sep 16 09:41:21 2015
+# Created: Mon Sep 28 23:46:16 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -100,6 +100,7 @@ class Ui_MainWindow(object):
         self.show_im_L_BTN.setSizePolicy(sizePolicy)
         self.show_im_L_BTN.setMinimumSize(QtCore.QSize(40, 0))
         self.show_im_L_BTN.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.show_im_L_BTN.setToolTip(_fromUtf8("Show data"))
         self.show_im_L_BTN.setText(_fromUtf8(""))
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(_fromUtf8("icons/Stock graph.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -284,7 +285,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 721, 27))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuSerie = QtGui.QMenu(self.menubar)
         self.menuSerie.setObjectName(_fromUtf8("menuSerie"))
@@ -352,7 +353,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.view_L_BTN.setToolTip(_translate("MainWindow", "Show figure", None))
-        self.show_im_L_BTN.setToolTip(_translate("MainWindow", "Show data", None))
         self.show_labels_L_BTN.setToolTip(_translate("MainWindow", "Show labels", None))
         self.show_contours_L_BTN.setToolTip(_translate("MainWindow", "Show contours", None))
         self.view_R_BTN.setToolTip(_translate("MainWindow", "Show figure", None))

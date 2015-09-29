@@ -13,22 +13,23 @@ class MyTableModel(QAbstractTableModel):
 
         self.objects = objects  # lesion list
         self.headerdata = headerdata
-        self.data = data  # data -> must be here to be able to del an object
+        self.data_arr = data  # data -> must be here to be able to del an object
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         # Number of rows corresponds to the number of objects
         return len(self.objects)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         # Number of columns corresponds to the number of features
         return len(self.headerdata)
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         elif role != Qt.DisplayRole:
             return QVariant()
-        data = (self.objects[index.row()].label, self.objects[index.row()].area, self.objects[index.row()].mean_density, self.objects[index.row()].compactness )
+        data = (self.objects[index.row()].label, self.objects[index.row()].area, self.objects[index.row()].mean_density,
+                self.objects[index.row()].compactness )
         if data[index.column()] is not None:
             if isinstance(data[index.column()], int):
                 out = QVariant('%i' % data[index.column()])
@@ -51,7 +52,7 @@ class MyTableModel(QAbstractTableModel):
         self.beginRemoveRows(QModelIndex(), row, row + count - 1)
         # self.objects = self.objects[:row] + self.objects[row + count:]
         lbl = self.objects[row].label
-        self.data.labels = np.where(self.data.labels == lbl, 0, self.data.labels)
+        self.data_arr.labels = np.where(self.data_arr.labels == lbl, 0, self.data_arr.labels)
         self.objects.pop(row)
         self.endRemoveRows()
         print 'removed label', lbl
@@ -63,9 +64,9 @@ class MyWindow(QWidget):
     def __init__(self, objects, labels, header=None, *args):
         QWidget.__init__(self, *args)
 
-        self.data = objects
+        self.data_arr = objects
         self.labels = labels
-        self.tablemodel = MyTableModel(self.data, self.labels, header, self)
+        self.tablemodel = MyTableModel(self.data_arr, self.labels, header, self)
         self.tableview = QTableView()
         self.tableview.setModel(self.tablemodel)
         self.tableview.setSelectionBehavior(QAbstractItemView.SelectRows)

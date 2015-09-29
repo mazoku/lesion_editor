@@ -43,6 +43,11 @@ class Objects_widget(QtGui.QWidget):
         self.area_RS.setMax(max(areas))
         self.area_RS.setRange()
 
+    def set_density_range(self, densities):
+        self.density_RS.setMin(min(densities))
+        self.density_RS.setMax(max(densities))
+        self.density_RS.setRange()
+
     def keyPressEvent(self, QKeyEvent):
         print 'hist widget key event: ',
         if QKeyEvent.key() == QtCore.Qt.Key_Escape:

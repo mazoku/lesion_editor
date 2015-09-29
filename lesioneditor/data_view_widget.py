@@ -55,7 +55,7 @@ for ii, jj in CONTOURS_COLORS.iteritems():
     CONTOURS_COLORTABLE[key,:3] = jj
     CONTOURS_COLORTABLE[key,3] = 64
     CONTOURLINES_COLORTABLE[key,0,:3] = jj
-    CONTOURLINES_COLORTABLE[key,0,3] = 16
+    CONTOURLINES_COLORTABLE[key,0,3] = 0  # alpha channel of color inside a contour, 0 = no color
     CONTOURLINES_COLORTABLE[key,1,:3] = jj
     CONTOURLINES_COLORTABLE[key,1,3] = 255
 
@@ -118,8 +118,9 @@ class SliceBox(QLabel):
         self.contours = None
         self.contours_old = None
         self.mask_points = None
-        self.contour_mode = 'fill'
+        # self.contour_mode = 'fill'
         # self.contour_mode = 'contours'
+        self.contours_mode_is_fill = True
 
         self.show_mode = self.SHOW_IM
 
@@ -280,10 +281,11 @@ class SliceBox(QLabel):
         #                       self.seeds_colortable)
 
         if self.contours is not None:
-            if self.contour_mode == 'fill':
+            # if self.contour_mode == 'fill':
+            if self.contours_mode_is_fill:
                 self.composeRgba(img, self.contours, CONTOURS_COLORTABLE)
-
-            elif self.contour_mode == 'contours':
+            # elif self.contour_mode == 'contours':
+            else:
                 self.get_contours(img, self.contours)
 
         # masking out pixels under circle
@@ -354,11 +356,11 @@ class SliceBox(QLabel):
         else:
             self.seeds = None
 
-        # if contours is not None and self.show_mode == self.SHOW_CONTOURS:
-        #     self.contours = contours.transpose(self.act_transposition).ravel(order='F')
+        if contours is not None and self.show_mode == self.SHOW_CONTOURS:
+            self.contours = contours.transpose().ravel(order='F')#self.act_transposition).ravel(order='F')
             # self.contours = contours.transpose(self.act_transposition)
-        # else:
-        #     self.contours = None
+        else:
+            self.contours = None
 
         self.updateSlice()
 

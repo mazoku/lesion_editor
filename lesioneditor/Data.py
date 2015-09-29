@@ -38,8 +38,10 @@ class Data(object):
         self.__labels_filt = None  # array of labeled data that are filtered, e.g. filtered by area, compactness etc.
         self.__labels_filt_aview = None
         self.__object_centers = None  # array of object centers
+        self.__object_centers_filt = None
         self.__object_centers_list = list()  # list of object centers
         self.__lesions = list()  # list of lesions, set it with Lesions.extract_lesions(self.labels)
+        self.__lesions_filt = list()
 
         self.filename = filename
         self.loaded = False
@@ -101,6 +103,20 @@ class Data(object):
         self.__labels_filt = x
         self.__labels_filt_aview = x.transpose(self.act_transposition)
 
+        # print 'setting lesion_filt ...',
+        # self.__lesions_filt = [x for x in self.lesions if x.label in np.unique(self.__labels_filt)]
+        # print 'done'
+
+        # print 'setting object_centers_filt...',
+        # self.__object_centers_filt = np.zeros(self.objects.shape, dtype=np.bool)
+        # for i in self.__lesions_filt:
+        #     try:
+        #         idx = (np.round(i.center)).astype(np.int)
+        #         self.__object_centers_filt[idx[0], idx[1], idx[2]] = 1
+        #     except:
+        #         pass
+        # print 'done'
+
     @labels_filt.deleter
     def labels_filt(self):
         del self.__labels_filt
@@ -113,9 +129,9 @@ class Data(object):
     def labels_filt_aview(self, x):
         self.__labels_filt_aview = x
 
-    @property
-    def user_seeds(self):
-        return self.__user_seeds
+    # @property
+    # def user_seeds(self):
+    #     return self.__user_seeds
 
     @property
     def lesions(self):
@@ -124,6 +140,7 @@ class Data(object):
     @lesions.setter
     def lesions(self, x):
         self.__lesions = x
+        self.__lesions_filt = x[:]
         self.__object_centers_list = [l.center for l in self.lesions]
         self.__object_centers = np.zeros(self.objects.shape, dtype=np.bool)
         for i in x:
@@ -134,12 +151,39 @@ class Data(object):
                 pass
 
     @property
+    def lesions_filt(self):
+        return self.__lesions_filt
+
+    @lesions_filt.setter
+    def lesions_filt(self, x):
+        self.__lesions_filt = x
+
+        centers = [l.center for l in self.lesions_filt]
+
+        centers_filt = np.zeros(self.objects.shape, dtype=np.bool)
+        for i in centers:
+            try:
+                idx = np.round(i).astype(np.int)
+                centers_filt[idx[0], idx[1], idx[2]] = 1
+            except:
+                pass
+        self.__object_centers_filt = centers_filt
+
+    @property
     def object_centers(self):
         return self.__object_centers
 
     @object_centers.setter
     def object_centers(self, x):
         self.__object_centers = x
+
+    @property
+    def object_centers_filt(self):
+        return self.__object_centers_filt
+
+    @object_centers_filt.setter
+    def object_centers_filt(self, x):
+        self.__object_centers_filt = x
 
     @property
     def object_centers_list(self):

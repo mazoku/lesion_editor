@@ -137,7 +137,7 @@
                   <cursorShape>PointingHandCursor</cursorShape>
                  </property>
                  <property name="toolTip">
-                  <string>Show data</string>
+                  <string notr="true">Show data</string>
                  </property>
                  <property name="text">
                   <string/>
@@ -553,7 +553,7 @@
      <x>0</x>
      <y>0</y>
      <width>721</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSerie">

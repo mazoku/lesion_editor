@@ -186,9 +186,9 @@ def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
     return rv
 
 def get_unaries(data, mask, models, params):
-    rv_heal = models['rv_heal']
-    rv_hyper = models['rv_hyper']
-    rv_hypo = models['rv_hypo']
+    rv_heal = models['heal']
+    rv_hyper = models['hyper']
+    rv_hypo = models['hypo']
     # mu_heal = models['mu_heal']
     mu_heal = rv_heal.mean()
 
@@ -365,9 +365,9 @@ def calculate_intensity_models(data, mask, params):
     print '\thyperdense pdf: mu = ', rv_hyper.mean(), ', sigma = ', rv_hyper.std()
 
     models = dict()
-    models['rv_heal'] = rv_heal
-    models['rv_hypo'] = rv_hypo
-    models['rv_hyper'] = rv_hyper
+    models['heal'] = rv_heal
+    models['hypo'] = rv_hypo
+    models['hyper'] = rv_hyper
 
     return models
 
@@ -401,9 +401,12 @@ def objects_filtration(data, params, selected_labels=None, area=None, density=No
     if selected_labels is not None:
         filtered_lbls = np.intersect1d(filtered_lbls, selected_labels)
 
-    data.labels_filt = np.where(data.labels > params['bgd_label'], params['healthy_label'], params['bgd_label'])
+    labels_filt_tmp = np.where(data.labels > params['bgd_label'], params['healthy_label'], params['bgd_label'])
     is_in = np.in1d(data.objects, filtered_lbls).reshape(data.labels.shape)
-    data.labels_filt = np.where(is_in, data.labels, data.labels_filt)
+    data.labels_filt = np.where(is_in, data.labels, labels_filt_tmp)
+    # print 'setting lesion_filt ...',
+    data.lesions_filt = [x for x in data.lesions if x.label in filtered_lbls]
+    # print 'done'
 
     return filtered_lbls
 

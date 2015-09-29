@@ -13,34 +13,42 @@ from hist_widget_GUI import Ui_Form
 # Main widget containing figures etc
 class Hist_widget(QtGui.QWidget):
 
-    def __init__(self, data, models=None, hist=None, bins=None, parent=None, unaries_as_cdf=False, params=None):
+    heal_parameter_changed = QtCore.pyqtSignal(int, int, basestring)
+    hypo_parameter_changed = QtCore.pyqtSignal(int, int, basestring)
+    hyper_parameter_changed = QtCore.pyqtSignal(int, int, basestring)
+
+    def __init__(self, data=None, mask=None, models=None, hist=None, bins=None, parent=None, unaries_as_cdf=False, params=None):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        self.setup_ui()
 
+        self.params = params
         self.hist = hist
         self.bins = bins
-        self.data = data
-        if self.hist is None and self.bins is None:
-            if self.data is None:
-                print 'No data given - returning.'
-                return
-            self.hist, self.bins = skiexp.histogram(self.data, nbins=256)
+        # if self.hist is None and self.bins is None:
+        #     if self.data is not None:
+        #         # print 'No data given - returning.'
+        #         # return
+        #         self.hist, self.bins = skiexp.histogram(self.data, nbins=256)
 
-        self.models = models  # color models
+        # self.models = models  # color models
+        #
+        # if self.models is not None:
+        #     self.rv_heal = models['heal']
+        #     self.rv_hypo = models['hypo']
+        #     self.rv_hyper = models['hyper']
+        #     self.setup_ui()
+        # else:
+        #     self.rv_heal = None
+        #     self.rv_hypo = None
+        #     self.rv_hyper = None
 
-        if self.models is not None:
-            self.rv_heal = models['heal']
-            self.rv_hypo = models['hypo']
-            self.rv_hyper = models['hyper']
-            self.setup_ui()
-        else:
-            self.rv_heal = None
-            self.rv_hypo = None
-            self.rv_hyper = None
+        self.rv_heal = scista.norm(0, 1)
+        self.rv_hypo = scista.norm(0, 1)
+        self.rv_hyper = scista.norm(0, 1)
 
         self.unaries_as_cdf = unaries_as_cdf
-        self.params = params
 
         self.figure = plt.figure()
         self.axes = self.figure.add_axes([0.08, 0.05, 0.91, 0.9])
@@ -50,16 +58,56 @@ class Hist_widget(QtGui.QWidget):
         layout.addWidget(self.canvas, 1)
         self.ui.histogram_F.setLayout(layout)
 
+        self.set_data(data)#, mask)
+        self.set_models(models)
+
         # seting up min and max values
+
+        # if self.params and self.params.has_key('data_min'):
+        #     self.data_min = self.params['data_min']
+        # elif self.data is not None:
+        #     self.data_min = self.data.min()
+        # else:
+        #     self.data_min = 0
+        # if self.params and self.params.has_key('datam_max'):
+        #     self.data_max = self.params['data_max']
+        # elif self.data is not None:
+        #     self.data_max = self.data.max()
+        # else:
+        #     self.data_max = 0
+        #
+        # self.ui.hypo_mean_SL.setMinimum(self.data_min)
+        # self.ui.heal_mean_SL.setMinimum(self.data_min)
+        # self.ui.hyper_mean_SL.setMinimum(self.data_min)
+        #
+        # self.ui.hypo_mean_SL.setMaximum(self.data_max)
+        # self.ui.heal_mean_SL.setMaximum(self.data_max)
+        # self.ui.hyper_mean_SL.setMaximum(self.data_max)
+        #
+        # self.update_figures()
+
+    def set_data(self, data):#, mask):
+        self.data = data
+        # self.mask = mask
+        if self.data is not None:
+            self.hist, self.bins = skiexp.histogram(self.data, nbins=1000)
+            # if mask is not None:
+            #     self.data_m = self.data[np.nonzero(self.mask)]
+            # else:
+            #     self.data_m = self.data
 
         if self.params and self.params.has_key('data_min'):
             self.data_min = self.params['data_min']
-        else:
+        elif self.data is not None:
             self.data_min = self.data.min()
+        else:
+            self.data_min = 0
         if self.params and self.params.has_key('datam_max'):
             self.data_max = self.params['data_max']
-        else:
+        elif self.data is not None:
             self.data_max = self.data.max()
+        else:
+            self.data_max = 0
 
         self.ui.hypo_mean_SL.setMinimum(self.data_min)
         self.ui.heal_mean_SL.setMinimum(self.data_min)
@@ -71,7 +119,26 @@ class Hist_widget(QtGui.QWidget):
 
         self.update_figures()
 
-    def setup_ui(self):
+    def set_models(self, models):
+        self.models = models  # color models
+
+        if self.models is not None:
+            self.rv_heal = models['heal']
+            self.rv_hypo = models['hypo']
+            self.rv_hyper = models['hyper']
+            # self.setup_ui()
+            self.setup_ranges()
+
+            self.update_heal_rv(self.rv_heal)
+            self.update_hypo_rv(self.rv_hypo)
+            self.update_hyper_rv(self.rv_hyper)
+            self.update_figures()
+        else:
+            self.rv_heal = None
+            self.rv_hypo = None
+            self.rv_hyper = None
+
+    def setup_ranges(self):
         # filling line edits and spinboxes
         self.ui.hypo_mean_LE.setText('%i'%int(self.rv_hypo.mean()))
         self.ui.hypo_mean_SL.setValue(int(self.rv_hypo.mean()))
@@ -84,6 +151,9 @@ class Hist_widget(QtGui.QWidget):
         self.ui.hyper_mean_LE.setText('%i'%int(self.rv_hyper.mean()))
         self.ui.hyper_mean_SL.setValue(int(self.rv_hyper.mean()))
         self.ui.hyper_std_SB.setValue(self.rv_hyper.std())
+
+    def setup_ui(self):
+        # self.setup_ranges()
 
         # callbacks - hypodense mean
         self.ui.hypo_mean_SL.valueChanged.connect(self.hypo_mean_SL_callback)
@@ -108,16 +178,16 @@ class Hist_widget(QtGui.QWidget):
         self.ui.hyper_std_SB.valueChanged.connect(self.hyper_std_SB_callback)
         self.ui.heal_std_SB.valueChanged.connect(self.heal_std_SB_callback)
 
-    def set_models(self, models):
-        self.models = models
-
-        self.rv_heal = models['heal']
-        self.rv_hypo = models['hypo']
-        self.rv_hyper = models['hyper']
-
-        self.setup_ui()
-
-        self.update_figures()
+    # def set_models(self, models):
+    #     self.models = models
+    #
+    #     self.rv_heal = models['heal']
+    #     self.rv_hypo = models['hypo']
+    #     self.rv_hyper = models['hyper']
+    #
+    #     self.setup_ui()
+    #
+    #     self.update_figures()
 
     def hypo_mean_SL_callback(self, value):
         self.rv_hypo = scista.norm(value, self.rv_hypo.std())
@@ -176,6 +246,7 @@ class Hist_widget(QtGui.QWidget):
             self.ui.heal_mean_LE.setText('%i'%int(self.rv_heal.mean()))
         if self.ui.heal_std_SB.value() != self.rv_heal.std():
             self.ui.heal_std_SB.setValue(self.rv_heal.std())
+        self.heal_parameter_changed.emit(new_rv.mean(), new_rv.std(), 'heal')
 
     def update_hypo_rv(self, new_rv):
         self.rv_hypo = new_rv
@@ -183,6 +254,7 @@ class Hist_widget(QtGui.QWidget):
             self.ui.hypo_mean_LE.setText('%i'%int(self.rv_hypo.mean()))
         if self.ui.hypo_std_SB.value() != self.rv_hypo.std():
             self.ui.hypo_std_SB.setValue(self.rv_hypo.std())
+        self.hypo_parameter_changed.emit(new_rv.mean(), new_rv.std(), 'hypo')
 
     def update_hyper_rv(self, new_rv):
         self.rv_hyper = new_rv
@@ -190,16 +262,17 @@ class Hist_widget(QtGui.QWidget):
             self.ui.hyper_mean_LE.setText('%i'%int(self.rv_hyper.mean()))
         if self.ui.hyper_std_SB.value() != self.rv_hyper.std():
             self.ui.hyper_std_SB.setValue(self.rv_hyper.std())
+        self.hyper_parameter_changed.emit(new_rv.mean(), new_rv.std(), 'hyper')
 
     def update_figures(self):
         plt.figure(self.figure.number)
-        x = np.arange(0, 256, 0.1)  # artificial x-axis
+        x = np.arange(self.data.min(), self.data.max())#, (self.data.max() - self.data.min()) / 100)  # artificial x-axis
         # self.figure.gca().cla()  # clearing the figure, just to be sure
 
         # plt.subplot(411)
         plt.plot(self.bins, self.hist, 'k')
         plt.hold(True)
-        if self.rv_heal and self.rv_hypo and self.rv_hyper:
+        if self.rv_heal is not None and self.rv_hypo is not None and self.rv_hyper is not None:
             healthy_y = self.rv_heal.pdf(x)
             if self.unaries_as_cdf:
                 hypo_y = (1 - self.rv_hypo.cdf(x)) * self.rv_heal.pdf(self.rv_heal.mean())
@@ -214,7 +287,7 @@ class Hist_widget(QtGui.QWidget):
             plt.plot(x, fac * hypo_y, 'b', linewidth=2)
             plt.plot(x, fac * hyper_y, 'r', linewidth=2)
         ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
+        # plt.axis([0, 256, ax[2], ax[3]])
         plt.gca().tick_params(direction='in', pad=-50)
         plt.hold(False)
         # plt.grid(True)

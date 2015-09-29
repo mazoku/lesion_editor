@@ -121,7 +121,13 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_widget_width = 50
         self.two_views = False
 
-        self.hist_widget = None
+        if self.data_1.loaded:
+            self.hist_widget = Hist_widget(data=self.data_1.data[np.nonzero(self.data_1.mask)])
+        else:
+            self.hist_widget = Hist_widget()
+        self.hist_widget.heal_parameter_changed.connect(self.update_models_from_widget)
+        self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
+        self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)
 
         # creating object widget, linking its sliders and buttons
         self.objects_widget = Objects_widget()
@@ -137,6 +143,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.objects_widget.ui.min_compactness_LE.textChanged.connect(self.min_compactness_LE_changed)
         # button callbacks
         self.objects_widget.ui.add_obj_BTN.clicked.connect(self.add_obj_BTN_callback)
+        self.objects_widget.ui.remove_obj_BTN.clicked.connect(self.remove_obj_BTN_callback)
         self.params['max_area'] = self.objects_widget.area_RS.end()
         self.params['min_area'] = self.objects_widget.area_RS.start()
         self.params['max_density'] = self.objects_widget.density_RS.end()
@@ -272,6 +279,10 @@ class LessionEditor(QtGui.QMainWindow):
                 self.view_L.area_hist_widget.close()
                 self.view_L.setMouseTracking(False)
                 self.view_L.updateSlice()
+            elif self.hist_widget is not None and self.hist_widget.isVisible():
+                self.hist_widget.close()
+            elif self.objects_widget is not None and self.objects_widget.isVisible():
+                self.objects_widget.close()
             else:
                 self.close()
         elif key == QtCore.Qt.Key_H:
@@ -308,8 +319,14 @@ class LessionEditor(QtGui.QMainWindow):
     def find_clicked_object(self, coords):
         print 'finding clicked object'
         lbl = self.active_data.objects[self.actual_slice_L, coords[1], coords[0]]
+        # for i in self.objects_widget.ui.objects_TV. rowAt()
+        #     self.objects_widget.ui.objects_TV.rowAt()
         if lbl > -1:
-            self.objects_widget.ui.objects_TV.selectRow(lbl - 1)
+            for i in range(self.table_model.rowCount()):
+                if self.table_model.data(self.table_model.index(i,0)).toInt()[0] == lbl:
+                    break
+            self.objects_widget.ui.objects_TV.selectRow(i)
+            # self.objects_widget.ui.objects_TV.selectRow(lbl - 1)
         self.view_L.updateSlice()
 
     def add_obj_event(self, coords, density):
@@ -321,7 +338,7 @@ class LessionEditor(QtGui.QMainWindow):
         else:
             idx = 1
         new_les = Lesion.create_lesion_from_pt(center, density, idx)
-        if self.active_data.models is not None and self.active_data.models['rv_heal'].mean() < density:
+        if self.active_data.models is not None and self.active_data.models['heal'].mean() < density:
             lbl = self.params['hyper_label']
         else:
             lbl = self.params['hypo_label']
@@ -359,8 +376,8 @@ class LessionEditor(QtGui.QMainWindow):
         # self.view_R.circle_active = True
 
     def action_show_color_model_callback(self):
-        if self.hist_widget is None:
-            self.hist_widget = Hist_widget(data=self.data_L.data)
+        if self.hist_widget.data is None and self.data_L.loaded:
+            self.hist_widget.set_data(self.data_L.data.data[np.nonzero(self.data_L.mask)])
         self.hist_widget.show()
         self.hist_widget.setFocus()
 
@@ -399,11 +416,8 @@ class LessionEditor(QtGui.QMainWindow):
             # coco.objects_filtration(self.selected_objects_labels, self.params, area=(min_area, max_area),
             #                         density=(min_density, max_density), compactness=min_comp)
             coco.objects_filtration(self.active_data, self.params, selected_labels=selected_objects_labels)
-        #TODO: nasleduje prasarna
-        if self.view_L.show_mode == self.view_L.SHOW_LABELS:
-            self.show_labels_L_callback()
-        if self.view_R.show_mode == self.view_R.SHOW_LABELS:
-            self.show_labels_R_callback()
+        self.update_view_L()
+        self.update_view_R()
         # self.activateWindow()
         # self.objects_widget.activateWindow()
 
@@ -424,11 +438,13 @@ class LessionEditor(QtGui.QMainWindow):
         filtered_idxs = coco.objects_filtration(self.active_data, self.params)
         if filtered_idxs is not None:
             self.fill_table(self.active_data.lesions, self.active_data.labels, filtered_idxs)
-            # TODO: nasleduje prasarna
-            if self.view_L.show_mode == self.view_L.SHOW_LABELS:
-                self.show_labels_L_callback()
-            if self.view_R.show_mode == self.view_R.SHOW_LABELS:
-                self.show_labels_R_callback()
+            # # TODO: nasleduje prasarna
+            # if self.view_L.show_mode == self.view_L.SHOW_LABELS:
+            #     self.show_labels_L_callback()
+            # if self.view_R.show_mode == self.view_R.SHOW_LABELS:
+            #     self.show_labels_R_callback()
+            self.update_view_L()
+            self.update_view_R()
 
     def load_parameters(self, config_path='config.xml'):
         config = ConfigParser.ConfigParser()
@@ -488,13 +504,13 @@ class LessionEditor(QtGui.QMainWindow):
         im_R = self.get_image('R')
         if self.show_mode_L == SHOW_CONTOURS:
             labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
-            obj_centers_L = self.data_L.object_centers[self.actual_slice_L, ...]
+            obj_centers_L = self.data_L.object_centers_filt[self.actual_slice_L, ...]
         else:
             labels_L = None
             obj_centers_L = None
         if self.show_mode_R == SHOW_CONTOURS:
             labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
-            obj_centers_R = self.data_R.object_centers[self.actual_slice_R, ...]
+            obj_centers_R = self.data_R.object_centers_filt[self.actual_slice_R, ...]
         else:
             labels_R = None
             obj_centers_R = None
@@ -519,7 +535,7 @@ class LessionEditor(QtGui.QMainWindow):
         im_L = self.get_image('L')
         if self.show_mode_L == SHOW_CONTOURS:
             labels_L = self.data_L.labels_filt[self.actual_slice_L, :, :]
-            obj_centers = self.data_L.object_centers[self.actual_slice_L, ...]
+            obj_centers = self.data_L.object_centers_filt[self.actual_slice_L, ...]
         else:
             labels_L = None
             obj_centers = None
@@ -540,7 +556,7 @@ class LessionEditor(QtGui.QMainWindow):
         im_R = self.get_image('R')
         if self.show_mode_R == SHOW_CONTOURS:
             labels_R = self.data_R.labels_filt[self.actual_slice_R, :, :]
-            obj_centers = self.data_R.object_centers[self.actual_slice_R, ...]
+            obj_centers = self.data_R.object_centers_filt[self.actual_slice_R, ...]
         else:
             labels_R = None
             obj_centers = None
@@ -562,11 +578,18 @@ class LessionEditor(QtGui.QMainWindow):
     def update_models(self):
         if self.hist_widget is None:
             self.hist_widget = Hist_widget(data=self.data_L.data)
-        self.hist_widget.update_heal_rv(self.active_data.models['rv_heal'])
-        self.hist_widget.update_hypo_rv(self.active_data.models['rv_hypo'])
-        self.hist_widget.update_hyper_rv(self.active_data.models['rv_hyper'])
+        self.hist_widget.set_models(self.active_data.models)
+        # self.hist_widget.update_heal_rv(self.active_data.models['heal'])
+        # self.hist_widget.update_hypo_rv(self.active_data.models['hypo'])
+        # self.hist_widget.update_hyper_rv(self.active_data.models['hyper'])
 
-        self.hist_widget.update_figures()
+        # self.hist_widget.update_figures()
+
+    def update_models_from_widget(self, mean, std, key):
+        # key = 'heal'
+        # print key, self.active_data.models[key].mean(),
+        self.active_data.models[key] = scista.norm(mean, std)
+        # print self.active_data.models[key].mean()
 
     def run_callback(self):
         # Viewer_3D.run(self.data)
@@ -583,9 +606,12 @@ class LessionEditor(QtGui.QMainWindow):
         areas = [x.area for x in self.active_data.lesions]
         self.objects_widget.set_area_range(areas)
 
+        densities = [x.mean_density for x in self.active_data.lesions]
+        self.objects_widget.set_density_range(densities)
+
         # filling table with objects
-        objects_labels = [x.label for x in self.active_data.lesions]
-        self.fill_table(self.active_data.lesions, self.active_data.objects, objects_labels)
+        # objects_labels = [x.label for x in self.active_data.lesions]
+        # self.fill_table(self.active_data.lesions, self.active_data.objects, objects_labels)
 
         self.ui.show_labels_L_BTN.setEnabled(True)
         self.ui.show_contours_L_BTN.setEnabled(True)
@@ -700,6 +726,8 @@ class LessionEditor(QtGui.QMainWindow):
         self.statusBar().showMessage('data_R set to labels')
 
     def show_contours_L_callback(self):
+        if self.show_mode_L == SHOW_CONTOURS:
+            self.view_L.contours_mode_is_fill = not self.view_L.contours_mode_is_fill
         self.show_mode_L = SHOW_CONTOURS
         self.view_L.show_mode = self.view_L.SHOW_CONTOURS
 
@@ -707,19 +735,35 @@ class LessionEditor(QtGui.QMainWindow):
         labels = self.data_L.labels_filt[self.actual_slice_L, :, :]
         # obj_centers = [self.data_L.object_centers[:2] if self.data_L.object_centers[2] == self.actual_slice_L]
         # obj_centers = [x[1:] for x in self.data_L.object_centers if round(x[0]) == self.actual_slice_L]
-        self.view_L.setSlice(im, contours=labels, centers=self.data_L.object_centers[self.actual_slice_L,...])
+        self.view_L.setSlice(im, contours=labels, centers=self.data_L.object_centers_filt[self.actual_slice_L,...])
 
         self.statusBar().showMessage('data_L set to contours')
 
     def show_contours_R_callback(self):
+        if self.show_mode_R == SHOW_CONTOURS:
+            self.view_R.contours_mode_is_fill = not self.view_R.contours_mode_is_fill
         self.show_mode_R = SHOW_CONTOURS
         self.view_R.show_mode = self.view_R.SHOW_CONTOURS
 
         im = self.get_image('R')
         labels = self.data_R.labels_filt[self.actual_slice_R, :, :]
-        self.view_R.setSlice(im, contours=labels)
+        self.view_R.setSlice(im, contours=labels, centers=self.data_R.object_centers_filt[self.actual_slice_R,...])
 
         self.statusBar().showMessage('data_R set to contours')
+
+    def update_view_L(self):
+        if self.show_view_L:
+            if self.view_L.show_mode == self.view_L.SHOW_LABELS:
+                self.show_labels_L_callback()
+            elif self.view_L.show_mode == self.view_L.SHOW_CONTOURS:
+                self.show_contours_L_callback()
+
+    def update_view_R(self):
+        if self.show_view_R:
+            if self.view_R.show_mode == self.view_R.SHOW_LABELS:
+                self.show_labels_R_callback()
+            elif self.view_R.show_mode == self.view_R.SHOW_CONTOURS:
+                self.show_contours_R_callback()
 
     def figure_L_CB_callback(self):
         if self.ui.figure_L_CB.currentIndex() == 0:
@@ -771,7 +815,7 @@ class LessionEditor(QtGui.QMainWindow):
         print fname
 
     def remove_obj_BTN_callback(self):
-        indexes = self.ui.objects_TV.selectionModel().selectedRows()
+        indexes = self.objects_widget.ui.objects_TV.selectionModel().selectedRows()
         # for i in reversed(indexes):
         #     self.table_model.removeRow(i.row())
         for i in indexes:
@@ -781,11 +825,13 @@ class LessionEditor(QtGui.QMainWindow):
         # objects_labels = [x.label for x in self.active_data.lesions]
         filtered_idxs = coco.objects_filtration(self.active_data, self.params)
         self.fill_table(self.active_data.lesions, self.active_data.objects, filtered_idxs)
-        #TODO: nasleduje prasarna
-        if self.view_L.show_mode == self.view_L.SHOW_LABELS:
-            self.show_labels_L_callback()
-        if self.view_R.show_mode == self.view_R.SHOW_LABELS:
-            self.show_labels_R_callback()
+        # #TODO: nasleduje prasarna
+        # if self.view_L.show_mode == self.view_L.SHOW_LABELS:
+        #     self.show_labels_L_callback()
+        # if self.view_R.show_mode == self.view_R.SHOW_LABELS:
+        #     self.show_labels_R_callback()
+        self.update_view_L()
+        self.update_view_R()
 
     def remove_object(self, obj):
         lbl = obj.label

@@ -56,7 +56,7 @@ def estimate_healthy_pdf(data, mask, params):
     perc = params['perc']
     k_std_l = params['k_std_h']
     simple_estim = params['healthy_simple_estim']
-    show_me = params['show_healthy_pdf_estim']
+    # show_me = params['show_healthy_pdf_estim']
 
     # data = tools.smoothing_tv(data.astype(np.uint8), tv_weight)
     ints = data[np.nonzero(mask)]
@@ -83,44 +83,44 @@ def estimate_healthy_pdf(data, mask, params):
         inners = ints[np.nonzero(inners_m)]
 
         # liver pdf -------------
-        mu = bins[peak_idx] + params['hack_healthy_mu']
-        sigma = k_std_l * np.std(inners) + params['hack_healthy_sigma']
+        mu = bins[peak_idx]# + params['hack_healthy_mu']
+        sigma = k_std_l * np.std(inners)# + params['hack_healthy_sigma']
 
     mu = int(mu)
     sigma = int(sigma)
     rv = scista.norm(mu, sigma)
 
-    if show_me:
-        plt.figure()
-        plt.subplot(211)
-        plt.plot(bins, hist)
-        plt.title('histogram with max peak')
-        plt.hold(True)
-        plt.plot([mu, mu], [0, hist.max()], 'g')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        # plt.subplot(212), plt.plot(bins, rv_l.pdf(bins), 'g')
-        x = np.arange(0, 256, 0.1)
-        plt.subplot(212), plt.plot(x, rv.pdf(x), 'g')
-        plt.hold(True)
-        plt.plot(mu, rv.pdf(mu), 'go')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('estimated normal pdf of healthy parenchym')
-        # plt.show()
+    # if show_me:
+    #     plt.figure()
+    #     plt.subplot(211)
+    #     plt.plot(bins, hist)
+    #     plt.title('histogram with max peak')
+    #     plt.hold(True)
+    #     plt.plot([mu, mu], [0, hist.max()], 'g')
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     # plt.subplot(212), plt.plot(bins, rv_l.pdf(bins), 'g')
+    #     x = np.arange(0, 256, 0.1)
+    #     plt.subplot(212), plt.plot(x, rv.pdf(x), 'g')
+    #     plt.hold(True)
+    #     plt.plot(mu, rv.pdf(mu), 'go')
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     plt.title('estimated normal pdf of healthy parenchym')
+    #     # plt.show()
 
     return rv
 
 def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
     prob_w = params['prob_w']
-    show_me = params['show_outlier_pdf_estim']
+    # show_me = params['show_outlier_pdf_estim']
 
-    if outlier_type == 'hypo':
-        hack_mu = params['hack_hypo_mu']
-        hack_sigma = params['hack_hypo_sigma']
-    elif outlier_type == 'hyper':
-        hack_mu = params['hack_hyper_mu']
-        hack_sigma = params['hack_hyper_sigma']
+    # if outlier_type == 'hypo':
+    #     hack_mu = params['hack_hypo_mu']
+    #     hack_sigma = params['hack_hypo_sigma']
+    # elif outlier_type == 'hyper':
+    #     hack_mu = params['hack_hyper_mu']
+    #     hack_sigma = params['hack_hyper_sigma']
 
     probs = rv_healthy.pdf(data) * mask
     # hist, bins = skiexp.histogram(probs, nbins=100)
@@ -156,32 +156,32 @@ def estimate_outlier_pdf(data, mask, rv_healthy, outlier_type, params):
     mu, sigma = scista.norm.fit(ints)
 
     # hack for moving pdfs of hypo and especially of hyper furhter from the pdf of healthy parenchyma
-    mu += hack_mu
-    sigma += hack_sigma
+    # mu += hack_mu
+    # sigma += hack_sigma
     #-----------
 
     mu = int(mu)
     sigma = int(sigma)
     rv = scista.norm(mu, sigma)
 
-    if show_me:
-        plt.figure()
-        plt.subplot(211)
-        plt.plot(bins, hist)
-        plt.title('histogram with max peak')
-        plt.hold(True)
-        plt.plot([mu, mu], [0, hist.max()], 'g')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        # plt.subplot(212), plt.plot(bins, rv_l.pdf(bins), 'g')
-        x = np.arange(0, 256, 0.1)
-        plt.subplot(212), plt.plot(x, rv.pdf(x), 'g')
-        plt.hold(True)
-        plt.plot(mu, rv.pdf(mu), 'go')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('estimated normal pdf of %sdense obejcts' % outlier_type)
-        plt.show()
+    # if show_me:
+    #     plt.figure()
+    #     plt.subplot(211)
+    #     plt.plot(bins, hist)
+    #     plt.title('histogram with max peak')
+    #     plt.hold(True)
+    #     plt.plot([mu, mu], [0, hist.max()], 'g')
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     # plt.subplot(212), plt.plot(bins, rv_l.pdf(bins), 'g')
+    #     x = np.arange(0, 256, 0.1)
+    #     plt.subplot(212), plt.plot(x, rv.pdf(x), 'g')
+    #     plt.hold(True)
+    #     plt.plot(mu, rv.pdf(mu), 'go')
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     plt.title('estimated normal pdf of %sdense obejcts' % outlier_type)
+    #     plt.show()
 
     return rv
 
@@ -192,11 +192,11 @@ def get_unaries(data, mask, models, params):
     # mu_heal = models['mu_heal']
     mu_heal = rv_heal.mean()
 
-    if params['erode_mask']:
-        if data.ndim == 3:
-            mask = tools.eroding3D(mask, skimor.disk(5), slicewise=True)
-        else:
-            mask = skimor.binary_erosion(mask, np.ones((5, 5)))
+    # if params['erode_mask']:
+    #     if data.ndim == 3:
+    #         mask = tools.eroding3D(mask, skimor.disk(5), slicewise=True)
+    #     else:
+    #         mask = skimor.binary_erosion(mask, np.ones((5, 5)))
 
     unaries_healthy = - rv_heal.logpdf(data) * mask
     if params['unaries_as_cdf']:
@@ -234,34 +234,34 @@ def get_unaries(data, mask, models, params):
     # plt.show()
 
     # self.params['show_unaries'] = True
-    if params['show_unaries']:
-        ints = data[np.nonzero(mask)]
-        hist, bins = skiexp.histogram(ints, nbins=256)
-        x = np.arange(0, 255, 0.01)
-        healthy = rv_heal.pdf(x)
-        if params['unaries_as_cdf']:
-            hypo = (1 - rv_hypo.cdf(x)) * rv_heal.pdf(mu_heal)
-            hyper = rv_hyper.cdf(x) * rv_heal.pdf(mu_heal)
-        else:
-            hypo = rv_hypo.pdf(x)
-            hyper = rv_hyper.pdf(x)
-
-        plt.figure()
-        plt.subplot(211)
-        plt.plot(bins, hist)
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('histogram of input data')
-        plt.subplot(212)
-        plt.plot(x, hypo, 'm')
-        plt.hold(True)
-        plt.plot(x, healthy, 'g')
-        plt.plot(x, hyper, 'r')
-        ax = plt.axis()
-        plt.axis([0, 256, ax[2], ax[3]])
-        plt.title('histogram of input data')
-        plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
-        plt.show()
+    # if params['show_unaries']:
+    #     ints = data[np.nonzero(mask)]
+    #     hist, bins = skiexp.histogram(ints, nbins=256)
+    #     x = np.arange(0, 255, 0.01)
+    #     healthy = rv_heal.pdf(x)
+    #     if params['unaries_as_cdf']:
+    #         hypo = (1 - rv_hypo.cdf(x)) * rv_heal.pdf(mu_heal)
+    #         hyper = rv_hyper.cdf(x) * rv_heal.pdf(mu_heal)
+    #     else:
+    #         hypo = rv_hypo.pdf(x)
+    #         hyper = rv_hyper.pdf(x)
+    #
+    #     plt.figure()
+    #     plt.subplot(211)
+    #     plt.plot(bins, hist)
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     plt.title('histogram of input data')
+    #     plt.subplot(212)
+    #     plt.plot(x, hypo, 'm')
+    #     plt.hold(True)
+    #     plt.plot(x, healthy, 'g')
+    #     plt.plot(x, hyper, 'r')
+    #     ax = plt.axis()
+    #     plt.axis([0, 256, ax[2], ax[3]])
+    #     plt.title('histogram of input data')
+    #     plt.legend(['hypodense pdf', 'healthy pdf', 'hyperdense pdf'])
+    #     plt.show()
 
     return unaries
 

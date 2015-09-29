@@ -9,19 +9,22 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
+- tools
+    - resize3D - nepouzivat cv2 ale skimage (cv2 se hur instaluje a je velky - pouziva se jen resize)
 - objects_widget
     - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
 - pocitani kompaktnosti
 - dve faze
     - registrace
     - srovnani vysledku
-- resize - nepouzivat cv2 ale skimage
+- setup.py - pridani ikon
+- Lesion - prepocet velikosti (voxely -> ml)
 
 ---------------------------------------
 DETAILY -------------------------------
 - min/max_area_SL_changed  - je tam prasarna, aby se aktualizovala vizualizace labelu uz pri pohybu slideru
 - inicializaci hist_widget delat hned v __init__ Lesitoru (nutno po nacteni dat priradit data do hist_widgetu)
-
+- sjednotit nazvy - vsude jen jedno S
 
 
 

@@ -25,7 +25,7 @@ def classify(bpairs_dat, k):
 
 
 def calculate_clustering_distance():
-
+    pass
 
 
 def run(data, B, n_observations, k_min, k_max):
@@ -49,4 +49,5 @@ if __name__ == '__main__':
     n = 10
     B = 5
     n_observations = 1
+    data = None
     run(data, B, n_observations, k_min, k_max)

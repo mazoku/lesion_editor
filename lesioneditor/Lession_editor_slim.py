@@ -88,8 +88,8 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L = data_view_widget.SliceBox(self)
         self.view_R = data_view_widget.SliceBox(self)
 
-        self.data_1 = None
-        self.data_2 = None
+        self.data_1 = Data.Data()
+        self.data_2 = Data.Data()
 
         # self.healthy_label = healthy_label
         # self.hypo_label = hypo_label
@@ -102,16 +102,34 @@ class LessionEditor(QtGui.QMainWindow):
         self.show_mode_R = SHOW_IM
 
         # load parameters
-        self.params = self.load_parameters()
-        self.win_l = self.params['win_level']
-        self.win_w = self.params['win_width']
+        self.params = {
+            'win_l': 50,
+            'win_w': 350,
+            'alpha': 4,
+            'beta': 1,
+            'zoom': 0,
+            'scale': 0.25,
+            'perc': 30,
+            'k_std_h': 3,
+            'healthy_simple_estim': 0,
+            'prob_w': 0.0001,
+            'unaries_as_cdf': 0,
+            'bgd_label': 0,
+            'hypo_label': 1,
+            'healthy_label': 2,
+            'hyper_label': 3
+            # 'voxel_size': (1, 1, 1)
+        }
+        # self.params.update(self.load_parameters())
+        # self.win_l = self.params['win_level']
+        # self.win_w = self.params['win_width']
 
         self.actual_slice_L = 0
         self.actual_slice_R = 0
 
         self.selected_objects_labels = None  # list of objects' labels selected in tableview
 
-        self.voxel_size = self.params['voxel_size']
+        # self.voxel_size = self.params['voxel_size']
         self.view_widget_width = 50
         self.two_views = False
 
@@ -303,18 +321,18 @@ class LessionEditor(QtGui.QMainWindow):
             self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
 
         # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_L.setup_widget(self.data_L.data_aview.shape[:-1], self.voxel_size)
-        self.view_L.setCW(self.win_l, 'c')
-        self.view_L.setCW(self.win_w, 'w')
+        self.view_L.setup_widget(self.data_L.data_aview.shape[:-1], self.params['voxel_size'][1:])
+        self.view_L.setCW(self.params['win_l'], 'c')
+        self.view_L.setCW(self.params['win_w'], 'w')
         self.view_L.setSlice(self.data_L.data_aview[...,0])
         # mouse click signal
         self.view_L.mouseClickSignal.connect(self.mouse_click_event)
         self.view_L.mousePressEvent = self.view_L.myMousePressEvent
 
         # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_R.setup_widget(self.data_R.data_aview.shape[:-1], self.voxel_size)
-        self.view_R.setCW(self.win_l, 'c')
-        self.view_R.setCW(self.win_w, 'w')
+        self.view_R.setup_widget(self.data_R.data_aview.shape[:-1], self.params['voxel_size'][1:])
+        self.view_R.setCW(self.params['win_l'], 'c')
+        self.view_R.setCW(self.params['win_w'], 'w')
         self.view_R.setSlice(self.data_R.data_aview[...,0])
         if not self.show_view_L:
             self.view_L.setVisible(False)
@@ -499,9 +517,9 @@ class LessionEditor(QtGui.QMainWindow):
             self.update_view_L()
             self.update_view_R()
 
-    def load_parameters(self, config_path='config.xml'):
+    def load_parameters(self, config_path='config.ini'):
         config = ConfigParser.ConfigParser()
-        config.read('config.ini')
+        config.read(config_path)
 
         params = dict()
 
@@ -1004,6 +1022,6 @@ if __name__ == '__main__':
 
     # starting application
     app = QtGui.QApplication(sys.argv)
-    le = LessionEditor(datap1=datap_1, datap2=datap_2)
+    le = LessionEditor(datap1=datap_1)#, datap2=datap_2)
     le.show()
     sys.exit(app.exec_())

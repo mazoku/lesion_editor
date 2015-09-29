@@ -430,7 +430,7 @@ def eroding3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
     return data
 
 
-def resize3D(data, scale=None, shape=None,sliceId=2, method='cv2'):
+def resize3D(data, scale=None, shape=None, sliceId=2, method='cv2'):
     if sliceId == 2:
         n_slices = data.shape[2]
         # new_shape = cv2.resize(data[:,:,0], None, fx=scale, fy=scale).shape
@@ -443,30 +443,90 @@ def resize3D(data, scale=None, shape=None,sliceId=2, method='cv2'):
                 new_data[:,:,i] = cv2.resize(data[:,:,i], (0,0),  fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
             else:
                 new_data[:,:,i] = scindiint.zoom(data[:,:,i], scale)
+
     elif sliceId == 0:
         n_slices = data.shape[0]
-        # new_shape = cv2.resize(data[0,:,:], None, fx=scale, fy=scale).shape
-        # new_shape = skitra.rescale(data[0,:,:], scale).shape
-        if scale is not None:
-            # new_shape = scindiint.zoom(data[0,:,:], scale).shape
-            # new_shape = np.hstack((n_slices, scindiint.zoom(data[0,:,:], scale).shape))
-            new_shape = np.hstack((n_slices, cv2.resize(data[0,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST).shape))
-            # new_data = np.zeros(new_shape, dtype=np.int)
-        else:
-            new_shape = shape
-        new_data = np.zeros(new_shape, dtype=np.int)
+        # if scale is not None:
+        #     new_shape = np.hstack((n_slices, cv2.resize(data[0,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST).shape))
+        # else:
+        #     new_shape = shape
+        # new_data = np.zeros(new_shape, dtype=np.int)
 
-        for i in range(n_slices):
-            # new_data[i,:,:] = cv2.resize(data[i,:,:], None, fx=scale, fy=scale)
-            # new_data[i,:,:] = (255 * skitra.rescale(data[i,:,:], scale)).astype(np.int)
-            if method == 'cv2':
-                if scale is not None:
-                    new_data[i,:,:] = cv2.resize(data[i,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-                elif shape is not None:
-                    new_data[i,:,:] = cv2.resize(data[i,:,:], new_shape[1:][::-1], interpolation=cv2.INTER_NEAREST)
-            else:
-                new_data[i,:,:] = scindiint.zoom(data[i,:,:], scale)
+
+
+        if method == 'cv2':
+            if scale is not None:
+                new_shape = np.hstack((n_slices, cv2.resize(data[0,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST).shape))
+                new_data = np.zeros(new_shape, dtype=np.int)
+                for i in range(n_slices):
+                    new_data[i, :, :] = cv2.resize(data[i,:,:], (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+            elif shape is not None:
+                new_shape = shape
+                new_data = np.zeros(new_shape, dtype=np.int)
+                for i in range(n_slices):
+                    new_data[i, :, :] = cv2.resize(data[i,:,:], new_shape[1:][::-1], interpolation=cv2.INTER_NEAREST)
+
+        elif method == 'skimage':
+            if scale is not None:
+                new_shape = np.hstack((n_slices, data.shape[1] * scale, data.shape[2] * scale))
+            elif shape is not None:
+                new_shape = shape
+            new_data = skitra.resize(data, new_shape, mode='nearest', preserve_range=True)
+            # new_data = skitra.resize(data, new_shape, mode='wrap', preserve_range=True)
+
+        else:
+            for i in range(n_slices):
+                # new_data[i, :, :] = scindiint.zoom(data[i,:,:], scale)
+                pass
     return new_data
+
+def resize_to_shape(data, shape, zoom=None, mode='nearest', order=0):
+    """
+    Function resize input data to specific shape.
+    :param data: input 3d array-like data
+    :param shape: shape of output data
+    :param zoom: zoom is used for back compatibility
+    :mode: default is 'nearest'
+    """
+    try:
+        import skimage
+        import skimage.transform
+# Now we need reshape  seeds and segmentation to original size
+
+        segm_orig_scale = skimage.transform.resize(
+            data, shape, order=0,
+            preserve_range=True
+        )
+
+        segmentation = segm_orig_scale
+    except:
+        import scipy
+        import scipy.ndimage
+        dtype = data.dtype
+        if zoom is None:
+            zoom = shape / np.asarray(data.shape).astype(np.double)
+
+        segm_orig_scale = scipy.ndimage.zoom(
+            data,
+            1.0 / zoom,
+            mode=mode,
+            order=order
+        ).astype(dtype)
+
+        shp = [
+            np.min([segm_orig_scale.shape[0], shape[0]]),
+            np.min([segm_orig_scale.shape[1], shape[1]]),
+            np.min([segm_orig_scale.shape[2], shape[2]]),
+        ]
+
+        segmentation = np.zeros(shape, dtype=dtype)
+        segmentation[
+            0:shp[0],
+            0:shp[1],
+            0:shp[2]] = segm_orig_scale[0:shp[0], 0:shp[1], 0:shp[2]]
+
+        del segm_orig_scale
+    return segmentation
 
 
 def get_overlay(mask, alpha=0.3, color='r'):

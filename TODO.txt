@@ -11,6 +11,7 @@ VZHLED  --------------------------------
 FUNKCNOST ------------------------------
 - tools
     - resize3D - nepouzivat cv2 ale skimage (cv2 se hur instaluje a je velky - pouziva se jen resize)
+        - otestovat mirovo resize_to_shape
 - objects_widget
     - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
 - pocitani kompaktnosti

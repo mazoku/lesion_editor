@@ -570,8 +570,6 @@
     <addaction name="action_calculate_color_model"/>
     <addaction name="separator"/>
     <addaction name="action_run"/>
-    <addaction name="action_delete"/>
-    <addaction name="action_restart"/>
    </widget>
    <widget class="QMenu" name="menuShow">
     <property name="title">

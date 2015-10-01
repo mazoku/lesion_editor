@@ -9,8 +9,8 @@ datap = dr.Get3DData(fname, dataplus_format=True)
 a = datap['data3d']
 a = a[15:18, 150:160, 150:160]
 
-b = tools.resize3D(a, scale = 0.5, sliceId=0)
-c = tools.resize3D(a, scale = 0.5, sliceId=0)
+b = tools.resize3D(a, scale = 0.5)
+c = tools.resize3D(a, scale = 0.5)
 
 # print 'ORIG:'
 # print a

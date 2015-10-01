@@ -1022,6 +1022,6 @@ if __name__ == '__main__':
 
     # starting application
     app = QtGui.QApplication(sys.argv)
-    le = LessionEditor(datap1=datap_1)#, datap2=datap_2)
+    le = LessionEditor(datap1=datap_1, datap2=datap_2)
     le.show()
     sys.exit(app.exec_())

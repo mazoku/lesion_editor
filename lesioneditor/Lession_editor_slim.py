@@ -120,7 +120,7 @@ class LessionEditor(QtGui.QMainWindow):
             'hyper_label': 3
             # 'voxel_size': (1, 1, 1)
         }
-        # self.params.update(self.load_parameters())
+        self.params.update(self.load_parameters())
         # self.win_l = self.params['win_level']
         # self.win_w = self.params['win_width']
 

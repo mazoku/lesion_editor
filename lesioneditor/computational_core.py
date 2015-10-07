@@ -30,7 +30,7 @@ from sklearn.cluster import KMeans
 
 import pickle
 
-import Viewer_3D
+from Viewer_3D import Viewer_3D
 
 import cv2
 
@@ -265,6 +265,54 @@ def get_unaries(data, mask, models, params):
 
     return unaries
 
+def add_heal_border_to_unaries(unaries, mask):
+    data_shape = mask.shape
+    unaries_shape = unaries.shape
+    unaries = unaries.reshape(np.hstack((data_shape, 3)))
+
+    # layer = skimor.binary_dilation(mask, selem=skimor.disk(1))# - mask
+    mask_d = tools.dilating3D(mask>0, selem=skimor.disk(2), slicewise=True, sliceId=0)
+    layer = mask_d - mask
+    # plt.figure()
+    # slice = 10
+    # plt.subplot(131), plt.imshow(mask_d[slice, : ,:], interpolation='nearest')
+    # plt.subplot(132), plt.imshow(mask[slice, : ,:], interpolation='nearest')
+    # plt.subplot(133), plt.imshow(layer[slice, : ,:], interpolation='nearest')
+    # plt.show()
+
+    heal_prob = 1#unaries.max()
+    hypo_prob = 0
+    hyper_prob = 0
+
+    # layer_coords = np.nonzero(layer)
+    # layer_idxs = np.ravel_multi_index(layer_coords, data_shape)
+    # tmp = np.zeros(unaries_shape[:1], dtype=np.uint8)
+    # tmp[layer_idxs] = 1
+    # slice = 10
+    # plt.figure()
+    # plt.subplot(121), plt.imshow(layer[slice, : ,:], interpolation='nearest')
+    # plt.subplot(122), plt.imshow(tmp.reshape(data_shape)[slice, : ,:], interpolation='nearest')
+    # plt.show()
+
+    # layer_v = layer.flatten()
+    # unaries_new = unaries.copy()
+    # unaries_new[:, :, 0] = np.where(layer_v, hypo_prob, unaries[:, :, 0])
+    # unaries_new[:, :, 1] = np.where(layer_v, heal_prob, unaries[:, :, 1])
+    # unaries_new[:, :, 2] = np.where(layer_v, hyper_prob, unaries[:, :, 2])
+
+    unaries_new = unaries.copy()
+    unaries_new[:, :, :, 0] = np.where(layer, hypo_prob, unaries[:, :, :, 0])
+    unaries_new[:, :, :, 1] = np.where(layer, heal_prob, unaries[:, :, :, 1])
+    unaries_new[:, :, :, 2] = np.where(layer, hyper_prob, unaries[:, :, :, 2])
+
+    # slice = 10
+    # plt.figure()
+    # plt.subplot(121), plt.imshow(unaries[slice, : , :, 0], interpolation='nearest'), plt.colorbar()
+    # plt.subplot(122), plt.imshow(unaries_new[slice, : , :, 0], interpolation='nearest'), plt.colorbar()
+    # plt.show()
+    unaries_new = unaries_new.reshape(unaries_shape)
+    return unaries_new, mask_d
+
 # def mayavi_visualization(self, res):
 #     ### Read the data in a numpy 3D array ##########################################
 #     #parenchym = np.logical_or(liver, vessels)
@@ -423,9 +471,14 @@ def run_mrf(data_o, params):
         data = data_zoom(data_o.data, data_o.voxel_size, params['working_voxel_size_mm'])
         mask = data_zoom(data_o.mask, data_o.voxel_size, params['working_voxel_size_mm'])
     else:
-        data = tools.resize3D(data_o.data, params['scale'], sliceId=0)
-        mask = tools.resize3D(data_o.mask, params['scale'], sliceId=0)
+        data = tools.resize3D(data_o.data, params['scale'])
+        mask = np.round(tools.resize3D(data_o.mask, params['scale'])).astype(np.bool)
     print 'ok'
+
+    # smoothing the data
+    # data = tools.smoothing_tv(data, weight=5, output_as_uint8=False, sliceId=0)
+    # data = tools.smoothing_median(data, radius=3, mask=mask, sliceId=0)
+    # np.save('data.npy', data)
     # data = data.astype(np.uint8)
 
     # calculating intensity models if necesarry
@@ -436,12 +489,19 @@ def run_mrf(data_o, params):
     else:
         print 'already done'
 
+    # mask = tools.dilating3D(mask, selem=skimor.disk(1), slicewise=True, sliceId=0)
+    # mask = tools.eroding3D(mask, selem=skimor.disk(5), slicewise=True, sliceId=0)
+
     print 'calculating unary potentials ...',
     # self.status_bar.showMessage('Calculating unary potentials...')
     # create unaries
     # # as we convert to int, we need to multipy to get sensible values
     # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
     unaries = beta * get_unaries(data, mask, data_o.models, params)
+    # unaries, mask = add_heal_border_to_unaries(unaries, mask)
+    # np.save('unaries.npy', unaries)
+    # Viewer_3D(unaries[:,:,0].reshape(data.shape)).show()
+
     n_labels = unaries.shape[2]
     print 'ok'
 
@@ -482,14 +542,18 @@ def run_mrf(data_o, params):
     # self.status_bar.showMessage('Calculating graph cut...')
     result_graph = pygco.cut_from_graph(edges, unaries.reshape(-1, n_labels), pairwise)
     labels = result_graph.reshape(data.shape) + 1  # +1 to shift the first class to label number 1
+    # np.save('labels.npy', result_graph.reshape(data.shape))
 
     labels = np.where(mask, labels, params['bgd_label'])
+
+    # mask = tools.eroding3D(mask, selem=skimor.disk(2), slicewise=True, sliceId=0)
+    # labels *= mask
 
     # zooming to the original size
     if params['zoom']:
         data_o.labels = zoom_to_shape(labels, data_o.orig_shape)
     else:
-        data_o.labels = tools.resize3D(labels, shape=data_o.orig_shape, sliceId=0)#.astype(np.int64)
+        data_o.labels = np.round(tools.resize3D(labels, shape=data_o.orig_shape)).astype(np.int64)
 
     print 'ok'
     # self.status_bar.showMessage('Done')

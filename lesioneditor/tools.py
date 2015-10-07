@@ -257,18 +257,24 @@ def smoothing_bilateral(data, sigma_space=15, sigma_color=0.05, pseudo_3D='True'
     return data
 
 
-def smoothing_tv(data, weight=0.1, pseudo_3D=True, multichannel=False, sliceId=2):
+def smoothing_tv(data, weight=0.1, pseudo_3D=True, multichannel=False, output_as_uint8=True, sliceId=2):
     if data.ndim == 3 and pseudo_3D:
         if sliceId == 2:
             for idx in range(data.shape[2]):
                 temp = skifil.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
                 # temp = skires.denoise_tv_chambolle(data[:, :, idx], weight=weight, multichannel=multichannel)
-                data[:, :, idx] = (255 * temp).astype(np.uint8)
+                if output_as_uint8:
+                    data[:, :, idx] = (255 * temp).astype(np.uint8)
+                else:
+                    data[:, :, idx] = temp
         elif sliceId == 0:
             for idx in range(data.shape[0]):
                 temp = skifil.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
                 # temp = skires.denoise_tv_chambolle(data[idx, :, :], weight=weight, multichannel=multichannel)
-                data[idx, :, :] = (255 * temp).astype(np.uint8)
+                if output_as_uint8:
+                    data[idx, :, :] = (255 * temp).astype(np.uint8)
+                else:
+                    data[idx, :, :] = temp
     else:
         data = skifil.denoise_tv_chambolle(data, weight=weight, multichannel=False)
         # data = skires.denoise_tv_chambolle(data, weight=weight, multichannel=False)
@@ -291,7 +297,29 @@ def smoothing_gauss(data, sigma=1, pseudo_3D='True', sliceId=2):
         data = (255 * data).astype(np.uint8)
     return data
 
-
+# def smoothing_median(data, radius=3, mask=None, pseudo_3D='True', sliceId=2):
+#   #TODO: nefunguje spravne - pri filtrovani obrazu z int <0,1> vrati hodnotu > 1  => asi bug
+#     orig_min = data.min()
+#     orig_max = data.max()
+#     print data.min(), data.max(),
+#     data = skiexp.rescale_intensity(data, (orig_min, orig_max), (0, 1))
+#     data_s = np.zeros_like(data)
+#     print '->  ', data.min(), data.max()
+#     if data.ndim == 3 and pseudo_3D:
+#         if sliceId == 2:
+#             for idx in range(data.shape[2]):
+#                 data_s[:, :, idx] = skifil.median(data[:, :, idx], selem=skimor.disk(radius))#, mask=mask[:, :, idx])
+#         elif sliceId == 0:
+#             for idx in range(data.shape[0]):
+#                 data_s[idx, :, :] = skifil.median(data[idx, :, :], selem=skimor.disk(radius))#, mask=mask[idx, :, :])
+#                 if data_s[idx, :, :].max() > 1:
+#                     pass
+#     else:
+#         data_s = skifil.median(data, selem=skimor.disk(radius))#, mask=mask)
+#     print data_s.min(), data_s.max(),
+#     data = skiexp.rescale_intensity(data_s, (0, 1), (orig_min, orig_max))
+#     print '->  ', data.min(), data.max()
+#     return data
 
 def analyse_histogram(data, roi=None, debug=False, dens_min=20, dens_max=255, minT=0.95, maxT=1.05):
     if roi == None:
@@ -431,6 +459,19 @@ def eroding3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
     return data
 
 
+def dilating3D(data, selem=skimor.disk(3), slicewise=False, sliceId=0):
+    if slicewise:
+        if sliceId == 0:
+            for i in range(data.shape[0]):
+                data[i, :, :] = skimor.binary_dilation(data[i, :, :], selem)
+        elif sliceId == 2:
+            for i in range(data.shape[2]):
+                data[:, :, i] = skimor.binary_dilation(data[:, :, i], selem)
+    else:
+        data = scindimor.binary_dilation(data, selem)
+    return data
+
+
 def resize3D(data, scale=None, shape=None):
     n_slices = data.shape[0]
 
@@ -441,7 +482,8 @@ def resize3D(data, scale=None, shape=None):
             new_shape = shape
         else:  # no scale nor new shape given -> returning input data
             return data
-        new_data = skitra.resize(data, new_shape, order=1, mode='reflect', preserve_range=True)
+        # new_data = skitra.resize(data, new_shape, order=1, mode='reflect', preserve_range=True)
+        new_data = skitra.resize(data, new_shape, order=0, mode='nearest', preserve_range=True)
     except:
         dtype = data.dtype
         if scale is None:

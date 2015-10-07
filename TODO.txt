@@ -14,6 +14,9 @@ FUNKCNOST ------------------------------
         - otestovat mirovo resize_to_shape
 - Lesion - prepocet velikosti (voxely -> ml)
 - setup.py - pridani ikon
+- centroidy
+    - pro kazdy udelat narustani oblasti (rw, loregro apod.)
+    - pro kazdy urcit vlastni color model a udelat binarni MRF (mozna navazat na predchozi krok - zpresneni)
 - objects_widget
     - kdyz jsou handly blizko u sebe, neni videt cislo udavajici hodnotu -> nezobrazovat cisla, ale pridat line edity?
 - pocitani kompaktnosti

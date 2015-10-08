@@ -10,6 +10,11 @@ VZHLED  --------------------------------
 ----------------------------------------
 FUNKCNOST ------------------------------
 - setup.py - pridani ikon
+- moznost spustit bez dat
+    - disabled scrolbars
+    - chytreji inicializovat sliceboxy - ted odchytavam errory pri resizu a paintevent
+- nacitani dat
+    - divne se pridavaji do comboboxu
 - centroidy
     - pro kazdy udelat narustani oblasti (rw, loregro apod.)
     - pro kazdy urcit vlastni color model a udelat binarni MRF (mozna navazat na predchozi krok - zpresneni)

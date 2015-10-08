@@ -64,6 +64,9 @@ class LessionEditor(QtGui.QMainWindow):
         self.data_1 = Data.Data()
         self.data_2 = Data.Data()
 
+        self.data_L = None
+        self.data_R = None
+
         # self.healthy_label = healthy_label
         # self.hypo_label = hypo_label
         # self.hyper_label = hyper_label
@@ -111,7 +114,8 @@ class LessionEditor(QtGui.QMainWindow):
         self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
         self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)
 
-        self.setup_data(datap1, datap2)
+        if datap1 is not None or datap2 is not None:
+            self.setup_data(datap1, datap2)
 
        # creating object widget, linking its sliders and buttons
         self.objects_widget = Objects_widget()
@@ -173,79 +177,6 @@ class LessionEditor(QtGui.QMainWindow):
         self.ui.slice_L_SB.valueChanged.connect(self.slider_L_changed)
         self.ui.slice_R_SB.valueChanged.connect(self.slider_R_changed)
 
-        # # DATA ---------------------------------------------
-        # if datap1 is not None:
-        #     self.data_1 = Data.Data()
-        #     self.data_1.create_data(datap1, 'datap1')
-        #     self.params['voxel_size'] = datap1['voxelsize_mm']
-        # else:
-        #     self.data_1 = None
-        # if datap2 is not None:
-        #     self.data_2 = Data.Data()
-        #     self.data_2.create_data(datap2, 'datap2')
-        # else:
-        #     self.data_2 = None
-        # #--------------------------------------------------
-
-        # if self.data_1.loaded:
-        #     self.hist_widget = Hist_widget(data=self.data_1.data[np.nonzero(self.data_1.mask)])
-        # else:
-        #     self.hist_widget = Hist_widget()
-        # self.hist_widget.heal_parameter_changed.connect(self.update_models_from_widget)
-        # self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
-        # self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)
-
-        # self.area_hist_widget = ahw.AreaHistWidget()
-
-        # computational core
-        ## self.coco = Computational_core.Computational_core(fname, self.params, self.statusBar())
-        # if self.data_1.loaded:
-        #     self.ui.figure_L_CB.addItem(self.data_1.filename.split('/')[-1])
-        #     self.ui.figure_R_CB.addItem(self.data_1.filename.split('/')[-1])
-        #     self.data_L = self.data_1
-        #     self.active_data_idx = 1
-        #     self.active_data = self.data_1
-        #     if not self.data_2.loaded:
-        #         self.data_R = self.data_1
-        # if self.data_2.loaded:
-        #     # self.ui.serie_2_RB.setText('Serie #2: ' + self.cc.data_2.filename.split('/')[-1])
-        #     self.ui.figure_L_CB.addItem(self.data_2.filename.split('/')[-1])
-        #     self.ui.figure_R_CB.addItem(self.data_2.filename.split('/')[-1])
-        #     self.data_R = self.data_2
-        #     self.ui.figure_R_CB.setCurrentIndex(1)
-        #     if not self.data_1.loaded:
-        #         self.data_L = self.data_2
-        #         self.active_data = self.data_2
-        #         self.active_data_idx = 2
-
-        # seting up the range of the scrollbar to cope with the number of slices
-        # if self.active_data_idx == 1:
-        #     self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
-        #     self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
-        # else:
-        #     self.ui.slice_C_SB.setMaximum(self.data_2.n_slices - 1)
-        #     self.ui.slice_L_SB.setMaximum(self.data_2.n_slices - 1)
-
-        # if self.data_2.loaded:
-        #     self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
-
-        # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
-        # self.view_L.setCW(self.win_l, 'c')
-        # self.view_L.setCW(self.win_w, 'w')
-        # self.view_L.setSlice(self.data_L.data_aview[...,0])
-        # # mouse click signal
-        # self.view_L.mouseClickSignal.connect(self.mouse_click_event)
-        # self.view_L.mousePressEvent = self.view_L.myMousePressEvent
-
-        # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
-        # self.view_R.setCW(self.win_l, 'c')
-        # self.view_R.setCW(self.win_w, 'w')
-        # self.view_R.setSlice(self.data_R.data_aview[...,0])
-        # if not self.show_view_L:
-        #     self.view_L.setVisible(False)
-        # if not self.show_view_R:
-        #     self.view_R.setVisible(False)
-
         # to be able to capture key press events immediately
         self.setFocus()
 
@@ -294,25 +225,28 @@ class LessionEditor(QtGui.QMainWindow):
 
             self.ui.slice_R_SB.setMaximum(self.data_2.n_slices - 1)
 
-        # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_L.setup_widget(self.data_L.data_aview.shape[:-1], self.params['voxel_size'][1:])
-        self.view_L.setCW(self.params['win_l'], 'c')
-        self.view_L.setCW(self.params['win_w'], 'w')
-        self.view_L.setSlice(self.data_L.data_aview[...,0])
-        # mouse click signal
-        self.view_L.mouseClickSignal.connect(self.mouse_click_event)
-        self.view_L.mousePressEvent = self.view_L.myMousePressEvent
+        if self.data_L is not None:
+            # self.view_L = data_view_widget.SliceBox(self)
+            # self.view_L = data_view_widget.SliceBox(self.data_L.data_aview.shape[:-1], self.voxel_size, self)
+            self.view_L.setup_widget(self.data_L.data_aview.shape[:-1], self.params['voxel_size'][1:])
+            self.view_L.setCW(self.params['win_l'], 'c')
+            self.view_L.setCW(self.params['win_w'], 'w')
+            self.view_L.setSlice(self.data_L.data_aview[...,0])
+            # mouse click signal
+            self.view_L.mouseClickSignal.connect(self.mouse_click_event)
+            self.view_L.mousePressEvent = self.view_L.myMousePressEvent
 
-        # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
-        self.view_R.setup_widget(self.data_R.data_aview.shape[:-1], self.params['voxel_size'][1:])
-        self.view_R.setCW(self.params['win_l'], 'c')
-        self.view_R.setCW(self.params['win_w'], 'w')
-        self.view_R.setSlice(self.data_R.data_aview[...,0])
-        if not self.show_view_L:
-            self.view_L.setVisible(False)
-        if not self.show_view_R:
-            self.view_R.setVisible(False)
-
+        if self.data_R is not None:
+            # self.view_R = data_view_widget.SliceBox(self)
+            # self.view_R = data_view_widget.SliceBox(self.data_R.data_aview.shape[:-1], self.voxel_size, self)
+            self.view_R.setup_widget(self.data_R.data_aview.shape[:-1], self.params['voxel_size'][1:])
+            self.view_R.setCW(self.params['win_l'], 'c')
+            self.view_R.setCW(self.params['win_w'], 'w')
+            self.view_R.setSlice(self.data_R.data_aview[...,0])
+            if not self.show_view_L:
+                self.view_L.setVisible(False)
+            if not self.show_view_R:
+                self.view_R.setVisible(False)
 
     def keyPressEvent(self, QKeyEvent):
         print 'key event: ',
@@ -996,6 +930,8 @@ if __name__ == '__main__':
 
     # starting application
     app = QtGui.QApplication(sys.argv)
-    le = LessionEditor(datap1=datap_1, datap2=datap_2)
+    # le = LessionEditor(datap1=datap_1, datap2=datap_2)
+    le = LessionEditor(datap1=datap_1)
+    # le = LessionEditor()
     le.show()
     sys.exit(app.exec_())

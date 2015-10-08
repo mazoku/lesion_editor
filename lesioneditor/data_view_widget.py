@@ -186,7 +186,10 @@ class SliceBox(QLabel):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawImage(event.rect(), self.image)
+        try:
+            painter.drawImage(event.rect(), self.image)
+        except:
+            pass
         painter.end()
 
     def get_contours(self, img, sl):
@@ -388,25 +391,28 @@ class SliceBox(QLabel):
         self.setPixmap(QPixmap.fromImage(self.image))
 
     def resizeEvent(self, event):
-        new_height = self.height()
-        new_grid_height = new_height / float(self.slice_size[1])
-        mul_height = new_grid_height / self.grid[1]
-        # mul_width = mul_height
+        try:
+            new_height = self.height()
+            new_grid_height = new_height / float(self.slice_size[1])
+            mul_height = new_grid_height / self.grid[1]
+            # mul_width = mul_height
 
-        new_width = self.width()
-        new_grid_width = new_width / float(self.slice_size[0])
-        mul_width = new_grid_width / self.grid[0]
+            new_width = self.width()
+            new_grid_width = new_width / float(self.slice_size[0])
+            mul_width = new_grid_width / self.grid[0]
 
-        # self.grid = np.array(self.grid) * mul_height
-        # self.grid =  np.array(self.grid)
-        # self.grid[0] *= mul_width
-        # self.grid[1] *= mul_height
-        self.grid_res[0] = self.grid[0] * mul_width
-        self.grid_res[1] = self.grid[1] * mul_height
-        # print self.grid, self.grid_res
+            # self.grid = np.array(self.grid) * mul_height
+            # self.grid =  np.array(self.grid)
+            # self.grid[0] *= mul_width
+            # self.grid[1] *= mul_height
+            self.grid_res[0] = self.grid[0] * mul_width
+            self.grid_res[1] = self.grid[1] * mul_height
+            # print self.grid, self.grid_res
 
-        self.resizeSlice()
-        self.updateSlice()
+            self.resizeSlice()
+            self.updateSlice()
+        except:
+            pass
 
     def set_width(self, new_width):
         new_grid = new_width / float(self.slice_size[0])

@@ -11,6 +11,7 @@ import tools
 # from mayavi import mlab
 # import TumorVisualiser
 # import Viewer_3D
+from os import path
 
 import io3d
 import ConfigParser
@@ -48,6 +49,19 @@ class LessionEditor(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent=None)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # seting up icons
+        cur_path = path.abspath(__file__)
+        head, tail = path.split(cur_path)
+        self.ui.view_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
+        self.ui.show_im_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
+        self.ui.show_labels_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
+        self.ui.show_contours_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
+
+        self.ui.view_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
+        self.ui.show_im_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
+        self.ui.show_labels_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
+        self.ui.show_contours_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
 
         # uprava stylu pro lepsi vizualizaci splitteru
         QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
@@ -93,7 +107,8 @@ class LessionEditor(QtGui.QMainWindow):
             'bgd_label': 0,
             'hypo_label': 1,
             'healthy_label': 2,
-            'hyper_label': 3
+            'hyper_label': 3,
+            'data_dir': '/home/tomas/Data/liver_segmentation/tryba/data_other'
             # 'voxel_size': (1, 1, 1)
         }
         self.params.update(self.load_parameters())

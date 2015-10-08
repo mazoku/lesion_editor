@@ -88,14 +88,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="crop_objects_BTN">
-       <property name="text">
-        <string>Crop</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="remove_obj_BTN">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
         <string>Remove</string>
        </property>
@@ -103,6 +102,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="add_obj_BTN">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="text">
         <string>Add</string>
        </property>

@@ -9,10 +9,6 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
-- tools
-    - resize3D - nepouzivat cv2 ale skimage (cv2 se hur instaluje a je velky - pouziva se jen resize)
-        - otestovat mirovo resize_to_shape
-- Lesion - prepocet velikosti (voxely -> ml)
 - setup.py - pridani ikon
 - centroidy
     - pro kazdy udelat narustani oblasti (rw, loregro apod.)

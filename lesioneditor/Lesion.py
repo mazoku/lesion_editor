@@ -43,7 +43,7 @@ def create_lesion_from_pt(pt, density, lbl, priority=PRIORITY_HIGH):
 class Lesion(object):
     """ This class represents lesions. """
 
-    def __init__(self, label, mask=None, data=None, priority=PRIORITY_LOW):
+    def __init__(self, label, mask=None, data=None, voxels2ml_k=1, priority=PRIORITY_LOW):
         self.label = label  # label of the lesion in segmented data; its identifier
 
         self.area = None  # area of the lesion
@@ -74,11 +74,11 @@ class Lesion(object):
         self.chord = None  # longest chord (tetiva in czech)
 
         if mask is not None:
-            self.compute_features(mask, data)
+            self.compute_features(mask, data, voxels2ml_k=voxels2ml_k)
 
-    def compute_features(self, mask, data):
+    def compute_features(self, mask, data, voxels2ml_k=1):
         # getting unique labels that are greater than 0 (0 = background, -1 = out of mask)
-        self.area = mask.sum()
+        self.area = mask.sum() * voxels2ml_k
 
         s, r, c = np.nonzero(mask)
 
@@ -106,7 +106,7 @@ class Lesion(object):
         return 'label=%i, area=%i, mean_dens=%.2f, mean_dens_std=%.2f, center=[%.1f, %.1f, %.1f]' % (
             self.label, self.area, self.mean_density, self.mean_density_std, self.center[0], self.center[1], self.center[2])
 
-def extract_lesions(labels, data=None):
+def extract_lesions(labels, data=None, voxels2ml_k=1):
     """
     For each label in 'labels' it creates an instance. Returns list of lesions.
     :param labels: labeled data, lesions have label > 0 (0 = background, -1 = points outside a mask)
@@ -117,7 +117,7 @@ def extract_lesions(labels, data=None):
 
     for i in lb_list:
         im = labels == i
-        lesion = Lesion(i, mask=im, data=data)
+        lesion = Lesion(i, mask=im, data=data, voxels2ml_k=voxels2ml_k)
         lesions.append(lesion)
 
     return lesions
@@ -131,7 +131,7 @@ if __name__ == '__main__':
                        [3, 0, 4, 0, 0]], dtype=np.int)
     labels = np.dstack((labels, labels, labels))
 
-    lesions = extract_lesions(labels, data=labels)
+    lesions = extract_lesions(labels, data=labels, voxels2ml_k=1)
 
     for i in lesions:
         print i

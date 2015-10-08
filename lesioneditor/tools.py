@@ -6,12 +6,12 @@ from skimage.segmentation import mark_boundaries
 import os
 import glob
 import dicom
-import cv2
+# import cv2
 # from skimage import measure
 import skimage.measure as skimea
 import skimage.morphology as skimor
 import skimage.transform as skitra
-import skimage.filter as skifil
+import skimage.color as skicol
 # import skimage.restoration as skires
 import skimage.filter as skifil
 import skimage.segmentation as skiseg
@@ -165,40 +165,40 @@ def change_slice_index(data):
     return data_reshaped
 
 
-def read_data(dcmdir, indices=None, wildcard='*.dcm', type=np.int16):
-
-    dcmlist = []
-    for infile in glob.glob(os.path.join(dcmdir, wildcard)):
-        dcmlist.append(infile)
-
-    if indices == None:
-        indices = range(len(dcmlist))
-
-    data3d = []
-    for i in range(len(indices)):
-        ind = indices[i]
-        onefile = dcmlist[ind]
-        if wildcard == '*.dcm':
-            data = dicom.read_file(onefile)
-            data2d = data.pixel_array
-            try:
-                data2d = (np.float(data.RescaleSlope) * data2d) + np.float(data.RescaleIntercept)
-            except:
-                print('problem with RescaleSlope and RescaleIntercept')
-        else:
-            data2d = cv2.imread(onefile, 0)
-
-        if len(data3d) == 0:
-            shp2 = data2d.shape
-            data3d = np.zeros([shp2[0], shp2[1], len(indices)], dtype=type)
-
-        data3d[:,:,i] = data2d
-
-    #need to reshape data to have slice index (ndim==3)
-    if data3d.ndim == 2:
-        data3d.resize(np.hstack((data3d.shape,1)))
-
-    return data3d
+# def read_data(dcmdir, indices=None, wildcard='*.dcm', type=np.int16):
+#
+#     dcmlist = []
+#     for infile in glob.glob(os.path.join(dcmdir, wildcard)):
+#         dcmlist.append(infile)
+#
+#     if indices == None:
+#         indices = range(len(dcmlist))
+#
+#     data3d = []
+#     for i in range(len(indices)):
+#         ind = indices[i]
+#         onefile = dcmlist[ind]
+#         if wildcard == '*.dcm':
+#             data = dicom.read_file(onefile)
+#             data2d = data.pixel_array
+#             try:
+#                 data2d = (np.float(data.RescaleSlope) * data2d) + np.float(data.RescaleIntercept)
+#             except:
+#                 print('problem with RescaleSlope and RescaleIntercept')
+#         else:
+#             data2d =  cv2.imread(onefile, 0)
+#
+#         if len(data3d) == 0:
+#             shp2 = data2d.shape
+#             data3d = np.zeros([shp2[0], shp2[1], len(indices)], dtype=type)
+#
+#         data3d[:,:,i] = data2d
+#
+#     #need to reshape data to have slice index (ndim==3)
+#     if data3d.ndim == 2:
+#         data3d.resize(np.hstack((data3d.shape,1)))
+#
+#     return data3d
 
 
 def windowing(data, level=50, width=300, sub1024=False, sliceId=2):
@@ -225,17 +225,17 @@ def windowing(data, level=50, width=300, sub1024=False, sliceId=2):
     return data.astype(np.uint8)
 
 
-def smoothing(data, d=10, sigmaColor=10, sigmaSpace=10, sliceId=2):
-    if data.ndim == 3:
-        if sliceId == 2:
-            for idx in range(data.shape[2]):
-                data[:, :, idx] = cv2.bilateralFilter( data[:, :, idx], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
-        elif sliceId == 0:
-            for idx in range(data.shape[0]):
-                data[idx, :, :] = cv2.bilateralFilter( data[idx, :, :], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
-    else:
-        data = cv2.bilateralFilter( data, d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
-    return data
+# def smoothing(data, d=10, sigmaColor=10, sigmaSpace=10, sliceId=2):
+#     if data.ndim == 3:
+#         if sliceId == 2:
+#             for idx in range(data.shape[2]):
+#                 data[:, :, idx] = cv2.bilateralFilter( data[:, :, idx], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+#         elif sliceId == 0:
+#             for idx in range(data.shape[0]):
+#                 data[idx, :, :] = cv2.bilateralFilter( data[idx, :, :], d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+#     else:
+#         data = cv2.bilateralFilter( data, d=d, sigmaColor=sigmaColor, sigmaSpace=sigmaSpace )
+#     return data
 
 
 def smoothing_bilateral(data, sigma_space=15, sigma_color=0.05, pseudo_3D='True', sliceId=2):
@@ -637,7 +637,8 @@ def slics_3D(im, pseudo_3D=True, n_segments=100, get_slicewise=False):
             suppxls_slicewise = np.zeros(im.shape)
         offset = 0
         for i in range(im.shape[0]):
-            suppxl = skiseg.slic(cv2.cvtColor(im[i,:,:], cv2.COLOR_GRAY2RGB), n_segments=n_segments)
+            # suppxl = skiseg.slic(cv2.cvtColor(im[i,:,:], cv2.COLOR_GRAY2RGB), n_segments=n_segments)
+            suppxl = skiseg.slic(skicol.gray2rgb(im[i,:,:]), n_segments=n_segments)
             suppxls[i,:,:] = suppxl + offset
             if get_slicewise:
                 suppxls_slicewise[i,:,:] = suppxl

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'objects_widget_GUI.ui'
 #
-# Created: Fri Sep 25 14:16:10 2015
+# Created: Thu Oct  8 07:02:14 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -70,13 +70,12 @@ class Ui_Form(object):
         self.verticalLayout.addLayout(self.density_layout)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.crop_objects_BTN = QtGui.QPushButton(Form)
-        self.crop_objects_BTN.setObjectName(_fromUtf8("crop_objects_BTN"))
-        self.horizontalLayout.addWidget(self.crop_objects_BTN)
         self.remove_obj_BTN = QtGui.QPushButton(Form)
+        self.remove_obj_BTN.setMaximumSize(QtCore.QSize(100, 16777215))
         self.remove_obj_BTN.setObjectName(_fromUtf8("remove_obj_BTN"))
         self.horizontalLayout.addWidget(self.remove_obj_BTN)
         self.add_obj_BTN = QtGui.QPushButton(Form)
+        self.add_obj_BTN.setMaximumSize(QtCore.QSize(100, 16777215))
         self.add_obj_BTN.setObjectName(_fromUtf8("add_obj_BTN"))
         self.horizontalLayout.addWidget(self.add_obj_BTN)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -95,7 +94,6 @@ class Ui_Form(object):
         self.label.setText(_translate("Form", "area [ml]:", None))
         self.label_2.setText(_translate("Form", "min. compactness=", None))
         self.label_3.setText(_translate("Form", "density [HU]:", None))
-        self.crop_objects_BTN.setText(_translate("Form", "Crop", None))
         self.remove_obj_BTN.setText(_translate("Form", "Remove", None))
         self.add_obj_BTN.setText(_translate("Form", "Add", None))
 

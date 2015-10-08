@@ -9,7 +9,7 @@ class MyTableModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent, *args)
 
         if headerdata is None:
-            headerdata = ['label', 'area', 'mean density', 'compactness']
+            headerdata = ['label', 'area [ml]', 'mean density', 'compactness']
 
         self.objects = objects  # lesion list
         self.headerdata = headerdata

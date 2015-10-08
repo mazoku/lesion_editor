@@ -6,51 +6,24 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.ndimage.morphology as scindimor
-import scipy.ndimage.measurements as scindimea
-import scipy.ndimage.interpolation as scindiint
-import scipy.ndimage as scindi
 import scipy.stats as scista
-
-import skimage.segmentation as skiseg
-import skimage.morphology as skimor
-import skimage.filter as skifil
-import skimage.exposure as skiexp
-import skimage.measure as skimea
-import skimage.transform as skitra
-
-# import cv2
-# import pygco
-
 import tools
-import py3DSeedEditor
 # from mayavi import mlab
-
-import TumorVisualiser
-import Viewer_3D
-
-from sklearn import metrics
-from sklearn.cluster import KMeans
-
-import pickle
+# import TumorVisualiser
+# import Viewer_3D
 
 import io3d
-
 import ConfigParser
 
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 
-
 from lession_editor_GUI_slim import Ui_MainWindow
-import Form_widget
 from hist_widget import Hist_widget
 from objects_widget import Objects_widget
 import My_table_model as mtm
 import area_hist_widget as ahw
-# import Computational_core
 import computational_core as coco
 import data_view_widget
 import Lesion
@@ -282,6 +255,7 @@ class LessionEditor(QtGui.QMainWindow):
             self.data_1 = Data.Data()
             self.data_1.create_data(datap1, 'datap1')
             self.params['voxel_size'] = datap1['voxelsize_mm']
+            self.params['voxels2ml_k'] = np.prod(self.params['voxel_size']) * 0.001
         if datap2 is not None:
             self.data_2 = Data.Data()
             self.data_2.create_data(datap2, 'datap2')

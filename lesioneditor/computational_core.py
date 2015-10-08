@@ -2,39 +2,19 @@ __author__ = 'tomas'
 
 
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.ndimage.morphology as scindimor
-import scipy.ndimage.measurements as scindimea
-import scipy.ndimage.interpolation as scindiint
 import scipy.ndimage as scindi
 import scipy.stats as scista
 
-import skimage.segmentation as skiseg
 import skimage.morphology as skimor
 import skimage.filter as skifil
 import skimage.exposure as skiexp
 import skimage.measure as skimea
-import skimage.transform as skitra
-
-import cv2
 import pygco
-
 import tools
-import py3DSeedEditor
 # from mayavi import mlab
+# import TumorVisualiser
+# from Viewer_3D import Viewer_3D
 
-import TumorVisualiser
-
-from sklearn import metrics
-from sklearn.cluster import KMeans
-
-import pickle
-
-from Viewer_3D import Viewer_3D
-
-import cv2
-
-import Data
 import Lesion
 
 import logging
@@ -566,7 +546,7 @@ def run_mrf(data_o, params):
     # self.status_bar.showMessage('Extracting objects ...'),
     labels_tmp = np.where(data_o.labels == params['healthy_label'], params['bgd_label'], data_o.labels)  # because we can set only one label as bgd
     data_o.objects = skimea.label(labels_tmp, background=params['bgd_label'])
-    data_o.lesions = Lesion.extract_lesions(data_o.objects, data_o.data)
+    data_o.lesions = Lesion.extract_lesions(data_o.objects, data_o.data, params['voxels2ml_k'])
     # self.status_bar.showMessage('Done')
     print 'ok'
 

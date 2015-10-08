@@ -1,7 +1,6 @@
 __author__ = 'tomas'
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 import sys
 
@@ -15,9 +14,6 @@ from PyQt4.QtGui import QImage, QDialog,\
 
 import skimage.morphology as skimor
 import skimage.io as skiio
-
-import area_hist_widget as ahw
-
 
 # BGRA order
 GRAY_COLORTABLE = np.array([[ii, ii, ii, 255] for ii in range(256)],

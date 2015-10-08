@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_slim_orez.ui'
 #
-# Created: Tue Sep 29 10:52:55 2015
+# Created: Thu Oct  8 07:00:58 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -330,8 +330,6 @@ class Ui_MainWindow(object):
         self.menuAction.addAction(self.action_calculate_color_model)
         self.menuAction.addSeparator()
         self.menuAction.addAction(self.action_run)
-        self.menuAction.addAction(self.action_delete)
-        self.menuAction.addAction(self.action_restart)
         self.menuShow.addAction(self.action_show_color_model)
         self.menuShow.addAction(self.action_show_object_list)
         self.menuTools.addAction(self.action_circle)

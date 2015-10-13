@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'lession_editor_GUI_slim.ui'
 #
-# Created: Tue Oct 13 13:10:20 2015
+# Created: Tue Oct 13 14:05:43 2015
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!

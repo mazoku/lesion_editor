@@ -49,7 +49,8 @@ class LesionEditorGUI(object):
         self.view_L_BTN.setMinimumSize(QtCore.QSize(22, 22))
         self.view_L_BTN.setMaximumSize(QtCore.QSize(22, 22))
         self.view_L_BTN.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.view_L_BTN.setToolTip(_fromUtf8("Enable / disable view window"))
+        # self.view_L_BTN.setToolTip(_fromUtf8("Enable / disable view window"))
+        self.view_L_BTN.setToolTip('Enable / disable view window')
         self.view_L_BTN.setIcon(QtGui.QIcon(os.path.join(head, 'icons', 'Eye.png')))
         self.view_L_BTN.setIconSize(QtCore.QSize(16, 16))
 
@@ -105,6 +106,7 @@ class LesionEditorGUI(object):
         self.view_R_BTN.setIconSize(QtCore.QSize(16, 16))
 
         self.show_im_R_BTN = QtGui.QPushButton()
+        self.show_im_R_BTN.setEnabled(False)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

@@ -30,6 +30,7 @@ class Data(object):
         self.n_cols = None
         self.n_slices = None
         self.models = None  # color models
+        self.processed = False
 
         # properties
         self.__data = data

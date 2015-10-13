@@ -49,6 +49,13 @@ class LessionEditor(QtGui.QMainWindow):
 
         QtGui.QWidget.__init__(self, parent=None)
         # self.ui = Ui_MainWindow()
+
+        self.setStyleSheet("""QToolTip {
+                           background-color: black;
+                           color: white;
+                           border: black solid 1px
+                           }""")
+
         self.ui = LesionEditorGUI()
         self.ui.setupUi(self)
 
@@ -598,6 +605,13 @@ class LessionEditor(QtGui.QMainWindow):
         coco.run_mrf(self.active_data, self.params)
         # self.active_data, self.models = coco.run_mrf(self.active_data, self.params, models=self.models)
         self.update_models()
+        self.active_data.processed = True
+        if self.show_view_L and self.data_L == self.active_data:
+            self.ui.show_labels_L_BTN.setEnabled(True)
+            self.ui.show_contours_L_BTN.setEnabled(True)
+        if self.show_view_R and self.data_R == self.active_data:
+            self.ui.show_labels_R_BTN.setEnabled(True)
+            self.ui.show_contours_R_BTN.setEnabled(True)
 
         # seting up range of area slider
         areas = [x.area for x in self.active_data.lesions]
@@ -649,31 +663,24 @@ class LessionEditor(QtGui.QMainWindow):
         # enabling and disabling other toolbar icons
         self.ui.show_im_L_BTN.setEnabled(self.show_view_L)
 
-        if self.show_view_L and self.data_L.labels is not None:
+        # if self.show_view_L and self.data_L.labels is not None:
+        if self.show_view_L and self.data_L.processed:
             self.ui.show_labels_L_BTN.setEnabled(True)
             self.ui.show_contours_L_BTN.setEnabled(True)
         else:
             self.ui.show_labels_L_BTN.setEnabled(False)
             self.ui.show_contours_L_BTN.setEnabled(False)
 
-        # if not self.show_view_L:
-            # self.ui.viewer_F.setFixedWidth(self.ui.viewer_F.width()/2)
-            # self.resize(self.height(), self.width() - self.ui.viewer_F.width()/2)
-
         # self.statusBar().showMessage('Left view set to %s' % self.show_view_L)
         # print 'view_1 set to', self.show_view_1
 
-        # self.form_widget.update_figures()
         self.view_L.update()
 
         # resizing back to one view size
         if self.show_view_L != self.show_view_R:  # logical XOR
-            print 'resizing'
             self.setMinimumSize(self.one_view_size)
             self.resize(self.one_view_size)
             self.setMinimumSize(QtCore.QSize(0, 0))
-
-        print 'one_view_size = ', self.one_view_size, ', current size = ', self.ui.viewer_F.size()
 
     def view_R_callback(self):
         if self.show_view_L != self.show_view_R:  # logical XOR
@@ -685,7 +692,8 @@ class LessionEditor(QtGui.QMainWindow):
         # enabling and disabling other toolbar icons
         self.ui.show_im_R_BTN.setEnabled(not self.ui.show_im_R_BTN.isEnabled())
 
-        if self.show_view_R and self.data_R.labels is not None:
+        # if self.show_view_R and self.data_R.labels is not None:
+        if self.show_view_R and self.data_R.processed:
             self.ui.show_labels_R_BTN.setEnabled(True)
             self.ui.show_contours_R_BTN.setEnabled(True)
         else:
@@ -699,7 +707,6 @@ class LessionEditor(QtGui.QMainWindow):
 
         # resizing back to one view size
         if self.show_view_L != self.show_view_R:  # logical XOR
-            print 'resizing'
             self.setMinimumSize(self.one_view_size)
             self.resize(self.one_view_size)
             self.setMinimumSize(QtCore.QSize(0, 0))

@@ -82,10 +82,11 @@ class SliceBox(QLabel):
         self.main = main
 
     def setup_widget(self, sliceSize, voxel_size):
-        height = 600
+        height = 400
         vscale = voxel_size / float(np.min(voxel_size))
         grid = height / float(sliceSize[1] * vscale[1])
         grid = (grid * vscale[0], grid * vscale[1])
+        # grid = (0.1, 0.1)
 
         # self.drawing = False
         # self.modified = False

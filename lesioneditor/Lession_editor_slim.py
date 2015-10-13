@@ -20,7 +20,8 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 
-from lession_editor_GUI_slim import Ui_MainWindow
+# from lession_editor_GUI_slim import Ui_MainWindow
+from lesion_editor_GUI_hand import LesionEditorGUI
 from hist_widget import Hist_widget
 from objects_widget import Objects_widget
 import My_table_model as mtm
@@ -47,21 +48,22 @@ class LessionEditor(QtGui.QMainWindow):
     def __init__(self, datap1=None, datap2=None):
 
         QtGui.QWidget.__init__(self, parent=None)
-        self.ui = Ui_MainWindow()
+        # self.ui = Ui_MainWindow()
+        self.ui = LesionEditorGUI()
         self.ui.setupUi(self)
 
         # seting up icons
-        cur_path = path.abspath(__file__)
-        head, tail = path.split(cur_path)
-        self.ui.view_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
-        self.ui.show_im_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
-        self.ui.show_labels_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
-        self.ui.show_contours_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
-
-        self.ui.view_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
-        self.ui.show_im_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
-        self.ui.show_labels_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
-        self.ui.show_contours_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
+        # cur_path = path.abspath(__file__)
+        # head, tail = path.split(cur_path)
+        # self.ui.view_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
+        # self.ui.show_im_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
+        # self.ui.show_labels_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
+        # self.ui.show_contours_L_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
+        #
+        # self.ui.view_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Eye.png')))
+        # self.ui.show_im_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Stock graph.png')))
+        # self.ui.show_labels_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Blue tag.png')))
+        # self.ui.show_contours_R_BTN.setIcon(QtGui.QIcon(path.join(head, 'icons', 'Brush.png')))
 
         # uprava stylu pro lepsi vizualizaci splitteru
         QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
@@ -218,6 +220,7 @@ class LessionEditor(QtGui.QMainWindow):
             self.active_data = self.data_1
             if not self.data_2.loaded:
                 self.data_R = self.data_1
+                self.ui.slice_R_SB.setMaximum(self.data_1.n_slices - 1)
 
             self.ui.slice_C_SB.setMaximum(self.data_1.n_slices - 1)
             self.ui.slice_L_SB.setMaximum(self.data_1.n_slices - 1)
@@ -513,7 +516,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_R.setSlice(im_R, contours=labels_R, centers=obj_centers_R)
 
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
-        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
+        # self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
 
     def slider_L_changed(self, val):
         if val == self.actual_slice_L:
@@ -537,7 +540,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_L.setSlice(im_L, contours=labels_L, centers=obj_centers)
 
         self.ui.slice_number_L_LBL.setText('%i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
-        self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
+        # self.ui.slice_number_C_LBL.setText('slice # = %i/%i' % (self.actual_slice_L + 1, self.data_L.n_slices))
 
     def slider_R_changed(self, val):
         if (val >= 0) and (val < self.data_R.n_slices):
@@ -558,15 +561,15 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_R.setSlice(im_R, contours=labels_R, centers=obj_centers)
 
     def calculate_models_callback(self):
-        self.statusBar().showMessage('Calculating intensity models...')
+        # self.statusBar().showMessage('Calculating intensity models...')
         if self.params['zoom']:
             data = self.data_zoom(self.active_data.data, self.active_data.voxel_size, self.params['working_voxel_size_mm'])
             mask = self.data_zoom(self.active_data.mask, self.active_data.voxel_size, self.params['working_voxel_size_mm'])
         else:
-            data = tools.resize3D(self.active_data.data, self.params['scale'], sliceId=0)
-            mask = tools.resize3D(self.active_data.mask, self.params['scale'], sliceId=0)
+            data = tools.resize3D(self.active_data.data, self.params['scale'])
+            mask = tools.resize3D(self.active_data.mask, self.params['scale'])
         self.active_data.models = coco.calculate_intensity_models(data, mask, self.params)
-        self.statusBar().showMessage('Intensity models calculated.')
+        # self.statusBar().showMessage('Intensity models calculated.')
         self.update_models()
 
     def update_models(self):
@@ -591,7 +594,7 @@ class LessionEditor(QtGui.QMainWindow):
         # viewer.show()
 
         # run localization
-        self.statusBar().showMessage('Localization started...')
+        # self.statusBar().showMessage('Localization started...')
         coco.run_mrf(self.active_data, self.params)
         # self.active_data, self.models = coco.run_mrf(self.active_data, self.params, models=self.models)
         self.update_models()
@@ -637,6 +640,9 @@ class LessionEditor(QtGui.QMainWindow):
 
 
     def view_L_callback(self):
+        if self.show_view_L != self.show_view_R:  # logical XOR
+            self.one_view_size = self.size()
+
         self.show_view_L = not self.show_view_L
         self.view_L.setVisible(self.show_view_L)
 
@@ -654,13 +660,25 @@ class LessionEditor(QtGui.QMainWindow):
             # self.ui.viewer_F.setFixedWidth(self.ui.viewer_F.width()/2)
             # self.resize(self.height(), self.width() - self.ui.viewer_F.width()/2)
 
-        self.statusBar().showMessage('Left view set to %s' % self.show_view_L)
+        # self.statusBar().showMessage('Left view set to %s' % self.show_view_L)
         # print 'view_1 set to', self.show_view_1
 
         # self.form_widget.update_figures()
         self.view_L.update()
 
+        # resizing back to one view size
+        if self.show_view_L != self.show_view_R:  # logical XOR
+            print 'resizing'
+            self.setMinimumSize(self.one_view_size)
+            self.resize(self.one_view_size)
+            self.setMinimumSize(QtCore.QSize(0, 0))
+
+        print 'one_view_size = ', self.one_view_size, ', current size = ', self.ui.viewer_F.size()
+
     def view_R_callback(self):
+        if self.show_view_L != self.show_view_R:  # logical XOR
+            self.one_view_size = self.size()
+
         self.show_view_R = not self.show_view_R
         self.view_R.setVisible(self.show_view_R)
 
@@ -674,14 +692,17 @@ class LessionEditor(QtGui.QMainWindow):
             self.ui.show_labels_R_BTN.setEnabled(False)
             self.ui.show_contours_R_BTN.setEnabled(False)
 
-        # if not self.show_view_R:
-        #     self.ui.viewer_F.setFixedWidth(self.ui.viewer_F.width()/2)
-
-        self.statusBar().showMessage('Right view set to %s' % self.show_view_R)
+        # self.statusBar().showMessage('Right view set to %s' % self.show_view_R)
         # print 'view_2 set to', self.show_view_2
 
-        # self.form_widget.update_figures()
         self.view_R.update()
+
+        # resizing back to one view size
+        if self.show_view_L != self.show_view_R:  # logical XOR
+            print 'resizing'
+            self.setMinimumSize(self.one_view_size)
+            self.resize(self.one_view_size)
+            self.setMinimumSize(QtCore.QSize(0, 0))
 
     def show_im_L_callback(self):
         self.show_mode_L = SHOW_IM
@@ -690,7 +711,7 @@ class LessionEditor(QtGui.QMainWindow):
         im = self.get_image('L')
         self.view_L.setSlice(im)
 
-        self.statusBar().showMessage('data_L set to im')
+        # self.statusBar().showMessage('data_L set to im')
 
     def show_im_R_callback(self):
         self.show_mode_R = SHOW_IM
@@ -699,7 +720,7 @@ class LessionEditor(QtGui.QMainWindow):
         im = self.get_image('R')
         self.view_R.setSlice(im)
 
-        self.statusBar().showMessage('data_R set to im')
+        # self.statusBar().showMessage('data_R set to im')
 
     def show_labels_L_callback(self):
         self.show_mode_L = SHOW_LABELS
@@ -708,7 +729,7 @@ class LessionEditor(QtGui.QMainWindow):
         im = self.get_image('L')
         self.view_L.setSlice(im)
 
-        self.statusBar().showMessage('data_L set to labels')
+        # self.statusBar().showMessage('data_L set to labels')
 
     def show_labels_R_callback(self):
         self.show_mode_R = SHOW_LABELS
@@ -717,7 +738,7 @@ class LessionEditor(QtGui.QMainWindow):
         im = self.get_image('R')
         self.view_R.setSlice(im)
 
-        self.statusBar().showMessage('data_R set to labels')
+        # self.statusBar().showMessage('data_R set to labels')
 
     def show_contours_L_callback(self):
         if self.show_mode_L == SHOW_CONTOURS:
@@ -734,7 +755,7 @@ class LessionEditor(QtGui.QMainWindow):
         # obj_centers = [x[1:] for x in self.data_L.object_centers if round(x[0]) == self.actual_slice_L]
         self.view_L.setSlice(im, contours=labels, centers=self.data_L.object_centers_filt[self.actual_slice_L,...])
 
-        self.statusBar().showMessage('data_L set to contours')
+        # self.statusBar().showMessage('data_L set to contours')
 
     def show_contours_R_callback(self):
         if self.show_mode_R == SHOW_CONTOURS:
@@ -749,7 +770,7 @@ class LessionEditor(QtGui.QMainWindow):
         labels = self.data_R.labels_filt[self.actual_slice_R, :, :]
         self.view_R.setSlice(im, contours=labels, centers=self.data_R.object_centers_filt[self.actual_slice_R,...])
 
-        self.statusBar().showMessage('data_R set to contours')
+        # self.statusBar().showMessage('data_R set to contours')
 
     def update_view_L(self):
         if self.show_view_L:

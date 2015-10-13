@@ -193,14 +193,19 @@ class SliceBox(QLabel):
             pass
         painter.end()
 
-    def get_contours(self, img, sl):
+    def get_contours(self, img, contours):
+        sl = contours.transpose().ravel(order='F')
         idxs = sl.nonzero()[0]
         keys = np.unique(sl[idxs])
         for ii in keys:
             if ii == 0:
                 continue
             aux = np.zeros_like(sl)
-            idxsi = np.where(sl == ii)[0]
+            if ii == 2:  # liver parenchyma
+                idxsi = np.where(sl > 0)[0]
+            else:
+                idxsi = np.where(sl == ii)[0]
+            # idxsi = np.where(sl == ii)[0]
             aux[idxsi] = 1
             cnt = self.gen_contours(aux)
 
@@ -284,7 +289,7 @@ class SliceBox(QLabel):
         if self.contours is not None:
             # if self.contour_mode == 'fill':
             if self.contours_mode_is_fill:
-                self.composeRgba(img, self.contours, CONTOURS_COLORTABLE)
+                self.composeRgba(img, self.contours.transpose().ravel(order='F'), CONTOURS_COLORTABLE)
             # elif self.contour_mode == 'contours':
             else:
                 self.get_contours(img, self.contours)
@@ -358,7 +363,8 @@ class SliceBox(QLabel):
             self.seeds = None
 
         if contours is not None and self.show_mode == self.SHOW_CONTOURS:
-            self.contours = contours.transpose().ravel(order='F')#self.act_transposition).ravel(order='F')
+            # self.contours = contours.transpose().ravel(order='F')#self.act_transposition).ravel(order='F')
+            self.contours = contours
             # self.contours = contours.transpose(self.act_transposition)
         else:
             self.contours = None

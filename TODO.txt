@@ -9,7 +9,6 @@ VZHLED  --------------------------------
 
 ----------------------------------------
 FUNKCNOST ------------------------------
-- setup.py - pridani ikon
 - moznost spustit bez dat
     - disabled scrolbars
     - chytreji inicializovat sliceboxy - ted odchytavam errory pri resizu a paintevent

@@ -4,6 +4,8 @@ __author__ = 'tomas'
 import numpy as np
 import scipy.ndimage as scindi
 import scipy.stats as scista
+import matplotlib.pyplot as plt
+import skfuzzy as fuzz
 
 import skimage.morphology as skimor
 import skimage.filter as skifil
@@ -438,6 +440,69 @@ def objects_filtration(data, params, selected_labels=None, area=None, density=No
 
     return filtered_lbls
 
+def fcm(img, mask, n_clusters=2, show=False):
+    if img.ndim == 2:
+        is_2D = True
+    else:
+        is_2D = False
+
+    coords = np.nonzero(mask)
+    data = img[coords]
+    # alldata = np.vstack((coords[0], coords[1], data))
+    alldata = data.reshape((1, data.shape[0]))
+
+    cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(alldata, n_clusters, 2, error=0.005, maxiter=1000, init=None)
+
+    # sorting the results in ascending order
+    idx = np.argsort(cntr[:, 0])
+    cntr = cntr[idx, :]
+    u = u[idx, :]
+
+    cm = np.argmax(u, axis=0) + 1  # cluster membership
+    labels = np.zeros(img.shape)
+    labels[coords] = cm
+    labels = labels.astype(np.int)
+
+    # calculating cluster memberships
+    mems = np.zeros(((n_clusters,) + img.shape))
+    for i in range(n_clusters):
+        cp = u[i, :] + 1  # cluster membership
+        mem = np.zeros(img.shape)
+        mem[coords] = cp
+        mems[i,...] = mem
+
+    if show:
+        if is_2D:
+            plt.figure()
+            plt.subplot(121), plt.imshow(img, 'gray', interpolation='nearest'), plt.axis('off'), plt.title('input')
+            plt.subplot(122), plt.imshow(labels, 'gray', interpolation='nearest'), plt.axis('off'), plt.title('fcm')
+        # else:
+            # py3DSeedEditor.py3DSeedEditor(labels).show()
+
+        plt.show()
+
+    return mems, labels, cntr, fpc
+
+def get_fuzzy_models(data, mask, n_clusters=3):
+    mems, labels, cntrs, fpc = fcm(data, mask, n_clusters=n_clusters)
+
+    rvs = list()
+    for i in range(1, labels.max() + 1):
+        pts = data[np.nonzero(labels==i)]
+        mu = np.mean(pts)
+        sigma = np.std(pts)
+
+        mu = int(mu)
+        sigma = int(sigma)
+        rvs.append(scista.norm(mu, sigma))
+
+    models = dict()
+    models['hypo'] = rvs[0]
+    models['heal'] = rvs[1]
+    models['hyper'] = rvs[2]
+
+    return models
+
 def run_mrf(data_o, params):
     # slice_idx = self.params['slice_idx']
     alpha = params['alpha']
@@ -478,6 +543,12 @@ def run_mrf(data_o, params):
     # # as we convert to int, we need to multipy to get sensible values
     # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
     unaries = beta * get_unaries(data, mask, data_o.models, params)
+    data_o.models = get_fuzzy_models(data, mask, n_clusters=3)
+    unaries = beta * get_unaries(data, mask, data_o.models, params)
+    # mems, cntrs, fpc = fcm(data, mask, n_clusters=3)
+    # unaries = np.dstack((mems[0,...].reshape(-1, 1), mems[1,...].reshape(-1, 1), mems[2,...].reshape(-1, 1)))
+    # unaries = (beta * 100 * unaries).astype(np.int32)
+
     # unaries, mask = add_heal_border_to_unaries(unaries, mask)
     # np.save('unaries.npy', unaries)
     # Viewer_3D(unaries[:,:,0].reshape(data.shape)).show()

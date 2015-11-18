@@ -133,7 +133,7 @@ class LessionEditor(QtGui.QMainWindow):
         self.view_widget_width = 50
         self.two_views = False
 
-        self.hist_widget = Hist_widget()
+        self.hist_widget = Hist_widget(params=self.params)
         self.hist_widget.heal_parameter_changed.connect(self.update_models_from_widget)
         self.hist_widget.hypo_parameter_changed.connect(self.update_models_from_widget)
         self.hist_widget.hyper_parameter_changed.connect(self.update_models_from_widget)

@@ -291,8 +291,12 @@ class Hist_widget(QtGui.QWidget):
             plt.plot(x, fac * healthy_y, 'g', linewidth=2)
             plt.plot(x, fac * hypo_y, 'b', linewidth=2)
             plt.plot(x, fac * hyper_y, 'r', linewidth=2)
-        ax = plt.axis()
-        # plt.axis([0, 256, ax[2], ax[3]])
+        if self.params and self.params.has_key('win_level') and self.params.has_key('win_width'):
+            ax = plt.axis()
+            border = 5
+            xmin = self.params['win_level'] - self.params['win_width'] / 2 - border
+            xmax = self.params['win_level'] + self.params['win_width'] / 2 + border
+            plt.axis([xmin, xmax, ax[2], ax[3]])
         plt.gca().tick_params(direction='in', pad=1)
         plt.hold(False)
         # plt.grid(True)

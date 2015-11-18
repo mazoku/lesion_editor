@@ -542,8 +542,7 @@ def run_mrf(data_o, params):
     # create unaries
     # # as we convert to int, we need to multipy to get sensible values
     # unaries = (1 * np.dstack([unaries, -unaries]).copy("C")).astype(np.int32)
-    unaries = beta * get_unaries(data, mask, data_o.models, params)
-    data_o.models = get_fuzzy_models(data, mask, n_clusters=3)
+    # data_o.models = get_fuzzy_models(data, mask, n_clusters=3)
     unaries = beta * get_unaries(data, mask, data_o.models, params)
     # mems, cntrs, fpc = fcm(data, mask, n_clusters=3)
     # unaries = np.dstack((mems[0,...].reshape(-1, 1), mems[1,...].reshape(-1, 1), mems[2,...].reshape(-1, 1)))

@@ -270,11 +270,11 @@ class LesionEditorGUI(object):
         view_layout.addWidget(self.show_contours_L_BTN)
         view_layout.addWidget(self.figure_L_CB)
         view_layout.addWidget(self.line)
-        view_layout.addWidget(self.figure_R_CB)
         view_layout.addWidget(self.view_R_BTN)
         view_layout.addWidget(self.show_im_R_BTN)
         view_layout.addWidget(self.show_labels_R_BTN)
         view_layout.addWidget(self.show_contours_R_BTN)
+        view_layout.addWidget(self.figure_R_CB)
 
         scroll_layout.addWidget(self.slice_number_L_LBL)
         scroll_layout.addWidget(self.slice_L_SB)

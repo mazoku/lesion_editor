@@ -182,13 +182,16 @@ def get_unaries(data, mask, models, params):
 
     unaries_healthy = - rv_heal.logpdf(data) * mask
     if params['unaries_as_cdf']:
+        print 'TODO: get_unaries - proc se pri pocitani cdf nasobi rv_heal_pdf????'
         unaries_hyper = - np.log(rv_hyper.cdf(data) * rv_heal.pdf(mu_heal)) * mask
+        # unaries_hyper = - np.log(rv_hyper.cdf(data)) * mask  # TODO:NENI TOHLE SPRAVNEJSI?
         # removing zeros with second lowest value so the log(0) wouldn't throw a warning -
         tmp = 1 - rv_hypo.cdf(data)
         values = np.unique(tmp)
         tmp = np.where(tmp == 0, values[1], tmp)
         #-
         unaries_hypo = - np.log(tmp * rv_heal.pdf(mu_heal)) * mask
+        # unaries_hypo = - np.log(tmp) * mask  # TODO:NENI TOHLE SPRAVNEJSI?
         unaries_hypo = np.where(np.isnan(unaries_hypo), 0, unaries_hypo)
     else:
         unaries_hyper = - rv_hyper.logpdf(data) * mask

@@ -921,8 +921,8 @@ if __name__ == '__main__':
     # 2 hypo, 1 on the border --------------------
     # TODO: study ID 29 - 3/3, 2 velke spoji v jeden
     # slice = 17
-    fname_1 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_venous_5.0_B30f-.pklz'
-    fname_2 = '/home/tomas/Data/liver_segmentation/tryba/data_other/org-exp_183_46324212_arterial_5.0_B30f-.pklz'
+    fname_1 = '/home/tomas/Data/medical/dataset/183a_venous-.pklz'
+    fname_2 = '/home/tomas/Data/medical/dataset/183a_arterial-.pklz'
 
     # hypo in venous -----------------------
     # arterial - bad
